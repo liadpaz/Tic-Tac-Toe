@@ -11,8 +11,6 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private String lobby_id = "";
-
     Button btn_singleplayer;
     Button btn_mutltiplayer;
     Button btn_exit;
