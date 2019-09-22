@@ -2,6 +2,8 @@ package com.example.tic_tac_toe;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,7 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.net.InetSocketAddress;
 import java.net.Socket;
 
 public class JoinMultiplayer extends AppCompatActivity implements View.OnClickListener, TextWatcher {
@@ -21,10 +22,9 @@ public class JoinMultiplayer extends AppCompatActivity implements View.OnClickLi
     EditText et_name_join;
     EditText et_ip;
 
-    Socket mSocket;
+    Socket client_socket;
 
-    String host_name, client_name;
-    boolean host_side, client_side;
+    String client_name, lobby_ip;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,17 +49,30 @@ public class JoinMultiplayer extends AppCompatActivity implements View.OnClickLi
     public void onClick(View view) {
         if (view == this.btn_return_join) {
             try {
-                mSocket.close();
+                client_socket.close();
                 finish();
             } catch (Exception e) {
                 finish();
             }
         } else if (view == this.btn_join) {
             try {
-                mSocket.connect( new InetSocketAddress(et_ip.getText().toString(), 1337));
+                lobby_ip = et_ip.getText().toString();
+                client_name = et_name_join.getText().toString();
 
+                ConnectSocket cs = new ConnectSocket(client_name);
+                cs.execute("192.168.1.5", "8820");
+
+                //client_socket = new Socket(lobby_ip, 8820);
+                //Utils.sendInitClientMessage(client_socket, client_name);
+                Toast.makeText(getApplicationContext(), "Succesfully joined lobby!", Toast.LENGTH_LONG).show();
             } catch (Exception e) {
-                Toast.makeText(getApplicationContext(), "Couldn't join the room\nMake sure that the ip is correct...", Toast.LENGTH_LONG).show();
+                try {
+                    client_socket.close();
+                } catch (Exception ignored) {
+                } finally {
+//                    Toast.makeText(getApplicationContext(), "Couldn't join the room\nMake sure that the ip is correct...", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
+                }
             }
         }
     }
@@ -79,6 +92,25 @@ public class JoinMultiplayer extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void afterTextChanged(Editable editable) {
-
     }
+}
+
+class ConnectSocket extends AsyncTask<String, Void, Socket> {
+    private String name;
+    public ConnectSocket(String name) {
+        this.name = name;
+    }
+
+    public Socket doInBackground(String... params) {
+        try {
+            Socket socket = new Socket(params[0], Integer.parseInt(params[1]));
+            Utils.sendInitClientMessage(socket, name);
+            return socket;
+        } catch (Exception ignored) {
+            throw new Exception();
+        } finally {
+            return null;
+        }
+    }
+
 }

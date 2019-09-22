@@ -13,7 +13,6 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class SettingsActivity extends AppCompatActivity implements View.OnClickListener, NumberPicker.OnValueChangeListener, CompoundButton.OnCheckedChangeListener {
 
@@ -113,7 +112,6 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                         .putExtra("Timer", timer)
                         .putExtra("HostName", et_name_host.getText())
                         .putExtra("Multiplayer", "Host");
-                Toast.makeText(getApplicationContext(), multiplayer_lobby.getStringExtra("HostName"), Toast.LENGTH_LONG).show();
                 startActivity(multiplayer_lobby);
             }
         }

@@ -1,13 +1,5 @@
 package com.example.tic_tac_toe;
 
-import android.os.AsyncTask;
-import android.os.Build;
-import android.util.Log;
-
-import androidx.annotation.RequiresApi;
-
-import org.xmlpull.v1.sax2.Driver;
-
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -40,7 +32,32 @@ public class Utils {
         return null;
     }
 
-    public static String getPublicIPAddress() {
-        return null;
+    public static String getSocketMessage(Socket socket, String type) throws Exception{
+        String rawInput = new BufferedReader(new InputStreamReader(socket.getInputStream())).readLine();
+        String[] input = rawInput.split(" ");
+        return input[0].equals(type) ? input[1] : null;
+    }
+
+    private static void sendSocketMessage(Socket socket, String type, String message) throws Exception {
+        PrintWriter output = new PrintWriter(socket.getOutputStream());
+        output.println(String.format("%s %s", type, message));
+        output.close();
+    }
+
+    public static void sendInitHostMessage(Socket socket, String name, String ip) throws Exception{
+        sendSocketMessage(socket, "Host Name", name);
+        sendSocketMessage(socket, "Host IP", ip);
+    }
+
+    public static void sendHostMessage(Socket socket, String type, String param) throws Exception{
+        sendSocketMessage(socket, "Host " + type, param);
+    }
+
+    public static void sendInitClientMessage(Socket socket, String name) throws Exception{
+        sendSocketMessage(socket, "Client Name", name);
+    }
+
+    public static void sendClientMessage(Socket socket, String type, String param) throws Exception{
+        sendSocketMessage(socket, "Client " + type, param);
     }
 }
