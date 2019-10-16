@@ -1,11 +1,29 @@
 package com.example.tic_tac_toe;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.Toast;
 
-public class Utils {
-    public static String getIPAddress(boolean useIPv4) {
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
+class Utils {
+    public enum Mode {Singleplayer, Multiplayer};
+
+    static String getIPAddress(boolean useIPv4) {
         try {
             List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
             for (NetworkInterface intf : interfaces) {
@@ -27,37 +45,157 @@ public class Utils {
                     }
                 }
             }
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
         return null;
     }
+}
 
-    public static String getSocketMessage(Socket socket, String type) throws Exception{
-        String rawInput = new BufferedReader(new InputStreamReader(socket.getInputStream())).readLine();
-        String[] input = rawInput.split(" ");
-        return input[0].equals(type) ? input[1] : null;
+class Database implements ValueEventListener {
+
+    private static String value;
+    private static String key;
+
+    public static String Value() {
+        return value;
     }
 
-    private static void sendSocketMessage(Socket socket, String type, String message) throws Exception {
-        PrintWriter output = new PrintWriter(socket.getOutputStream());
-        output.println(String.format("%s %s", type, message));
-        output.close();
+//    public void writeLobbyDatabase(String type, String message) {
+//        lobbyRef.child(type).setValue(message);
+//    }
+//
+//    public void writeClientDatabase(String query, String type, String message) {
+//        if (query.equals("Lobby"))
+//            lobbyRef.child(type).setValue(message);
+//        else if (query.equals("Games"))
+//            gamesRef.child(type).setValue(message);
+//    }
+
+    static void readServer(String... children) throws Exception {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        for (String child: children) {
+            reference = reference.child(child);
+        }
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                value = dataSnapshot.getValue(String.class);
+                key   = dataSnapshot.getKey();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        reference.child("KeepAlive").setValue(1);
     }
 
-    public static void sendInitHostMessage(Socket socket, String name, String ip) throws Exception{
-        sendSocketMessage(socket, "Host Name", name);
-        sendSocketMessage(socket, "Host IP", ip);
+    @Override
+    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+        Toast.makeText(new JoinMultiplayer().getApplicationContext(), "Reading",Toast.LENGTH_LONG).show();
+        value = dataSnapshot.getValue(String.class);
     }
 
-    public static void sendHostMessage(Socket socket, String type, String param) throws Exception{
-        sendSocketMessage(socket, "Host " + type, param);
+    @Override
+    public void onCancelled(@NonNull DatabaseError databaseError) {
+        Log.w("", "loadInfo:onCancelled", databaseError.toException());
+    }
+}
+
+class Cell {
+    public enum Type {
+        X,
+        O
     }
 
-    public static void sendInitClientMessage(Socket socket, String name) throws Exception{
-        sendSocketMessage(socket, "Client Name", name);
+    private ImageView[] XO;
+    private Type type;
+    private boolean visible = false;
+
+    public Cell(ImageView[] XO) {
+        this.XO = XO;
+        XO[0].setVisibility(View.INVISIBLE);
+        XO[1].setVisibility(View.INVISIBLE);
+        XO[0].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.setVisibility(View.VISIBLE);
+            }
+        });
+        XO[1].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
-    public static void sendClientMessage(Socket socket, String type, String param) throws Exception{
-        sendSocketMessage(socket, "Client " + type, param);
+    public boolean setType(Type type) {
+        if (!visible) {
+            this.type = type;
+            if (type == Type.X)
+                XO[0].setVisibility(View.VISIBLE);
+            else if (type == Type.O)
+                XO[1].setVisibility(View.VISIBLE);
+            return true;
+        }
+        return false;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    void setLocation(int x, int y) {
+        for (ImageView iv : XO) {
+            iv.setX(x);
+            iv.setY(y);
+        }
+    }
+
+    void setSize(int x) {
+        for (ImageView iv : XO) {
+            iv.setLayoutParams(new ConstraintLayout.LayoutParams(x, x));
+        }
+    }
+
+    void setClickable(Type type) {
+        if (type == Type.X) {
+            XO[0].setClickable(true);
+            XO[1].setClickable(false);
+        } else if (type == Type.O) {
+            XO[0].setClickable(true);
+            XO[1].setClickable(false);
+        }
+    }
+}
+
+class Player {
+    public enum Type {
+        Human,
+        CPU
+    }
+
+    private final Type playerType;
+    private int wins = 0;
+    private final Cell.Type XO;
+
+    public Player(Type player, Cell.Type type) {
+        playerType = player;
+        this.XO = type;
+    }
+
+    public void won() {
+        wins++;
+    }
+
+    public Cell.Type getXO() {
+        return XO;
+    }
+
+    public int[] getRandom() {
+        if (playerType == Type.Human) return null;
+        return new int[] {new Random().nextInt(3), new Random().nextInt(3)};
     }
 }

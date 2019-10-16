@@ -12,11 +12,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LobbyActivity" />
-        <activity android:name=".JoinMultiplayer" />
-        <activity android:name=".Game" />
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".LobbyActivity"
+            android:resizeableActivity="false"
+            android:screenOrientation="portrait" />
+        <activity android:name=".JoinMultiplayer"
+            android:resizeableActivity="false"
+            android:screenOrientation="portrait" />
+        <activity android:name=".Game"
+            android:resizeableActivity="false"
+            android:screenOrientation="portrait" />
+        <activity android:name=".SettingsActivity"
+            android:resizeableActivity="false"
+            android:screenOrientation="portrait" />
+        <activity android:name=".MainActivity"
+            android:resizeableActivity="false"
+            android:screenOrientation="portrait" >
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

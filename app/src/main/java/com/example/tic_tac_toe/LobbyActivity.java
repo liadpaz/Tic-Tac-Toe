@@ -12,36 +12,31 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.OnLifecycleEvent;
-import java.net.Socket;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class LobbyActivity extends AppCompatActivity implements View.OnClickListener {
 
-    Socket host_socket;
-    Socket client_socket;
+    protected Button btn_exit_lobby;
 
-    Button btn_exit_lobby;
+    protected TextView tv_host_name;
+    protected TextView tv_client_name;
+    protected TextView tv_room_ip;
 
-    TextView tv_host_name;
-    TextView tv_client_name;
-    TextView tv_room_ip;
+    protected Switch sw_host;
+    protected Switch sw_client;
 
-    Switch sw_host;
-    Switch sw_client;
+    protected CheckBox ckbx_ready;
 
-    CheckBox ckbx_ready;
+    protected String multiplayer_mode = "";
+    protected String server_address;
+    protected String host_name;
+    protected String client_name = null;
 
-    String multiplayer_mode = "";
-    String server_address;
-    String host_name;
-    String client_name = null;
+    protected boolean ready_host = false, ready_client = false;
+    protected boolean type_host = false, type_client = false;
 
-    boolean ready_host = false, ready_client = false;
-    boolean type_host = false, type_client = false;
-
-    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,16 +64,10 @@ public class LobbyActivity extends AppCompatActivity implements View.OnClickList
                 if (multiplayer_mode.equals("Host")) {
                     ready_host = isChecked;
                     sw_host.setEnabled(!isChecked);
-                    try {
-                        Utils.sendHostMessage(host_socket, "Ready", String.valueOf(isChecked));
-                    } catch (Exception ignored) {}
                 }
                 else if (multiplayer_mode.equals("Client")) {
                     ready_client = isChecked;
                     sw_client.setEnabled(!isChecked);
-                    try {
-                        Utils.sendClientMessage(client_socket, "Ready", String.valueOf(isChecked));
-                    } catch (Exception ignored) {}
                 }
             }
         });
@@ -86,59 +75,24 @@ public class LobbyActivity extends AppCompatActivity implements View.OnClickList
         if (multiplayer_mode.equals("Host")) {
             ckbx_ready.setEnabled(false);
             try {
-                host_socket = new Socket("192.168.1.5",8820);
-                Utils.sendInitHostMessage(host_socket, host_name, "192.168.1.5");
 
                 sw_client.setEnabled(false);
                 server_address = Utils.getIPAddress(true);
                 tv_room_ip.setText(server_address);
             } catch (Exception e) {
-                Toast.makeText(getApplicationContext(), "Couldn't initialize room\nTry again...", Toast.LENGTH_LONG).show();
-                try {
-                    host_socket.close();
-                } catch (Exception ignored){
-                }
+                Toast.makeText(getApplicationContext(), e.toString()/*"Couldn't initialize room\nTry again..."*/, Toast.LENGTH_LONG).show();
+                finish();
             }
-        } else if (multiplayer_mode.equals("Client")) {
+        } else /* if (multiplayer_mode.equals("Client")) */ {
             sw_host.setEnabled(false);
         }
-    }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    public void checkClient() {
-        if (multiplayer_mode.equals("Host")) {
-            try {
-
-            } catch (Exception ignored) {
-                Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        try {
-            if (!host_socket.isClosed())
-                host_socket.close();
-            if (!client_socket.isClosed())
-                client_socket.close();
-        } catch (Exception ignored) {
-        } finally {
-            finish();
-        }
+        DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference();
+        dataRef.child("new").setValue(multiplayer_mode);
     }
 
     @Override
     public void onClick(View v) {
-        try {
-            if (!host_socket.isClosed())
-                host_socket.close();
-            if (!client_socket.isClosed())
-                client_socket.close();
-        } catch (Exception ignored) {
-        } finally {
-                finish();
-        }
+        finish();
     }
 }

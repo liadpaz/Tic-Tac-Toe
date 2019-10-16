@@ -16,7 +16,8 @@ import android.widget.TextView;
 
 public class SettingsActivity extends AppCompatActivity implements View.OnClickListener, NumberPicker.OnValueChangeListener, CompoundButton.OnCheckedChangeListener {
 
-    int mode, max_games = 1, timer = 0;
+    int max_games = 1, timer = 0;
+    Utils.Mode mode;
 
     NumberPicker numpic_maxgames;
     NumberPicker numpic_timer;
@@ -34,7 +35,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        mode = getIntent().getIntExtra("Mode", -1);
+        mode = (Utils.Mode) getIntent().getSerializableExtra("Mode");
 
         max_games = getIntent().getIntExtra("Max", 1);
         timer = getIntent().getIntExtra("Timer", 5);
@@ -83,10 +84,10 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         numpic_timer.setValue(timer);
         numpic_timer.setEnabled(false);
 
-        if (mode == 1)
-            btn_play.setEnabled(false);
+        if (mode == Utils.Mode.Singleplayer)
+            btn_play.setEnabled(true);
 
-        if (mode == 1)
+        if (mode == Utils.Mode.Multiplayer)
         {
             et_name_host.setVisibility(View.VISIBLE);
             tv_name_host.setVisibility(View.VISIBLE);
@@ -99,15 +100,15 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             finish();
         }
         else if (view == this.btn_play) {
-            if (mode == 0) {
+            if (mode == Utils.Mode.Singleplayer) {
                 Intent singleplayer = new Intent(getApplicationContext(), Game.class);
-                singleplayer.putExtra("Mode", 0)
+                singleplayer.putExtra("Mode", Utils.Mode.Singleplayer)
                         .putExtra("Max", max_games)
                         .putExtra("Timer", timer);
                 startActivity(singleplayer);
-            } else if (mode == 1) {
+            } else /*if (mode == Utils.Mode.Multiplayer) */ {
                 Intent multiplayer_lobby = new Intent(getApplicationContext(), LobbyActivity.class);
-                multiplayer_lobby.putExtra("Mode", 1)
+                multiplayer_lobby.putExtra("Mode", Utils.Mode.Multiplayer)
                         .putExtra("Max", max_games)
                         .putExtra("Timer", timer)
                         .putExtra("HostName", et_name_host.getText())
