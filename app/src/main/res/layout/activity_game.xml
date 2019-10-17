@@ -11,8 +11,7 @@
         android:id="@+id/btn_resign"
         android:layout_width="100sp"
         android:layout_height="50sp"
-        android:layout_marginStart="50dp"
-        android:layout_marginLeft="50dp"
+        android:layout_marginStart="40dp"
         android:layout_marginBottom="30dp"
         android:text="Resign"
         android:textAllCaps="false"
@@ -24,116 +23,102 @@
         android:id="@+id/btn_reset"
         android:layout_width="100sp"
         android:layout_height="50sp"
-        android:layout_marginEnd="50dp"
-        android:layout_marginRight="50dp"
+        android:layout_marginEnd="40dp"
         android:layout_marginBottom="30dp"
         android:text="Reset"
         android:textAllCaps="false"
         android:textSize="20sp"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_board"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/background"
+        tools:srcCompat="@drawable/background" />
 
     <ImageView
         android:id="@+id/iv_Otl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/iv_board"
-        app:srcCompat="@drawable/o" />
-
-    <ImageView
-        android:id="@+id/iv_Otm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/iv_board"
-        app:srcCompat="@drawable/o" />
-
-    <ImageView
-        android:id="@+id/iv_Otr"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/iv_board"
-        app:srcCompat="@drawable/o" />
+        app:srcCompat="@drawable/o"
+        tools:visibility="gone" />
 
     <ImageView
         android:id="@+id/iv_Xtl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="132dp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="@+id/iv_board"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/x" />
+        app:srcCompat="@drawable/x"
+        tools:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/iv_Otm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/iv_board"
+        app:srcCompat="@drawable/o"
+        tools:visibility="gone" />
 
     <ImageView
         android:id="@+id/iv_Xtm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="172dp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="@+id/iv_board"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/x" />
+        app:srcCompat="@drawable/x"
+        tools:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/iv_Otr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/iv_board"
+        app:srcCompat="@drawable/o"
+        tools:visibility="gone" />
 
     <ImageView
         android:id="@+id/iv_Xtr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="220dp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="@+id/iv_board"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/x" />
+        app:srcCompat="@drawable/x"
+        tools:visibility="gone" />
 
     <ImageView
         android:id="@+id/iv_Oml"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/iv_board"
-        app:srcCompat="@drawable/o" />
-
-    <ImageView
-        android:id="@+id/iv_Omm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="32dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/iv_board"
-        app:srcCompat="@drawable/o" />
-
-    <ImageView
-        android:id="@+id/iv_Omr"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="32dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/iv_board"
-        app:srcCompat="@drawable/o" />
-
-    <ImageView
-        android:id="@+id/iv_Xmr"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="224dp"
-        android:layout_marginTop="32dp"
-        app:layout_constraintStart_toStartOf="@+id/iv_board"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/x" />
-
-    <ImageView
-        android:id="@+id/iv_Xmm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="200dp"
-        android:layout_marginTop="32dp"
-        app:layout_constraintStart_toStartOf="@+id/iv_board"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/x" />
+        app:srcCompat="@drawable/o"
+        tools:visibility="gone" />
 
     <ImageView
         android:id="@+id/iv_Xml"
@@ -141,49 +126,82 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="184dp"
         android:layout_marginTop="32dp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="@+id/iv_board"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/x" />
+        app:srcCompat="@drawable/x"
+        tools:visibility="gone" />
 
     <ImageView
-        android:id="@+id/iv_Xbm"
+        android:id="@+id/iv_Omm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="32dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/iv_board"
+        app:srcCompat="@drawable/o"
+        tools:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/iv_Xmm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="200dp"
-        android:layout_marginTop="156dp"
+        android:layout_marginTop="32dp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="@+id/iv_board"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/x" />
+        app:srcCompat="@drawable/x"
+        tools:visibility="gone" />
 
     <ImageView
-        android:id="@+id/iv_Xbr"
+        android:id="@+id/iv_Omr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="220dp"
-        android:layout_marginTop="156dp"
-        app:layout_constraintStart_toStartOf="@+id/iv_board"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/x" />
-
-    <ImageView
-        android:id="@+id/iv_board"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="32dp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/iv_board"
+        app:srcCompat="@drawable/o"
+        tools:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/iv_Xmr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="224dp"
+        android:layout_marginTop="32dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@+id/iv_board"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/background"
-        tools:srcCompat="@drawable/background" />
+        app:srcCompat="@drawable/x"
+        tools:visibility="gone" />
 
     <ImageView
         android:id="@+id/iv_Obl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="156dp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/iv_board"
-        app:srcCompat="@drawable/o" />
+        app:srcCompat="@drawable/o"
+        tools:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/iv_Xbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="188dp"
+        android:layout_marginTop="156dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@+id/iv_board"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/x"
+        tools:visibility="gone" />
 
     <ImageView
         android:id="@+id/iv_Obm"
@@ -191,9 +209,23 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginTop="156dp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/iv_board"
-        app:srcCompat="@drawable/o" />
+        app:srcCompat="@drawable/o"
+        tools:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/iv_Xbm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="200dp"
+        android:layout_marginTop="156dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@+id/iv_board"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/x"
+        tools:visibility="gone" />
 
     <ImageView
         android:id="@+id/iv_Obr"
@@ -201,19 +233,23 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="156dp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/iv_board"
-        app:srcCompat="@drawable/o" />
+        app:srcCompat="@drawable/o"
+        tools:visibility="gone" />
 
     <ImageView
-        android:id="@+id/iv_Xbl"
+        android:id="@+id/iv_Xbr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="200dp"
+        android:layout_marginStart="220dp"
         android:layout_marginTop="156dp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="@+id/iv_board"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/x" />
+        app:srcCompat="@drawable/x"
+        tools:visibility="gone" />
 
     <TextView
         android:id="@+id/tv_time_text"
@@ -238,6 +274,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="17dp"
         android:layout_marginBottom="44dp"
+        android:text="60 seconds"
+        android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_reset"
         app:layout_constraintStart_toEndOf="@+id/btn_resign"

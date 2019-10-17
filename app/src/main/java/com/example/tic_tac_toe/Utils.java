@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.firebase.database.DataSnapshot;
@@ -113,31 +114,22 @@ class Cell {
     private Type type;
     private boolean visible = false;
 
-    public Cell(ImageView[] XO) {
+    Cell(ImageView[] XO) {
         this.XO = XO;
-        XO[0].setVisibility(View.INVISIBLE);
-        XO[1].setVisibility(View.INVISIBLE);
-        XO[0].setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.setVisibility(View.VISIBLE);
-            }
-        });
-        XO[1].setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.setVisibility(View.VISIBLE);
-            }
-        });
     }
 
-    public boolean setType(Type type) {
+    public boolean isVisible() {
+        return visible;
+    }
+
+    boolean setType(Type type) {
         if (!visible) {
             this.type = type;
             if (type == Type.X)
                 XO[0].setVisibility(View.VISIBLE);
-            else if (type == Type.O)
+            else /*if (type == Type.O)*/
                 XO[1].setVisibility(View.VISIBLE);
+            visible = true;
             return true;
         }
         return false;
@@ -160,14 +152,11 @@ class Cell {
         }
     }
 
-    void setClickable(Type type) {
-        if (type == Type.X) {
-            XO[0].setClickable(true);
-            XO[1].setClickable(false);
-        } else if (type == Type.O) {
-            XO[0].setClickable(true);
-            XO[1].setClickable(false);
-        }
+    void hide() {
+        visible = false;
+        type = null;
+        XO[0].setVisibility(View.GONE);
+        XO[1].setVisibility(View.GONE);
     }
 }
 
@@ -177,11 +166,11 @@ class Player {
         CPU
     }
 
-    private final Type playerType;
+    public final Type playerType;
     private int wins = 0;
     private final Cell.Type XO;
 
-    public Player(Type player, Cell.Type type) {
+    Player(Type player, Cell.Type type) {
         playerType = player;
         this.XO = type;
     }
@@ -194,8 +183,9 @@ class Player {
         return XO;
     }
 
-    public int[] getRandom() {
+    int[] getRandom() {
         if (playerType == Type.Human) return null;
-        return new int[] {new Random().nextInt(3), new Random().nextInt(3)};
+        Random rnd = new Random();
+        return new int[] {rnd.nextInt(3), rnd.nextInt(3)};
     }
 }
