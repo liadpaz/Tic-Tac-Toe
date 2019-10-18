@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -34,6 +35,12 @@ public class Game extends AppCompatActivity {
     Button btn_resign;
     Button btn_reset;
 
+    TextView tv_playerX;
+    TextView tv_playerXwins;
+    TextView tv_playerO;
+    TextView tv_playerOwins;
+    TextView tv_maxgames;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +64,19 @@ public class Game extends AppCompatActivity {
         cells[2][2] = new Cell(new ImageView[]{findViewById(R.id.iv_Xbr), findViewById(R.id.iv_Obr)});
         btn_resign = findViewById(R.id.btn_resign);
         btn_reset = findViewById(R.id.btn_reset);
+        tv_playerX = findViewById(R.id.tv_playerX);
+        tv_playerXwins = findViewById(R.id.tv_playerXwins);
+        tv_playerO = findViewById(R.id.tv_playerO);
+        tv_playerOwins = findViewById(R.id.tv_playerOwins);
+        tv_maxgames = findViewById(R.id.tv_maxgames);
+
+        tv_playerX.setVisibility(View.INVISIBLE);
+        tv_playerO.setVisibility(View.INVISIBLE);
+        tv_playerXwins.setVisibility(View.INVISIBLE);
+        tv_playerOwins.setVisibility(View.INVISIBLE);
+        tv_playerXwins.setText("0");
+        tv_playerOwins.setText("0");
+        tv_maxgames.setText("First to " + maxgames + " wins, wins!");
 
         btn_resign.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,7 +113,6 @@ public class Game extends AppCompatActivity {
             }
         });
 
-
         int x = getApplicationContext().getResources().getDisplayMetrics().widthPixels;
 
         iv_board.setLayoutParams(new ConstraintLayout.LayoutParams(x, x));
@@ -117,6 +136,12 @@ public class Game extends AppCompatActivity {
                             this_type = Cell.Type.X;
                             players[0] = new Player(Player.Type.CPU, Cell.Type.O);
                             players[1] = new Player(Player.Type.Human, Cell.Type.X);
+                            tv_playerO.setText(players[0].getStringType());
+                            tv_playerX.setText(players[1].getStringType());
+                            tv_playerX.setVisibility(View.VISIBLE);
+                            tv_playerO.setVisibility(View.VISIBLE);
+                            tv_playerXwins.setVisibility(View.VISIBLE);
+                            tv_playerOwins.setVisibility(View.VISIBLE);
                             putCPU();
                         }
                     })
@@ -126,6 +151,12 @@ public class Game extends AppCompatActivity {
                             this_type = Cell.Type.O;
                             players[0] = new Player(Player.Type.Human, Cell.Type.O);
                             players[1] = new Player(Player.Type.CPU, Cell.Type.X);
+                            tv_playerO.setText(players[0].getStringType());
+                            tv_playerX.setText(players[1].getStringType());
+                            tv_playerX.setVisibility(View.VISIBLE);
+                            tv_playerO.setVisibility(View.VISIBLE);
+                            tv_playerXwins.setVisibility(View.VISIBLE);
+                            tv_playerOwins.setVisibility(View.VISIBLE);
                         }
                     });
             dialog.show();
@@ -144,28 +175,39 @@ public class Game extends AppCompatActivity {
                     if (over_cells[i][j].contains((int) touchX, (int) touchY) && turn == this_type && !cells[i][j].isVisible()) {
                         cells[i][j].setType(turn);
                         if (mode == Utils.Mode.Singleplayer) {
+                            turn = turn == Cell.Type.X ? Cell.Type.O : Cell.Type.X;
                             if (turn == Cell.Type.X) {
-                                turn = Cell.Type.O;
-                                if (winner() == null && !allVisible()) {
-                                    putCPU();
-                                } else {
-                                    if (allVisible()) {
+                                if (winner() == null) {
+                                    if (!putCPU()) {
                                         tieAlert().show();
-                                        resetGame(false);
+                                        i = 3;
+                                    } else {
+                                        if (winner() != null) {
+                                            i = 3;
+                                            break;
+                                        }
                                     }
+                                } else {
                                     i = 3;
                                     break;
                                 }
                             }
                             else {
-                                turn = Cell.Type.X;
-                                if (winner() == null && !allVisible()) {
-                                    putCPU();
-                                } else {
-                                    if (allVisible()) {
+                                if (winner() == null) {
+                                    if (!putCPU()) {
                                         tieAlert().show();
-                                        resetGame(false);
+                                        i = 3;
+                                    } else {
+                                        if (winner() != null) {
+                                            i = 3;
+                                            break;
+                                        } else if (allVisible()) {
+                                            tieAlert().show();
+                                            i = 3;
+                                            break;
+                                        }
                                     }
+                                } else {
                                     i = 3;
                                     break;
                                 }
@@ -180,6 +222,7 @@ public class Game extends AppCompatActivity {
 
     private AlertDialog.Builder winnerAlert(String player_won) {
         return new AlertDialog.Builder(this)
+                .setCancelable(false)
                 .setTitle("Winner")
                 .setMessage("Player " + player_won + " Won!")
                 .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
@@ -192,6 +235,7 @@ public class Game extends AppCompatActivity {
 
     private AlertDialog.Builder tieAlert() {
         return new AlertDialog.Builder(this)
+                .setCancelable(false)
                 .setTitle("Tie")
                 .setMessage("It's a tie!")
                 .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
@@ -208,9 +252,13 @@ public class Game extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "WINNER", Toast.LENGTH_LONG).show();
             Cell.Type winner = turn == Cell.Type.O ? Cell.Type.X : Cell.Type.O;
             winnerAlert(winner.toString()).show();
-            resetGame(false);
-            if (winner == Cell.Type.O) players[0].won();
-            else players[1].won();
+            if (winner == Cell.Type.O) {
+                players[0].won();
+                tv_playerOwins.setText(players[0].getWins());
+            } else {
+                players[1].won();
+                tv_playerXwins.setText(players[1].getWins());
+            }
             return winner;
         }
         return null;
@@ -250,33 +298,21 @@ public class Game extends AppCompatActivity {
     }
 
     private boolean putCPU() {
-        try {
-            if (players[0].playerType == Player.Type.CPU) {
-                int[] rand = players[0].getRandom();
-                while (!cells[rand[0]][rand[1]].setType(turn) && !allVisibleExeption()) {
-                    rand = players[0].getRandom();
-                }
-                turn = Cell.Type.X;
-            } else {
-                int[] rand = players[1].getRandom();
-                while (!cells[rand[0]][rand[1]].setType(turn) && !allVisibleExeption()) {
-                    rand = players[1].getRandom();
-                }
-                turn = Cell.Type.O;
+        if (allVisible()) return false;
+        if (players[0].playerType == Player.Type.CPU) {
+            int[] rand = players[0].getRandom();
+            while (!cells[rand[0]][rand[1]].setType(turn)) {
+                rand = players[0].getRandom();
             }
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private boolean allVisibleExeption() throws Exception {
-        for (Cell[] cellRow : cells) {
-            for (Cell cell : cellRow) {
-                if (!cell.isVisible()) return false;
+            turn = Cell.Type.X;
+        } else {
+            int[] rand = players[1].getRandom();
+            while (!cells[rand[0]][rand[1]].setType(turn)) {
+                rand = players[1].getRandom();
             }
+            turn = Cell.Type.O;
         }
-        throw new Exception();
+        return true;
     }
 
     private boolean allVisible() {
@@ -285,12 +321,15 @@ public class Game extends AppCompatActivity {
                 if (!cell.isVisible()) return false;
             }
         }
-        return false;
+        return true;
     }
 
     private void hideAll() {
         for (Cell[] cellRow : cells)
             for (Cell cell : cellRow)
                 cell.hide();
+        if (Integer.parseInt(players[0].getWins()) == maxgames || Integer.parseInt(players[1].getWins()) == maxgames) {
+            finish();
+        }
     }
 }

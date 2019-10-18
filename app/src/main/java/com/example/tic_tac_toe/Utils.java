@@ -166,7 +166,7 @@ class Player {
         CPU
     }
 
-    public final Type playerType;
+    final Type playerType;
     private int wins = 0;
     private final Cell.Type XO;
 
@@ -175,12 +175,17 @@ class Player {
         this.XO = type;
     }
 
-    public void won() {
+    void won() {
         wins++;
     }
 
-    public Cell.Type getXO() {
-        return XO;
+    String getStringType() {
+        if (playerType == Type.CPU) return "Computer";
+        return "You";
+    }
+
+    String getWins() {
+        return String.valueOf(wins);
     }
 
     int[] getRandom() {
