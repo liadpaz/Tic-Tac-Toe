@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,6 +36,8 @@ public class Game extends AppCompatActivity {
     Button btn_resign;
     Button btn_reset;
 
+    TextView tv_time_text;
+    TextView tv_timer;
     TextView tv_playerX;
     TextView tv_playerXwins;
     TextView tv_playerO;
@@ -82,14 +83,17 @@ public class Game extends AppCompatActivity {
         tv_playerO = findViewById(R.id.tv_playerO);
         tv_playerOwins = findViewById(R.id.tv_playerOwins);
         tv_maxgames = findViewById(R.id.tv_maxgames);
+        tv_time_text = findViewById(R.id.tv_time_text);
+        tv_timer = findViewById(R.id.tv_timer);
 
-        tv_playerX.setVisibility(View.INVISIBLE);
-        tv_playerO.setVisibility(View.INVISIBLE);
-        tv_playerXwins.setVisibility(View.INVISIBLE);
-        tv_playerOwins.setVisibility(View.INVISIBLE);
         tv_playerXwins.setText("0");
         tv_playerOwins.setText("0");
         tv_maxgames.setText("First to " + maxgames + " wins, wins!");
+
+        if (timer != 0) {
+            tv_time_text.setVisibility(View.VISIBLE);
+            tv_timer.setVisibility(View.VISIBLE);
+        }
 
         btn_resign.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -332,6 +336,11 @@ public class Game extends AppCompatActivity {
         return null;
     }
 
+    /**
+     * This function resets the game with or without players score
+     *
+     * @param hardReset true if to reset also the players score
+     */
     private void resetGame(boolean hardReset) {
         if (hardReset) {
             players[0] = new Player(players[0].playerType, Cell.Type.O);
@@ -345,6 +354,11 @@ public class Game extends AppCompatActivity {
         }
     }
 
+    /**
+     * This function puts a CPU X / O depends on what it needs
+     *
+     * @return true if succeeded, otherwise false
+     */
     private boolean putCPU() {
         if (allVisible()) return false;
         if (players[0].playerType == Player.Type.CPU) {

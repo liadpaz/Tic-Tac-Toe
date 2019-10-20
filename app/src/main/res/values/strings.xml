@@ -6,7 +6,7 @@
     <string name="Continue">Continue</string>
     <string name="Won">" Won"</string>
     <string name="Its_a_tie">"It\'s a tie!"</string>
-    <string name="Winner">Winner</string>
+    <string name="Winner">Congratulations!</string>
     <string name="Tie">Tie</string>
 
     <!-- Preference Titles -->

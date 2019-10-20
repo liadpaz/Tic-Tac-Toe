@@ -52,26 +52,26 @@ public class MainActivity extends AppCompatActivity {
                 singleplayer.show();
             }
         });
-        btn_mutltiplayer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder multiplayer = new AlertDialog.Builder(MainActivity.this);
-                multiplayer.setNegativeButton("Host a game", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent settingsAct = new Intent(getApplicationContext(), SettingsActivity.class);
-                        settingsAct.putExtra("Mode", Mode.Multiplayer);
-                        startActivity(settingsAct);
-                    }
-                }).setPositiveButton("Join a game", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        startActivity(new Intent(MainActivity.this, JoinMultiplayer.class));
-                    }
-                }).setTitle("Multiplayer Options").setMessage("Choose if you'd like to join a game / host a game").create();
-                multiplayer.show();
-            }
-        });
+//        btn_mutltiplayer.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                AlertDialog.Builder multiplayer = new AlertDialog.Builder(MainActivity.this);
+//                multiplayer.setNegativeButton("Host a game", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        Intent settingsAct = new Intent(getApplicationContext(), SettingsActivity.class);
+//                        settingsAct.putExtra("Mode", Mode.Multiplayer);
+//                        startActivity(settingsAct);
+//                    }
+//                }).setPositiveButton("Join a game", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        startActivity(new Intent(MainActivity.this, JoinMultiplayer.class));
+//                    }
+//                }).setTitle("Multiplayer Options").setMessage("Choose if you'd like to join a game / host a game").create();
+//                multiplayer.show();
+//            }
+//        });
         btn_exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

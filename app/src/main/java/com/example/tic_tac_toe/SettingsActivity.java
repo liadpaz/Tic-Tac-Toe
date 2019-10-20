@@ -15,7 +15,7 @@ import android.widget.NumberPicker;
 import android.widget.Switch;
 import android.widget.TextView;
 
-public class SettingsActivity extends AppCompatActivity implements View.OnClickListener, NumberPicker.OnValueChangeListener, CompoundButton.OnCheckedChangeListener {
+public class SettingsActivity extends AppCompatActivity {
 
     int max_games = 1, timer = 0;
     Utils.Mode mode;
@@ -60,13 +60,63 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         numpic_timer.setMinValue(5);
         numpic_timer.setMaxValue(60);
 
-        numpic_maxgames.setOnValueChangedListener(this);
-        numpic_timer.setOnValueChangedListener(this);
+        numpic_maxgames.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                max_games = newVal;
+            }
+        });
+        numpic_timer.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                timer = newVal;
+            }
+        });
 
-        tgl_timer.setOnCheckedChangeListener(this);
+        tgl_timer.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                numpic_timer.setEnabled(isChecked);
+                if (!isChecked)
+                    timer = 0;
+                else
+                    timer = numpic_timer.getValue();
+            }
+        });
 
-        btn_return.setOnClickListener(this);
-        btn_play.setOnClickListener(this);
+        btn_play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mode == Utils.Mode.Computer) {
+                    startActivity(new Intent(getApplicationContext(), Game.class)
+                            .putExtra("Mode", Utils.Mode.Computer)
+                            .putExtra("Max", max_games)
+                            .putExtra("Timer", timer)
+                            .putExtra("Starting", starting_player));
+                } else if (mode == Utils.Mode.TwoPlayer) {
+                    startActivity(new Intent(getApplicationContext(), Game.class)
+                            .putExtra("Mode", Utils.Mode.TwoPlayer)
+                            .putExtra("Max", max_games)
+                            .putExtra("Timer", timer)
+                            .putExtra("Starting", starting_player));
+
+                } else if (mode == Utils.Mode.Multiplayer) {
+                    startActivity(new Intent(getApplicationContext(), LobbyActivity.class)
+                            .putExtra("Mode", Utils.Mode.Multiplayer)
+                            .putExtra("Max", max_games)
+                            .putExtra("Timer", timer)
+                            .putExtra("HostName", et_name_host.getText())
+                            .putExtra("Multiplayer", "Host")
+                            .putExtra("Starting", starting_player));
+                }
+            }
+        });
+        btn_return.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         et_name_host.addTextChangedListener(new TextWatcher() {
             @Override
@@ -102,60 +152,9 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
         if (mode == Utils.Mode.Computer || mode == Utils.Mode.TwoPlayer)
             btn_play.setEnabled(true);
-        else /*if (mode == Utils.Mode.Multiplayer)*/
-        {
+        else /*if (mode == Utils.Mode.Multiplayer)*/ {
             et_name_host.setVisibility(View.VISIBLE);
             tv_name_host.setVisibility(View.VISIBLE);
         }
-    }
-
-    @Override
-    public void onClick(View view) {
-        if (view == this.btn_return) {
-            finish();
-        }
-        else if (view == this.btn_play) {
-            if (mode == Utils.Mode.Computer) {
-                startActivity(new Intent(getApplicationContext(), Game.class)
-                        .putExtra("Mode", Utils.Mode.Computer)
-                        .putExtra("Max", max_games)
-                        .putExtra("Timer", timer)
-                        .putExtra("Starting", starting_player));
-            } else if (mode == Utils.Mode.TwoPlayer) {
-                startActivity(new Intent(getApplicationContext(), Game.class)
-                        .putExtra("Mode", Utils.Mode.TwoPlayer)
-                        .putExtra("Max", max_games)
-                        .putExtra("Timer", timer)
-                        .putExtra("Starting", starting_player));
-
-            } else if (mode == Utils.Mode.Multiplayer) {
-                startActivity(new Intent(getApplicationContext(), LobbyActivity.class)
-                        .putExtra("Mode", Utils.Mode.Multiplayer)
-                        .putExtra("Max", max_games)
-                        .putExtra("Timer", timer)
-                        .putExtra("HostName", et_name_host.getText())
-                        .putExtra("Multiplayer", "Host")
-                        .putExtra("Starting", starting_player));
-            }
-        }
-    }
-
-    @Override
-    public void onValueChange(NumberPicker numberPicker, int i, int i1) {
-        if (numberPicker == this.numpic_maxgames) {
-            max_games = numberPicker.getValue();
-        }
-        else if (numberPicker == this.numpic_timer) {
-            timer = numberPicker.getValue();
-        }
-    }
-
-    @Override
-    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-            numpic_timer.setEnabled(b);
-            if (!b)
-                timer = 0;
-            else
-                timer = numpic_timer.getValue();
     }
 }
