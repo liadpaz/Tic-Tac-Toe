@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 class Utils {
-    public enum Mode {Singleplayer, Multiplayer};
+    public enum Mode {TwoPlayer, Computer, Multiplayer};
 
     static String getIPAddress(boolean useIPv4) {
         try {
@@ -118,7 +118,7 @@ class Cell {
         this.XO = XO;
     }
 
-    public boolean isVisible() {
+    boolean isVisible() {
         return visible;
     }
 
@@ -179,6 +179,10 @@ class Player {
         wins++;
     }
 
+    public Cell.Type getXO() {
+        return XO;
+    }
+
     String getStringType() {
         if (playerType == Type.CPU) return "Computer";
         return "You";
@@ -189,7 +193,6 @@ class Player {
     }
 
     int[] getRandom() {
-        if (playerType == Type.Human) return null;
         Random rnd = new Random();
         return new int[] {rnd.nextInt(3), rnd.nextInt(3)};
     }

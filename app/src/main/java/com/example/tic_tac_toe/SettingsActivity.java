@@ -12,15 +12,20 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.NumberPicker;
+import android.widget.Switch;
 import android.widget.TextView;
 
 public class SettingsActivity extends AppCompatActivity implements View.OnClickListener, NumberPicker.OnValueChangeListener, CompoundButton.OnCheckedChangeListener {
 
     int max_games = 1, timer = 0;
     Utils.Mode mode;
+    Cell.Type starting_player = Cell.Type.X;
 
     NumberPicker numpic_maxgames;
     NumberPicker numpic_timer;
+
+    TextView tv_player_start;
+    Switch sw_player_start;
 
     TextView tv_name_host;
     EditText et_name_host;
@@ -31,7 +36,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     Button btn_play;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
@@ -41,16 +46,19 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         timer = getIntent().getIntExtra("Timer", 5);
 
         numpic_maxgames = findViewById(R.id.numpic_games);
-        numpic_maxgames.setMinValue(1);
-        numpic_maxgames.setMaxValue(10);
         numpic_timer = findViewById(R.id.numpic_timer);
-        numpic_timer.setMinValue(5);
-        numpic_timer.setMaxValue(60);
         tgl_timer = findViewById(R.id.tgl_timer);
         btn_return = findViewById(R.id.btn_return_settigns);
         btn_play = findViewById(R.id.btn_play);
         et_name_host = findViewById(R.id.et_name_host);
         tv_name_host = findViewById(R.id.tv_name_host);
+        tv_player_start = findViewById(R.id.tv_player_start);
+        sw_player_start = findViewById(R.id.sw_player_start);
+
+        numpic_maxgames.setMinValue(1);
+        numpic_maxgames.setMaxValue(10);
+        numpic_timer.setMinValue(5);
+        numpic_timer.setMaxValue(60);
 
         numpic_maxgames.setOnValueChangedListener(this);
         numpic_timer.setOnValueChangedListener(this);
@@ -80,14 +88,21 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             }
         });
 
+        sw_player_start.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) starting_player = Cell.Type.O;
+                else starting_player = Cell.Type.X;
+            }
+        });
+
         numpic_maxgames.setValue(max_games);
         numpic_timer.setValue(timer);
         numpic_timer.setEnabled(false);
 
-        if (mode == Utils.Mode.Singleplayer)
+        if (mode == Utils.Mode.Computer || mode == Utils.Mode.TwoPlayer)
             btn_play.setEnabled(true);
-
-        if (mode == Utils.Mode.Multiplayer)
+        else /*if (mode == Utils.Mode.Multiplayer)*/
         {
             et_name_host.setVisibility(View.VISIBLE);
             tv_name_host.setVisibility(View.VISIBLE);
@@ -100,20 +115,27 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             finish();
         }
         else if (view == this.btn_play) {
-            if (mode == Utils.Mode.Singleplayer) {
-                Intent singleplayer = new Intent(getApplicationContext(), Game.class);
-                singleplayer.putExtra("Mode", Utils.Mode.Singleplayer)
+            if (mode == Utils.Mode.Computer) {
+                startActivity(new Intent(getApplicationContext(), Game.class)
+                        .putExtra("Mode", Utils.Mode.Computer)
                         .putExtra("Max", max_games)
-                        .putExtra("Timer", timer);
-                startActivity(singleplayer);
-            } else /*if (mode == Utils.Mode.Multiplayer) */ {
-                Intent multiplayer_lobby = new Intent(getApplicationContext(), LobbyActivity.class);
-                multiplayer_lobby.putExtra("Mode", Utils.Mode.Multiplayer)
+                        .putExtra("Timer", timer)
+                        .putExtra("Starting", starting_player));
+            } else if (mode == Utils.Mode.TwoPlayer) {
+                startActivity(new Intent(getApplicationContext(), Game.class)
+                        .putExtra("Mode", Utils.Mode.TwoPlayer)
+                        .putExtra("Max", max_games)
+                        .putExtra("Timer", timer)
+                        .putExtra("Starting", starting_player));
+
+            } else if (mode == Utils.Mode.Multiplayer) {
+                startActivity(new Intent(getApplicationContext(), LobbyActivity.class)
+                        .putExtra("Mode", Utils.Mode.Multiplayer)
                         .putExtra("Max", max_games)
                         .putExtra("Timer", timer)
                         .putExtra("HostName", et_name_host.getText())
-                        .putExtra("Multiplayer", "Host");
-                startActivity(multiplayer_lobby);
+                        .putExtra("Multiplayer", "Host")
+                        .putExtra("Starting", starting_player));
             }
         }
     }

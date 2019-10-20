@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">איקס עיגול</string>
+    <string name="Continue">המשך</string>
+    <string name="Its_a_tie">תיקו!</string>
+    <string name="Player">"שחקן "</string>
+    <string name="Tie">תיקו</string>
+    <string name="Won">" ניצח"</string>
+    <string name="Won_The_Game">"ניצח את המשחק "</string>
+    <string name="Winner">נצחון</string>
+</resources>

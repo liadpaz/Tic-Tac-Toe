@@ -12,8 +12,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
         android:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_maxgames"></NumberPicker>
@@ -34,9 +32,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
         android:layout_marginTop="80dp"
-        android:text="Choose number of games to win:"
+        android:text="Number of wins, to win:"
         android:textColor="@android:color/black"
         android:textSize="15sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,8 +44,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginBottom="20dp"
         android:text="Choose max time per turn:"
         android:textColor="@android:color/black"
         android:textSize="15sp"
@@ -61,6 +56,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:text="Settings"
+        android:textAlignment="center"
         android:textColor="@android:color/black"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -95,14 +91,12 @@
         android:id="@+id/tgl_timer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginBottom="15dp"
+        android:layout_marginStart="20dp"
         android:text="Toggle time"
         android:textColorHighlight="@color/colorPrimary"
         android:textColorLink="@color/colorPrimary"
-        app:layout_constraintBottom_toTopOf="@+id/numpic_timer"
-        app:layout_constraintStart_toEndOf="@+id/tv_timer" />
+        app:layout_constraintBottom_toTopOf="@+id/tv_timer"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/tv_name_host"
@@ -130,5 +124,53 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/btn_play"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <Switch
+        android:id="@+id/sw_player_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="55dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_player_start" />
+
+    <TextView
+        android:id="@+id/tv_player_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:text="Choose starting player:"
+        android:textColor="@android:color/black"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_settingX"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="14dp"
+        android:text="X"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        app:layout_constraintBottom_toTopOf="@+id/sw_player_start"
+        app:layout_constraintEnd_toStartOf="@+id/tv_settingX2"
+        app:layout_constraintTop_toBottomOf="@+id/tv_player_start"
+        app:layout_constraintVertical_bias="0.529"
+        tools:text="X" />
+
+    <TextView
+        android:id="@+id/tv_settingX2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="60dp"
+        android:text="O"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        app:layout_constraintBottom_toTopOf="@+id/sw_player_start"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_player_start"
+        app:layout_constraintVertical_bias="0.529"
+        tools:text="O" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
