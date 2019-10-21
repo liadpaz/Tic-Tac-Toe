@@ -10,7 +10,7 @@
         android:id="@+id/btn_singleplayer"
         android:layout_width="250sp"
         android:layout_height="60sp"
-        android:layout_marginBottom="70dp"
+        android:layout_marginBottom="30dp"
         android:text="Play On This Device"
         android:textAllCaps="false"
         android:textSize="20sp"
@@ -22,12 +22,26 @@
         android:id="@+id/btn_multiplayer"
         android:layout_width="250sp"
         android:layout_height="60sp"
-        android:layout_marginBottom="70dp"
+        android:layout_marginBottom="30dp"
         android:text="Play VS Another Player"
+        android:textAllCaps="false"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_stats"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btn_stats"
+        android:layout_width="250sp"
+        android:layout_height="60sp"
+        android:layout_marginBottom="30dp"
+        android:text="Statictics"
         android:textAllCaps="false"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/btn_exit"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
@@ -54,6 +68,27 @@
         android:textSize="50sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Made by Liad Paz"
+        android:textAllCaps="false"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:text="Beta"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

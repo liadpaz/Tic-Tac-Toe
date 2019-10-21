@@ -73,6 +73,8 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        tgl_timer.setEnabled(false);
+        numpic_timer.setEnabled(false);
         tgl_timer.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

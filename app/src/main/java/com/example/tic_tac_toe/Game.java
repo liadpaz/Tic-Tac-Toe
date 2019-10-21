@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -19,7 +20,7 @@ import com.example.tic_tac_toe.Cell.Type;
 
 public class Game extends AppCompatActivity {
 
-    ConstraintLayout activity_game;
+    ConstraintLayout layout_game;
 
     Player[] players = new Player[2];
     Type turn;
@@ -28,6 +29,9 @@ public class Game extends AppCompatActivity {
     int timer;
     Utils.Mode mode;
     Type startingType;
+
+    DisplayMetrics screen;
+    int topScreen;
 
     ImageView iv_board;
     Cell[][] cells = new Cell[3][3];
@@ -64,7 +68,7 @@ public class Game extends AppCompatActivity {
         vs_computer = mode == Utils.Mode.Computer;
         vs_on_this_device = mode == Utils.Mode.TwoPlayer;
 
-        activity_game = findViewById(R.id.activity_game);
+        layout_game = findViewById(R.id.activity_game);
 
         iv_board = findViewById(R.id.iv_board);
         cells[0][0] = new Cell(new ImageView[]{findViewById(R.id.iv_Xtl), findViewById(R.id.iv_Otl)});
@@ -134,15 +138,18 @@ public class Game extends AppCompatActivity {
             }
         });
 
-        int x = getApplicationContext().getResources().getDisplayMetrics().widthPixels;
+        screen = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(screen);
+        topScreen = screen.densityDpi / 2;
+        int x = screen.widthPixels;
 
         iv_board.setLayoutParams(new ConstraintLayout.LayoutParams(x, x));
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                over_cells[i][j] = new Rect(j * (x / 3), i * (x / 3), (j + 1) * (x / 3), (i + 1) * (x / 3));
+                over_cells[i][j] = new Rect(j * (x / 3), i * (x / 3) + topScreen, (j + 1) * (x / 3), (i + 1) * (x / 3) + topScreen);
                 cells[i][j].setSize(x / 3);
-                cells[i][j].setLocation(j * (x / 3), i * (x / 3));
+                cells[i][j].setLocation(j * (x / 3), i * (x / 3) + topScreen / 100);
             }
         }
 
@@ -187,7 +194,7 @@ public class Game extends AppCompatActivity {
                         }
                     });
             dialog.show();
-        } else if (vs_on_this_device) {
+        } else {
             players[0] = new Player(Player.Type.Human, Type.O);
             players[1] = new Player(Player.Type.Human, Type.X);
             tv_playerO.setText("O");
@@ -200,8 +207,8 @@ public class Game extends AppCompatActivity {
     }
 
     /**
-     * This function gets triggered whenever the user touches the screen, and
-     * decides whether to count as a valid XO press, if so it makes the X / O
+     * This function gets triggered whenever the user touches the pScreen, and
+     * decides whether to count as a valid XO press, if so, it makes the X / O
      * visible and checks for winner / tie.
      *
      * @param event touch location and info about the touch
@@ -211,7 +218,7 @@ public class Game extends AppCompatActivity {
         Point screen = new Point();
         getWindowManager().getDefaultDisplay().getSize(screen);
         final int touchX = (int) event.getRawX();
-        final int touchY = (int) (event.getRawY() - (screen.y - activity_game.getHeight()));
+        final int touchY = (int) event.getRawY();
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
@@ -329,8 +336,15 @@ public class Game extends AppCompatActivity {
             }
             if (!(Integer.parseInt(players[0].getWins()) == maxgames || Integer.parseInt(players[1].getWins()) == maxgames))
                 winnerAlert(winner.toString()).show();
-            else
+            else {
+                if (vs_on_this_device || (vs_computer && !CPUturn()) || (vs_multiplayer && winner == this_type)) {
+                    if (winner == Type.X)
+                        Stats.writeFile(Stats.Readables.Xwins, String.valueOf(Integer.parseInt(Stats.readFile(Stats.Readables.Xwins)) + 1));
+                    else if (winner == Type.O)
+                        Stats.writeFile(Stats.Readables.Owins, String.valueOf(Integer.parseInt(Stats.readFile(Stats.Readables.Owins)) + 1));
+                }
                 absoluteWinnerAlert(winner.toString()).show();
+            }
             return winner;
         }
         return null;
@@ -450,5 +464,14 @@ public class Game extends AppCompatActivity {
     private boolean checkDiagonals() {
         return ((cells[0][0].getType() == cells[1][1].getType() && cells[1][1].getType() == cells[2][2].getType() && cells[0][0].getType() != null) ||
                 (cells[2][0].getType() == cells[1][1].getType() && cells[1][1].getType() == cells[0][2].getType() && cells[2][0].getType() != null));
+    }
+
+    /**
+     * This function checks whether it's a CPU turn
+     *
+     * @return true if it's a CPU turn, otherwise false
+     */
+    private boolean CPUturn() {
+        return ((players[0].getXO() == turn && players[0].playerType == Player.Type.CPU) || (players[1].getXO() == turn && players[1].playerType == Player.Type.CPU));
     }
 }

@@ -3,10 +3,10 @@ package com.example.tic_tac_toe;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.firebase.database.DataSnapshot;
@@ -15,14 +15,36 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.CacheRequest;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
 class Utils {
-    public enum Mode {TwoPlayer, Computer, Multiplayer};
+    public enum Mode {TwoPlayer, Computer, Multiplayer}
+
+    static long last_time;
+
+    static void setTime() {
+        last_time = Calendar.getInstance().getTime().getTime();
+    }
+
+    static long getTime() {
+        long time = (Calendar.getInstance().getTime().getTime() - last_time) / 1000;
+        setTime();
+        return time;
+    }
+
 
     static String getIPAddress(boolean useIPv4) {
         try {
@@ -195,5 +217,69 @@ class Player {
     int[] getRandom() {
         Random rnd = new Random();
         return new int[] {rnd.nextInt(3), rnd.nextInt(3)};
+    }
+}
+
+class Stats {
+    public enum Readables {
+        Xwins,
+        Owins,
+        Time
+    }
+    static File file;
+
+    static void setFile(File parent, String child) {
+        file = new File(parent, child);
+        if (readFile(Readables.Xwins) == null)
+            writeFileAll("0");
+    }
+
+    static String readFile(@NonNull Readables param) {
+        StringBuffer stringBuffer = new StringBuffer();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line = reader.readLine();
+            while (line != null) {
+                stringBuffer.append(line).append('\n');
+                line = reader.readLine();
+            }
+            String[] contents = stringBuffer.toString().split(" ");
+            switch (param) {
+                case Xwins:
+                    return contents[0];
+
+                case Owins:
+                    return contents[1];
+
+                case Time:
+                    return contents[2];
+
+                default:
+                    return null;
+            }
+        } catch (IOException error) {
+            return null;
+        }
+    }
+
+    static void writeFile(Readables type, String message) {
+        try {
+            String Xwins = type == Readables.Xwins ? message : readFile(Readables.Xwins);
+            String Owins = type == Readables.Owins ? message : readFile(Readables.Owins);
+            String Time  = type == Readables.Time ? message : readFile(Readables.Time);
+
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(String.format("%s %s %s", Xwins, Owins, Time));
+            writer.close();
+        } catch (Exception ignored) {
+        }
+    }
+
+    static void writeFileAll(String message) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(String.format("%s %s %s", message, message, message));
+            writer.close();
+        } catch (Exception ignored) {
+        }
     }
 }
