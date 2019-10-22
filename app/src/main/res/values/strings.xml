@@ -1,13 +1,22 @@
 <resources>
     <string name="app_name">Tic-Tac-Toe</string>
     <string name="title_activity_settings_global" translatable="false">Settings</string>
-    <string name="Player">"Player "</string>
-    <string name="Won_The_Game">" Won The Game"</string>
+    <string name="Player">Player</string>
+    <string name="Won_The_Game">Won The Game</string>
     <string name="Continue">Continue</string>
-    <string name="Won">" Won"</string>
+    <string name="Won">Won</string>
     <string name="Its_a_tie">"It\'s a tie!"</string>
-    <string name="Winner">Congratulations!</string>
+    <string name="Congratulations">Congratulations!</string>
     <string name="Tie">Tie</string>
+    <string name="Choose_Player">"Choose player"</string>
+    <string name="Player_Chooser">"Which player you wish to be?"</string>
+    <string name="not_available_offline">"Not available while offline…"</string>
+    <string name="Restart">Restart</string>
+    <string name="Restart_question">"Are you sure you want to restart the current game?"</string>
+    <string name="Yes">Yes</string>
+    <string name="No">No</string>
+    <string name="First_To">First to</string>
+    <string name="Wins_wins">wins, wins!</string>
 
     <!-- Preference Titles -->
     <string name="messages_header" translatable="false">Messages</string>
@@ -23,4 +32,24 @@
     <string name="attachment_summary_on" translatable="false">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off" translatable="false">Only download attachments when manually requested</string>
+    <string name="Winner">Winner</string>
+    <string name="Resign">Resign</string>
+    <string name="Resign_Message">Are you sure you want to resign the current game?</string>
+    <string name="Reset_BTN">Reset</string>
+    <string name="Time_Left">Time Left:</string>
+    <string name="You">You</string>
+    <string name="Computer">Computer</string>
+    <string name="Seconds">seconds</string>
+    <string name="Exit">Exit</string>
+    <string name="Statistics">Statistics</string>
+    <string name="Play_Multi">Play VS Another Player</string>
+    <string name="Play_Local">Play On This Device</string>
+    <string name="Main_Menu">Return to main menu</string>
+    <string name="Local_O_wins">Your wins with O:</string>
+    <string name="Global_O_wins">Total wins with O:</string>
+    <string name="Local_X_wins">Your wins with X:</string>
+    <string name="Global_X_wins">Total wins with X:</string>
+    <string name="Local_Time">Your time on this app:</string>
+    <string name="Global_Time">Total time on this app:</string>
+    <string name="Settings">Settings</string>
 </resources>

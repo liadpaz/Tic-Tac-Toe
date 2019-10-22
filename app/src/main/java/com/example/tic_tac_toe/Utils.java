@@ -1,9 +1,9 @@
 package com.example.tic_tac_toe;
 
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,19 +21,17 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.CacheRequest;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
 class Utils {
     public enum Mode {TwoPlayer, Computer, Multiplayer}
 
-    static long last_time;
+    private static long last_time;
 
     static void setTime() {
         last_time = Calendar.getInstance().getTime().getTime();
@@ -68,9 +66,10 @@ class Utils {
                     }
                 }
             }
+            return null;
         } catch (Exception ignored) {
+            return null;
         }
-        return null;
     }
 }
 
@@ -234,14 +233,11 @@ class Stats {
             writeFileAll("0");
     }
 
-    static String readFile(@NonNull Readables param) {
+    static String readFile(Readables param) {
         StringBuffer stringBuffer = new StringBuffer();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line = reader.readLine();
-            while (line != null) {
-                stringBuffer.append(line).append('\n');
-                line = reader.readLine();
-            }
+            stringBuffer.append(line);
             String[] contents = stringBuffer.toString().split(" ");
             switch (param) {
                 case Xwins:
@@ -261,7 +257,7 @@ class Stats {
         }
     }
 
-    static void writeFile(Readables type, String message) {
+    static private void writeFile(Readables type, String message) {
         try {
             String Xwins = type == Readables.Xwins ? message : readFile(Readables.Xwins);
             String Owins = type == Readables.Owins ? message : readFile(Readables.Owins);
@@ -272,6 +268,18 @@ class Stats {
             writer.close();
         } catch (Exception ignored) {
         }
+    }
+
+    static void addXwins() {
+        writeFile(Readables.Xwins, String.valueOf(Integer.parseInt(readFile(Readables.Xwins)) + 1));
+    }
+
+    static void addOwins() {
+        writeFile(Readables.Owins, String.valueOf(Integer.parseInt(readFile(Readables.Owins)) + 1));
+    }
+
+    static void addTime(long time) {
+        writeFile(Readables.Time, String.valueOf(Integer.parseInt(readFile(Readables.Time)) + (int) time));
     }
 
     static void writeFileAll(String message) {

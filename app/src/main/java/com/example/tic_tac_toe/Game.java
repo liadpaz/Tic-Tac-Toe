@@ -2,9 +2,9 @@ package com.example.tic_tac_toe;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,18 +22,19 @@ public class Game extends AppCompatActivity {
 
     ConstraintLayout layout_game;
 
-    Player[] players = new Player[2];
     Type turn;
     Type this_type;
     int maxgames;
     int timer;
     Utils.Mode mode;
     Type startingType;
+    CountDownTimer counter;
 
     DisplayMetrics screen;
     int topScreen;
 
     ImageView iv_board;
+    Player[] players = new Player[2];
     Cell[][] cells = new Cell[3][3];
     Rect[][] over_cells = new Rect[3][3];
 
@@ -92,11 +93,40 @@ public class Game extends AppCompatActivity {
 
         tv_playerXwins.setText("0");
         tv_playerOwins.setText("0");
-        tv_maxgames.setText("First to " + maxgames + " wins, wins!");
+        tv_maxgames.setText(String.format("%s %s %s", getString(R.string.First_To), String.valueOf(maxgames), getString(R.string.Wins_wins)));
 
         if (timer != 0) {
             tv_time_text.setVisibility(View.VISIBLE);
             tv_timer.setVisibility(View.VISIBLE);
+            tv_timer.setText(String.format("%s %s", String.valueOf(timer), getString(R.string.Seconds)));
+            counter = new CountDownTimer(timer * 1000, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    tv_timer.setText(String.format("%s %s", String.valueOf((int) millisUntilFinished / 1000 + 1), getString(R.string.Seconds)));
+                }
+
+                @Override
+                public void onFinish() {
+                    putCPU(turn == Type.O ? 0 : 1);
+                    if (winner() == null) {
+                        turn = turn == Type.O ? Type.X : Type.O;
+                        if (allVisible())
+                            tieAlert().show();
+                        else if (vs_computer) {
+                            putCPU();
+                            if (winner() == null) {
+                                turn = turn == Type.O ? Type.X : Type.O;
+                                if (allVisible())
+                                    tieAlert().show();
+                                else
+                                    this.start();
+                            }
+                        } else if (vs_on_this_device) {
+                            this.start();
+                        }
+                    }
+                }
+            }.start();
         }
 
         btn_resign.setOnClickListener(new View.OnClickListener() {
@@ -104,16 +134,16 @@ public class Game extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder resignDialog = new AlertDialog.Builder(Game.this);
                 resignDialog
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        .setTitle(getString(R.string.Resign))
+                        .setMessage(getString(R.string.Resign_Message))
+                        .setPositiveButton(getString(R.string.Yes), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                     finish();
                             }
                         })
-                        .setNegativeButton("No", null)
-                        .setCancelable(true)
-                        .setTitle("Resign")
-                        .setMessage("Are you sure you want to resign the current game?");
+                        .setNegativeButton(getString(R.string.No), null)
+                        .setCancelable(true);
                 resignDialog.show();
             }
         });
@@ -122,7 +152,7 @@ public class Game extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder restartDialog = new AlertDialog.Builder(Game.this);
                 restartDialog
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(getString(R.string.Yes), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 tv_playerOwins.setText("0");
@@ -130,10 +160,10 @@ public class Game extends AppCompatActivity {
                                 resetGame(true);
                             }
                         })
-                        .setNegativeButton("No", null)
+                        .setNegativeButton(getString(R.string.No), null)
                         .setCancelable(true)
-                        .setTitle("Restart")
-                        .setMessage("Are you sure you want to restart the current game?");
+                        .setTitle(getString(R.string.Restart))
+                        .setMessage(getString(R.string.Restart_question));
                 restartDialog.show();
             }
         });
@@ -156,15 +186,15 @@ public class Game extends AppCompatActivity {
         if (vs_computer) {
             AlertDialog.Builder dialog = new AlertDialog.Builder(this)
                     .setCancelable(false)
-                    .setMessage("Which player you wish to be?")
-                    .setTitle("Choose player")
+                    .setMessage(getString(R.string.Player_Chooser))
+                    .setTitle(getString(R.string.Choose_Player))
                     .setPositiveButton("X", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             players[0] = new Player(Player.Type.CPU, Cell.Type.O);
                             players[1] = new Player(Player.Type.Human, Cell.Type.X);
-                            tv_playerO.setText(players[0].getStringType());
-                            tv_playerX.setText(players[1].getStringType());
+                            tv_playerO.setText(getString(R.string.Computer));
+                            tv_playerX.setText(getString(R.string.You));
                             tv_playerX.setVisibility(View.VISIBLE);
                             tv_playerO.setVisibility(View.VISIBLE);
                             tv_playerXwins.setVisibility(View.VISIBLE);
@@ -173,6 +203,8 @@ public class Game extends AppCompatActivity {
                                 putCPU();
                                 turn = Type.X;
                             }
+                            if (timer != 0)
+                                counter.start();
                         }
                     })
                     .setNegativeButton("O", new DialogInterface.OnClickListener() {
@@ -180,8 +212,8 @@ public class Game extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             players[0] = new Player(Player.Type.Human, Cell.Type.O);
                             players[1] = new Player(Player.Type.CPU, Cell.Type.X);
-                            tv_playerO.setText(players[0].getStringType());
-                            tv_playerX.setText(players[1].getStringType());
+                            tv_playerO.setText(getString(R.string.You));
+                            tv_playerX.setText(getString(R.string.Computer));
                             tv_playerX.setVisibility(View.VISIBLE);
                             tv_playerO.setVisibility(View.VISIBLE);
                             tv_playerXwins.setVisibility(View.VISIBLE);
@@ -190,6 +222,8 @@ public class Game extends AppCompatActivity {
                                 putCPU();
                                 turn = Type.O;
                             }
+                            if (timer != 0)
+                                if (timer != 0) counter.start();
 
                         }
                     });
@@ -215,38 +249,15 @@ public class Game extends AppCompatActivity {
     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        Point screen = new Point();
-        getWindowManager().getDefaultDisplay().getSize(screen);
         final int touchX = (int) event.getRawX();
         final int touchY = (int) event.getRawY();
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
                     if (over_cells[i][j].contains(touchX, touchY) && !cells[i][j].isVisible() && (vs_computer || vs_on_this_device || (vs_multiplayer && turn == this_type))) {
-                        cells[i][j].setType(turn);
-                        if (winner() != null) { //Winner is found
+                        if (play(i, j)) {
                             i = 3;
                             break;
-                        }   //No winner is found
-                        turn = turn == Cell.Type.X ? Cell.Type.O : Cell.Type.X; //Flip the turn
-                        if (vs_computer) {  //One of the players is CPU
-                            if (!putCPU()) {    //If the CPU couldn't place a X / O
-                                tieAlert().show();
-                                i = 3;
-                                break;
-                            }   //If the CPU could place a type
-                            if (winner() == null && allVisible()) { //If no winner and no vacant place
-                                tieAlert().show();
-                                i = 3;
-                                break;
-                            }
-                            turn = turn == Cell.Type.X ? Cell.Type.O : Cell.Type.X;
-                        } else if (vs_on_this_device) {
-                            if (allVisible()) {
-                                tieAlert().show();
-                                i = 3;
-                                break;
-                            }
                         }
                     }
                 }
@@ -265,12 +276,14 @@ public class Game extends AppCompatActivity {
     private AlertDialog.Builder winnerAlert(String player_won) {
         return new AlertDialog.Builder(this)
                 .setCancelable(false)
-                .setTitle(getString(R.string.Winner))
-                .setMessage(getString(R.string.Player) + player_won + getString(R.string.Won))
+                .setTitle(getString(R.string.Congratulations))
+                .setMessage(String.format("%s %s %s", getString(R.string.Player), player_won, getString(R.string.Won)))
                 .setPositiveButton(getString(R.string.Continue), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         resetGame(false);
+                        if (timer != 0 && notCPUturn())
+                            counter.start();
                     }
                 });
     }
@@ -283,12 +296,14 @@ public class Game extends AppCompatActivity {
     private AlertDialog.Builder tieAlert() {
         return new AlertDialog.Builder(this)
                 .setCancelable(false)
-                .setTitle("Tie")
-                .setMessage("It's a tie!")
-                .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                .setTitle(getString(R.string.Tie))
+                .setMessage(getString(R.string.Its_a_tie))
+                .setPositiveButton(getString(R.string.Continue), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         resetGame(false);
+                        if (timer != 0 && notCPUturn())
+                            counter.start();
                     }
                 });
     }
@@ -305,9 +320,9 @@ public class Game extends AppCompatActivity {
     private AlertDialog.Builder absoluteWinnerAlert(String player_won) {
         return new AlertDialog.Builder(this)
                 .setCancelable(false)
-                .setTitle("Winner")
-                .setMessage("Player " + player_won + " Won The Game!")
-                .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                .setTitle(getString(R.string.Winner))
+                .setMessage(String.format("%s %s %s", getString(R.string.Player),player_won, getString(R.string.Won_The_Game)))
+                .setPositiveButton(getString(R.string.Continue), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         finishAffinity();
@@ -326,6 +341,7 @@ public class Game extends AppCompatActivity {
      */
     private Type winner() {
         if (checkWinner()) {
+            if (timer != 0) counter.cancel();
             Type winner = turn;
             if (winner == Type.O) {
                 players[0].won();
@@ -337,11 +353,11 @@ public class Game extends AppCompatActivity {
             if (!(Integer.parseInt(players[0].getWins()) == maxgames || Integer.parseInt(players[1].getWins()) == maxgames))
                 winnerAlert(winner.toString()).show();
             else {
-                if (vs_on_this_device || (vs_computer && !CPUturn()) || (vs_multiplayer && winner == this_type)) {
+                if (vs_on_this_device || notCPUturn() || (vs_multiplayer && winner == this_type)) {
                     if (winner == Type.X)
-                        Stats.writeFile(Stats.Readables.Xwins, String.valueOf(Integer.parseInt(Stats.readFile(Stats.Readables.Xwins)) + 1));
+                        Stats.addXwins();
                     else if (winner == Type.O)
-                        Stats.writeFile(Stats.Readables.Owins, String.valueOf(Integer.parseInt(Stats.readFile(Stats.Readables.Owins)) + 1));
+                        Stats.addOwins();
                 }
                 absoluteWinnerAlert(winner.toString()).show();
             }
@@ -362,19 +378,16 @@ public class Game extends AppCompatActivity {
         }
         hideAll();
         turn = startingType;
-        if ((players[0].playerType == Player.Type.CPU && players[0].getXO() == turn) || (players[1].playerType == Player.Type.CPU && players[1].getXO() == turn)) {
+        if ((players[0].playerType == Player.Type.CPU && turn == Type.O) || (players[1].playerType == Player.Type.CPU && turn == Type.X)) {
             putCPU();
             turn = turn == Type.O ? Type.X : Type.O;
         }
     }
 
     /**
-     * This function puts a CPU X / O depends on what it needs
-     *
-     * @return true if succeeded, otherwise false
+     * This function plays a CPU turn
      */
-    private boolean putCPU() {
-        if (allVisible()) return false;
+    private void putCPU() {
         if (players[0].playerType == Player.Type.CPU) {
             int[] rand = players[0].getRandom();
             while (!cells[rand[0]][rand[1]].setType(turn)) {
@@ -386,17 +399,19 @@ public class Game extends AppCompatActivity {
                 rand = players[1].getRandom();
             }
         }
-        return true;
     }
 
-//    private boolean putCPU(int playerIndex) {
-//        if (allVisible()) return false;
-//        int[] rand = players[playerIndex].getRandom();
-//        while (!cells[rand[0]][rand[1]].setType(turn)) {
-//            rand = players[playerIndex].getRandom();
-//        }
-//        return true;
-//    }
+    /**
+     * This function plays a player who runs out of time turn
+     *
+     * @param playerIndex player index from {@code players} to play
+     */
+    private void putCPU(int playerIndex) {
+        int[] rand = players[playerIndex].getRandom();
+        while (!cells[rand[0]][rand[1]].setType(turn)) {
+            rand = players[playerIndex].getRandom();
+        }
+    }
 
     /**
      * This function checks if all the X's / O's are visible
@@ -471,7 +486,41 @@ public class Game extends AppCompatActivity {
      *
      * @return true if it's a CPU turn, otherwise false
      */
-    private boolean CPUturn() {
-        return ((players[0].getXO() == turn && players[0].playerType == Player.Type.CPU) || (players[1].getXO() == turn && players[1].playerType == Player.Type.CPU));
+    private boolean notCPUturn() {
+        return (((turn != Type.O || players[0].playerType != Player.Type.CPU) && (turn != Type.X || players[1].playerType != Player.Type.CPU)) || !vs_computer);
+    }
+
+    /**
+     * This function plays a turn, if needed a CPU turn afterwards it does this
+     *
+     * @param i the y index of the cell
+     * @param j the x index of the cell
+     *
+     * @return  true if no more turns allowed, otherwise false
+     */
+    private boolean play(int i, int j) {
+        if (timer != 0) counter.cancel();
+        cells[i][j].setType(turn);
+        if (winner() != null) { //Winner is found
+            if (timer != 0) counter.cancel();
+            return true;
+        }                       //No winner is found
+        turn = turn == Cell.Type.X ? Cell.Type.O : Cell.Type.X; //Flip the turn
+        if (allVisible()) {     //No winner and the board is full (tie)
+            if (timer != 0) counter.cancel();
+            tieAlert().show();
+            return true;
+        }
+        if (vs_computer) {      //One of the players is CPU
+            putCPU();
+            if (winner() == null && allVisible()) { //If no winner and no vacant place
+                if (timer != 0) counter.cancel();
+                tieAlert().show();
+                return true;
+            }
+            turn = turn == Cell.Type.X ? Cell.Type.O : Cell.Type.X;
+        }
+        if (timer != 0) counter.start();
+        return false;
     }
 }

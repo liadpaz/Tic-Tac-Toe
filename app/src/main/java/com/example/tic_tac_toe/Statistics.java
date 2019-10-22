@@ -1,13 +1,13 @@
 package com.example.tic_tac_toe;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class Statistics extends AppCompatActivity {
 
@@ -26,9 +26,6 @@ public class Statistics extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
 
-//        int time = Integer.parseInt(Stats.readFile(Stats.Readables.Time)) + (int) Utils.getTime();
-//        Stats.writeFile(Stats.Readables.Time, String.valueOf(time));
-
         btn_return = findViewById(R.id.btn_return_stats);
         btn_reset = findViewById(R.id.btn_reset_stats);
         tv_localO = findViewById(R.id.tv_local_wins_O);
@@ -40,7 +37,17 @@ public class Statistics extends AppCompatActivity {
 
         tv_localO.setText(Stats.readFile(Stats.Readables.Owins));
         tv_localX.setText(Stats.readFile(Stats.Readables.Xwins));
-        tv_localTime.setText(Stats.readFile(Stats.Readables.Time));
+        tv_localTime.setText(String.format("%s %s", Stats.readFile(Stats.Readables.Time), getString(R.string.Seconds)));
+
+        if (Utils.getIPAddress(true) != null) {
+//            tv_globalO.getString(getGlobalOwins());
+//            tv_globalX.getString(getGloablXwins());
+//            tv_globalTime.getString(String.format("%s seconds", getGlobalTime()));
+        } else {
+            tv_globalO.setText(getString(R.string.not_available_offline));
+            tv_globalX.setText(getString(R.string.not_available_offline));
+            tv_globalTime.setText(getString(R.string.not_available_offline));
+        }
 
         btn_return.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,16 +61,17 @@ public class Statistics extends AppCompatActivity {
                 AlertDialog.Builder alert = new AlertDialog.Builder(Statistics.this)
                         .setTitle("Reset Local Data")
                         .setMessage("You are about to delete local stats. Are you sure?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(getString(R.string.Yes), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Stats.writeFileAll("0");
                                 tv_localO.setText("0");
                                 tv_localX.setText("0");
                                 tv_localTime.setText("0");
+                                Utils.setTime();
                             }
                         })
-                        .setNegativeButton("No", null)
+                        .setNegativeButton(getString(R.string.No), null)
                         .setCancelable(true);
                 alert.show();
             }

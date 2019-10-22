@@ -17,7 +17,8 @@ import android.widget.TextView;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    int max_games = 1, timer = 0;
+    int max_games = 1;
+    int timer = 0;
     Utils.Mode mode;
     Cell.Type starting_player = Cell.Type.X;
 
@@ -42,9 +43,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         mode = (Utils.Mode) getIntent().getSerializableExtra("Mode");
 
-        max_games = getIntent().getIntExtra("Max", 1);
-        timer = getIntent().getIntExtra("Timer", 5);
-
         numpic_maxgames = findViewById(R.id.numpic_games);
         numpic_timer = findViewById(R.id.numpic_timer);
         tgl_timer = findViewById(R.id.tgl_timer);
@@ -57,8 +55,8 @@ public class SettingsActivity extends AppCompatActivity {
 
         numpic_maxgames.setMinValue(1);
         numpic_maxgames.setMaxValue(10);
-        numpic_timer.setMinValue(5);
-        numpic_timer.setMaxValue(60);
+        numpic_timer.setMinValue(2);
+        numpic_timer.setMaxValue(10);
 
         numpic_maxgames.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
@@ -73,8 +71,6 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        tgl_timer.setEnabled(false);
-        numpic_timer.setEnabled(false);
         tgl_timer.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
