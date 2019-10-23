@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class JoinMultiplayer extends AppCompatActivity implements View.OnClickListener, TextWatcher {
+public class JoinMultiplayer extends AppCompatActivity implements TextWatcher {
 
     Button btn_return_join;
     Button btn_join;
@@ -30,8 +30,18 @@ public class JoinMultiplayer extends AppCompatActivity implements View.OnClickLi
         et_name_join = findViewById(R.id.et_name_join);
         et_ip = findViewById(R.id.et_ip);
 
-        btn_join.setOnClickListener(this);
-        btn_return_join.setOnClickListener(this);
+        btn_join.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        btn_return_join.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         et_name_join.addTextChangedListener(this);
         et_ip.addTextChangedListener(this);
@@ -41,43 +51,12 @@ public class JoinMultiplayer extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
-    public void onClick(View view) {
-        if (view == this.btn_return_join) {
-            finish();
-        }
-        else if (view == this.btn_join) {
-            try {
-                lobby_ip = et_ip.getText().toString();
-                client_name = et_name_join.getText().toString();
-
-                Database.readServer("Lobbys", "Room1", "IP");
-
-                Toast.makeText(getApplicationContext(), Database.Value(), Toast.LENGTH_LONG).show();
-
-
-                //if (db.readServer(Database.lobbyRef.child("Room1").child("IP")).equals(lobby_ip)) {
-                //    Toast.makeText(getApplicationContext(), "Joining room!", Toast.LENGTH_LONG).show();
-                //}
-                //else {
-                //    Toast.makeText(getApplicationContext(), "Can't find the room!", Toast.LENGTH_LONG).show();
-                //}
-//                Toast.makeText(getApplicationContext(), Database.readServer(Database.database.getReference()), Toast.LENGTH_LONG).show();
-
-
-//                Toast.makeText(getApplicationContext(), "Successfully joined lobby!", Toast.LENGTH_LONG).show();
-            } catch (Exception e) {
-                Toast.makeText(getApplicationContext(), "Couldn't join the room\nMake sure that the ip is correct...", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    @Override
-    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
     }
 
     @Override
-    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
         if (et_name_join.getText().length() == 0 || et_ip.getText().length() == 0)
             btn_join.setEnabled(false);
         else
@@ -85,7 +64,8 @@ public class JoinMultiplayer extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
-    public void afterTextChanged(Editable editable) {
+    public void afterTextChanged(Editable s) {
+
     }
 }
 

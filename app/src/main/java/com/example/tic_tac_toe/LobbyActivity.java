@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class LobbyActivity extends AppCompatActivity implements View.OnClickListener {
+public class LobbyActivity extends AppCompatActivity {
 
     protected Button btn_exit_lobby;
 
@@ -41,20 +41,17 @@ public class LobbyActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
 
-        Intent intent = getIntent();
+        multiplayer_mode = getIntent().getStringExtra("Multiplayer");
+        host_name = getIntent().getStringExtra("HostName");
 
-        multiplayer_mode    = intent.getStringExtra("Multiplayer");
-        host_name           = intent.getCharSequenceExtra("HostName").toString();
+        btn_exit_lobby = findViewById(R.id.btn_exit_lobby);
+        tv_host_name = findViewById(R.id.tv_host_name);
+        tv_client_name = findViewById(R.id.tv_client_name);
+        tv_room_ip = findViewById(R.id.tv_room_ip);
+        sw_host = findViewById(R.id.sw_host_side);
+        sw_client = findViewById(R.id.sw_client_side);
+        ckbx_ready = findViewById(R.id.ckbx_ready);
 
-        btn_exit_lobby  = findViewById(R.id.btn_exit_lobby);
-        tv_host_name    = findViewById(R.id.tv_host_name);
-        tv_client_name  = findViewById(R.id.tv_client_name);
-        tv_room_ip      = findViewById(R.id.tv_room_ip);
-        sw_host         = findViewById(R.id.sw_host_side);
-        sw_client       = findViewById(R.id.sw_client_side);
-        ckbx_ready      = findViewById(R.id.ckbx_ready);
-
-        btn_exit_lobby.setOnClickListener(this);
         tv_host_name.setText(host_name);
         tv_client_name.setText("Waiting...");
         ckbx_ready.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -64,10 +61,12 @@ public class LobbyActivity extends AppCompatActivity implements View.OnClickList
                     ready_host = isChecked;
                     sw_host.setEnabled(!isChecked);
                 }
-                else if (multiplayer_mode.equals("Client")) {
-                    ready_client = isChecked;
-                    sw_client.setEnabled(!isChecked);
-                }
+            }
+        });
+        btn_exit_lobby.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LobbyActivity.this.finish();
             }
         });
 
@@ -84,14 +83,7 @@ public class LobbyActivity extends AppCompatActivity implements View.OnClickList
             }
         } else /* if (multiplayer_mode.equals("Client")) */ {
             sw_host.setEnabled(false);
+            sw_client.setEnabled(false);
         }
-
-        DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference();
-        dataRef.child("new").setValue(multiplayer_mode);
-    }
-
-    @Override
-    public void onClick(View v) {
-        finish();
     }
 }

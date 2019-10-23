@@ -103,7 +103,7 @@ public class SettingsActivity extends AppCompatActivity {
                             .putExtra("Mode", Utils.Mode.Multiplayer)
                             .putExtra("Max", max_games)
                             .putExtra("Timer", timer)
-                            .putExtra("HostName", et_name_host.getText())
+                            .putExtra("HostName", et_name_host.getText().toString())
                             .putExtra("Multiplayer", "Host")
                             .putExtra("Starting", starting_player));
                 }

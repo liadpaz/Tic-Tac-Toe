@@ -37,4 +37,13 @@
     <string name="Local_Time">הזמן שלך באפליקציה:</string>
     <string name="Global_Time">הזמן הכולל באפלקציה:</string>
     <string name="Settings">הגדרות</string>
+    <string name="Play_Local_Message">תבחר/י אם את/ה רוצה לשחק מול מחשב או שני שחקנים בפלאפון זה</string>
+    <string name="Two_Players">2 שחקנים</string>
+    <string name="Number_Wins">מספר נצחונות לנצחון</string>
+    <string name="Start_Player">בחר/י שחקן מתחיל:</string>
+    <string name="Toggle_Time">מתג זמן</string>
+    <string name="Max_Time">זמן לתור:</string>
+    <string name="Enter_Name">הכנס/הכניסי את שמך:</string>
+    <string name="Play">שחק/י</string>
+    <string name="Loading">טוען</string>
 </resources>

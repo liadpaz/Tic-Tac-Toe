@@ -1,10 +1,7 @@
 package com.example.tic_tac_toe;
 
-import android.os.SystemClock;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -13,6 +10,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.BufferedReader;
@@ -23,6 +21,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
@@ -73,56 +72,14 @@ class Utils {
     }
 }
 
-class Database implements ValueEventListener {
+class Database {
 
-    private static String value;
-    private static String key;
+    static DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference();
 
-    public static String Value() {
-        return value;
-    }
-
-//    public void writeLobbyDatabase(String type, String message) {
-//        lobbyRef.child(type).setValue(message);
-//    }
-//
-//    public void writeClientDatabase(String query, String type, String message) {
-//        if (query.equals("Lobby"))
-//            lobbyRef.child(type).setValue(message);
-//        else if (query.equals("Games"))
-//            gamesRef.child(type).setValue(message);
-//    }
-
-    static void readServer(String... children) throws Exception {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        for (String child: children) {
-            reference = reference.child(child);
-        }
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                value = dataSnapshot.getValue(String.class);
-                key   = dataSnapshot.getKey();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-        reference.child("KeepAlive").setValue(1);
-    }
-
-    @Override
-    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-        Toast.makeText(new JoinMultiplayer().getApplicationContext(), "Reading",Toast.LENGTH_LONG).show();
-        value = dataSnapshot.getValue(String.class);
-    }
-
-    @Override
-    public void onCancelled(@NonNull DatabaseError databaseError) {
-        Log.w("", "loadInfo:onCancelled", databaseError.toException());
-    }
+    private static List<String> message = new ArrayList<>();
+    private static String Ostat = null;
+    private static String Xstat = null;
+    private static String timeStat = null;
 }
 
 class Cell {
@@ -156,7 +113,7 @@ class Cell {
         return false;
     }
 
-    public Type getType() {
+    Type getType() {
         return type;
     }
 
@@ -223,12 +180,18 @@ class Stats {
     public enum Readables {
         Xwins,
         Owins,
-        Time
-    }
-    static File file;
+        Time;
 
-    static void setFile(File parent, String child) {
-        file = new File(parent, child);
+        String getRead() {
+            if (this == Xwins)  return "Xwins";
+            if (this == Owins)  return "Owins";
+                                return "Time";
+        }
+    }
+    private static File file;
+
+    static void setFile(File parent) {
+        file = new File(parent, "tic-tac-toe");
         if (readFile(Readables.Xwins) == null)
             writeFileAll("0");
     }
@@ -291,3 +254,28 @@ class Stats {
         }
     }
 }
+
+class Lobby {
+    String hostName;
+    String clientName;
+    String number;
+    String message = null;
+    boolean isFull = false;
+
+    public Lobby() {}
+    public Lobby(String number) {
+        this.number = number;
+    }
+
+    public String getHostName() { return hostName; }
+    public void setHostName(String hostName) { this.hostName = hostName; }
+    public String getClientName() { return clientName; }
+    public void setClientName(String clientName) { this.clientName = clientName; }
+    public String getNumber() { return number; }
+    public void setNumber(String number) { this.number = number; }
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
+    public boolean getFull() { return isFull; }
+    public void setFull(boolean isFull) { this.isFull = isFull; }
+}
+

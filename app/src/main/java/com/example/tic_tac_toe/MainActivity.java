@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Utils.setTime();
-        Stats.setFile(getFilesDir(), "tic-tac-toe");
+        Stats.setFile(getFilesDir());
 
         btn_singleplayer = findViewById(R.id.btn_singleplayer);
         btn_mutltiplayer = findViewById(R.id.btn_multiplayer);
@@ -36,17 +35,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder singleplayer = new AlertDialog.Builder(MainActivity.this)
-                        .setTitle("Play On This Device")
-                        .setMessage("Choose if you want to play VS a computer or 2 players on this device")
+                        .setTitle(getString(R.string.Play_Local))
+                        .setMessage(getString(R.string.Play_Local_Message))
                         .setCancelable(true)
-                        .setPositiveButton("Computer", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(getString(R.string.Computer), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startActivity(new Intent(getApplicationContext(), SettingsActivity.class)
                                         .putExtra("Mode", Mode.Computer));
                             }
                         })
-                        .setNegativeButton("2 Players", new DialogInterface.OnClickListener() {
+                        .setNegativeButton(getString(R.string.Two_Players), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startActivity(new Intent(getApplicationContext(), SettingsActivity.class)
@@ -59,31 +58,25 @@ public class MainActivity extends AppCompatActivity {
         btn_mutltiplayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "This feature is not available yet...", Toast.LENGTH_LONG).show();
+                AlertDialog.Builder multiplayer = new AlertDialog.Builder(MainActivity.this)
+                        .setNegativeButton("Host a game", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                startActivity(new Intent(getApplicationContext(), SettingsActivity.class)
+                                        .putExtra("Mode", Mode.Multiplayer));
+                            }
+                        })
+                        .setPositiveButton("Join a game", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                startActivity(new Intent(MainActivity.this, JoinMultiplayer.class));
+                            }
+                        })
+                        .setTitle("Multiplayer Options")
+                        .setMessage("Choose if you'd like to join a game / host a game");
+                multiplayer.show();
             }
         });
-//        btn_mutltiplayer.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                AlertDialog.Builder multiplayer = new AlertDialog.Builder(MainActivity.this)
-//                        .setNegativeButton("Host a game", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialogInterface, int i) {
-//                                startActivity(new Intent(getApplicationContext(), SettingsActivity.class)
-//                                        .putExtra("Mode", Mode.Multiplayer));
-//                            }
-//                        })
-//                        .setPositiveButton("Join a game", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialogInterface, int i) {
-//                                startActivity(new Intent(MainActivity.this, JoinMultiplayer.class));
-//                            }
-//                        })
-//                        .setTitle("Multiplayer Options")
-//                        .setMessage("Choose if you'd like to join a game / host a game");
-//                multiplayer.show();
-//            }
-//        });
         btn_stats.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
