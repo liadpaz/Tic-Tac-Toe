@@ -51,4 +51,17 @@
     <string name="LobbyNotFound">לא נמצא לובי עם המספר שהזנת</string>
     <string name="LobbyLeftMessage">השחקן האחר יצא מהלובי</string>
     <string name="BackMainMenu">חזרה לתפריט ראשי</string>
+    <string name="HostGame">פתח/י לובי</string>
+    <string name="JoinGame">הצטרף/הצטרפי ללובי קיים</string>
+    <string name="MultiplayerOptions">אפשרויות משחק מרובה שחקנים</string>
+    <string name="MultiplayerDialog">תבחר/י אם את/ה רוצה לפתוח לובי או להצטרף ללובי קיים</string>
+    <string name="Lobby">לובי משחק מרובה שחקנים</string>
+    <string name="LobbyNumber">מספר לובי:</string>
+    <string name="Ready">מוכן</string>
+    <string name="ReturnSettings">חזור להגדרות</string>
+    <string name="JoinLobby">חיבור ללובי קיים</string>
+    <string name="Join">הצטרף/הצטרפי</string>
+    <string name="EnterRoomNumber">הכנס/הכניסי את מספר הלובי (שאל/י את חברך):</string>
+    <string name="ResetData">איפוס נתונים מקומיים</string>
+    <string name="ResetDataDialog">את/ה עומד/ת לאפס את הנתונים המקומיים. את/ה בטוח/ה?</string>
 </resources>

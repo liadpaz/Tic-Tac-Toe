@@ -62,8 +62,8 @@ public class Statistics extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder alert = new AlertDialog.Builder(Statistics.this)
-                        .setTitle("Reset Local Data")
-                        .setMessage("You are about to delete local stats. Are you sure?")
+                        .setTitle(getString(R.string.ResetData))
+                        .setMessage(getString(R.string.ResetDataDialog))
                         .setPositiveButton(getString(R.string.Yes), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {

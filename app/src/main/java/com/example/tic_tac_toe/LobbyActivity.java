@@ -138,7 +138,6 @@ public class LobbyActivity extends AppCompatActivity {
                                         lobbyRef.setValue(null);
 
                                         finishAffinity();
-
                                         startActivity(new Intent(LobbyActivity.this, MainActivity.class));
 
                                     }

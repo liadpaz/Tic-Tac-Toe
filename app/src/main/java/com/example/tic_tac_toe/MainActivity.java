@@ -59,21 +59,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder multiplayer = new AlertDialog.Builder(MainActivity.this)
-                        .setNegativeButton("Host a game", new DialogInterface.OnClickListener() {
+                        .setNegativeButton(getString(R.string.HostGame), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 startActivity(new Intent(getApplicationContext(), SettingsActivity.class)
                                         .putExtra("Mode", Mode.Multiplayer));
                             }
                         })
-                        .setPositiveButton("Join a game", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(getString(R.string.JoinGame), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 startActivity(new Intent(MainActivity.this, JoinMultiplayer.class));
                             }
                         })
-                        .setTitle("Multiplayer Options")
-                        .setMessage("Choose if you'd like to join a game / host a game");
+                        .setTitle(getString(R.string.MultiplayerOptions))
+                        .setMessage(R.string.MultiplayerDialog);
                 multiplayer.show();
             }
         });
