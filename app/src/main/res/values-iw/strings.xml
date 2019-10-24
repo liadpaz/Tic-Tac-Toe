@@ -46,4 +46,9 @@
     <string name="Enter_Name">הכנס/הכניסי את שמך:</string>
     <string name="Play">שחק/י</string>
     <string name="Loading">טוען</string>
+    <string name="Waiting">מחכה...</string>
+    <string name="LobbyLength">מספר הלובי צריך להיות בדיוק ארבע ספרות</string>
+    <string name="LobbyNotFound">לא נמצא לובי עם המספר שהזנת</string>
+    <string name="LobbyLeftMessage">השחקן האחר יצא מהלובי</string>
+    <string name="BackMainMenu">חזרה לתפריט ראשי</string>
 </resources>

@@ -8,11 +8,12 @@
 
     <TextView
         android:id="@+id/tv_join"
-        android:textAllCaps="false"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:text="Join a Room"
+        android:textAlignment="center"
+        android:textAllCaps="false"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -30,15 +31,16 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_name_join" />
 
     <EditText
-        android:id="@+id/et_ip"
+        android:id="@+id/et_lobby_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:ems="10"
-        android:inputType="textPersonName"
+        android:inputType="number"
+        android:maxLength="4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_ip" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_lobby_number" />
 
     <TextView
         android:id="@+id/tv_name_join"
@@ -46,6 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
         android:text="Enter name:"
+        android:textAlignment="center"
         android:textColor="@android:color/black"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -53,11 +56,12 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_join" />
 
     <TextView
-        android:id="@+id/tv_ip"
+        android:id="@+id/tv_lobby_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
         android:text="Enter room ip (ask your friend):"
+        android:textAlignment="center"
         android:textColor="@android:color/black"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -69,9 +73,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
-        android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
         android:text="Join"
+        android:textAlignment="center"
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -81,9 +85,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
         android:layout_marginBottom="10dp"
-        android:text="Return to main menu"
+        android:text="@string/Main_Menu"
+        android:textAlignment="center"
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

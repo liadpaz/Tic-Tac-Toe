@@ -1,5 +1,6 @@
 package com.example.tic_tac_toe;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -15,7 +16,14 @@ import android.widget.NumberPicker;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+
 public class SettingsActivity extends AppCompatActivity {
+
+    DatabaseReference settingRef;
 
     int max_games = 1;
     int timer = 0;
@@ -31,7 +39,7 @@ public class SettingsActivity extends AppCompatActivity {
     TextView tv_name_host;
     EditText et_name_host;
 
-    CheckBox tgl_timer;
+    CheckBox sw_timer;
 
     Button btn_return;
     Button btn_play;
@@ -45,7 +53,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         numpic_maxgames = findViewById(R.id.numpic_games);
         numpic_timer = findViewById(R.id.numpic_timer);
-        tgl_timer = findViewById(R.id.tgl_timer);
+        sw_timer = findViewById(R.id.sw_timer);
         btn_return = findViewById(R.id.btn_return_settigns);
         btn_play = findViewById(R.id.btn_play);
         et_name_host = findViewById(R.id.et_name_host);
@@ -71,7 +79,15 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        tgl_timer.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+        sw_player_start.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) starting_player = Cell.Type.O;
+                else starting_player = Cell.Type.X;
+            }
+        });
+        sw_timer.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 numpic_timer.setEnabled(isChecked);
@@ -99,13 +115,7 @@ public class SettingsActivity extends AppCompatActivity {
                             .putExtra("Starting", starting_player));
 
                 } else if (mode == Utils.Mode.Multiplayer) {
-                    startActivity(new Intent(getApplicationContext(), LobbyActivity.class)
-                            .putExtra("Mode", Utils.Mode.Multiplayer)
-                            .putExtra("Max", max_games)
-                            .putExtra("Timer", timer)
-                            .putExtra("HostName", et_name_host.getText().toString())
-                            .putExtra("Multiplayer", "Host")
-                            .putExtra("Starting", starting_player));
+                    initializeLobby();
                 }
             }
         });
@@ -136,14 +146,6 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        sw_player_start.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) starting_player = Cell.Type.O;
-                else starting_player = Cell.Type.X;
-            }
-        });
-
         numpic_maxgames.setValue(max_games);
         numpic_timer.setValue(timer);
         numpic_timer.setEnabled(false);
@@ -154,5 +156,34 @@ public class SettingsActivity extends AppCompatActivity {
             et_name_host.setVisibility(View.VISIBLE);
             tv_name_host.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void initializeLobby() {
+
+        settingRef = Database.dataRef.child("Lobbies");
+
+        settingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                String lobbyNumber = Utils.getRoomNumber();
+
+                while (dataSnapshot.hasChild(lobbyNumber))
+                    lobbyNumber = Utils.getRoomNumber();
+
+                settingRef.child(lobbyNumber).setValue(new Lobby(et_name_host.getText().toString(), lobbyNumber, starting_player.toString(), timer, max_games));
+                settingRef.child(lobbyNumber).child("startingType").setValue(starting_player.toString());
+
+                startActivity(new Intent(SettingsActivity.this, LobbyActivity.class)
+                        .putExtra("HostName", et_name_host.getText().toString())
+                        .putExtra("Multiplayer", "Host")
+                        .putExtra("Starting", starting_player)
+                        .putExtra("LobbyNumber", lobbyNumber));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
     }
 }

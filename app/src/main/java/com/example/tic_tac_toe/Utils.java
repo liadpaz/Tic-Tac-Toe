@@ -3,15 +3,10 @@ package com.example.tic_tac_toe;
 import android.view.View;
 import android.widget.ImageView;
 
-import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -21,7 +16,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
@@ -42,44 +36,33 @@ class Utils {
         return time;
     }
 
+    static String getRoomNumber() {
+        StringBuilder number = new StringBuilder();
+        for (int i = 0; i < 4; i++)
+            number.append((new Random()).nextInt(10));
+        return number.toString();
+    }
 
-    static String getIPAddress(boolean useIPv4) {
+    static boolean isConnected() {
         try {
             List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
             for (NetworkInterface intf : interfaces) {
                 List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
                 for (InetAddress addr : addrs) {
                     if (!addr.isLoopbackAddress()) {
-                        String sAddr = addr.getHostAddress();
-                        boolean isIPv4 = sAddr.indexOf(':') < 0;
-
-                        if (useIPv4) {
-                            if (isIPv4)
-                                return sAddr;
-                        } else {
-                            if (!isIPv4) {
-                                int delim = sAddr.indexOf('%');
-                                return delim < 0 ? sAddr.toUpperCase() : sAddr.substring(0, delim).toUpperCase();
-                            }
-                        }
+                        return addr.getHostAddress() != null;
                     }
                 }
             }
-            return null;
+            return false;
         } catch (Exception ignored) {
-            return null;
+            return false;
         }
     }
 }
 
 class Database {
-
     static DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference();
-
-    private static List<String> message = new ArrayList<>();
-    private static String Ostat = null;
-    private static String Xstat = null;
-    private static String timeStat = null;
 }
 
 class Cell {
@@ -146,24 +129,13 @@ class Player {
 
     final Type playerType;
     private int wins = 0;
-    private final Cell.Type XO;
 
-    Player(Type player, Cell.Type type) {
+    Player(Type player) {
         playerType = player;
-        this.XO = type;
     }
 
     void won() {
         wins++;
-    }
-
-    public Cell.Type getXO() {
-        return XO;
-    }
-
-    String getStringType() {
-        if (playerType == Type.CPU) return "Computer";
-        return "You";
     }
 
     String getWins() {
@@ -193,7 +165,7 @@ class Stats {
     static void setFile(File parent) {
         file = new File(parent, "tic-tac-toe");
         if (readFile(Readables.Xwins) == null)
-            writeFileAll("0");
+            resetFile();
     }
 
     static String readFile(Readables param) {
@@ -245,10 +217,10 @@ class Stats {
         writeFile(Readables.Time, String.valueOf(Integer.parseInt(readFile(Readables.Time)) + (int) time));
     }
 
-    static void writeFileAll(String message) {
+    static void resetFile() {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(String.format("%s %s %s", message, message, message));
+            writer.write(String.format("%s %s %s", "0", "0", "0"));
             writer.close();
         } catch (Exception ignored) {
         }
@@ -256,26 +228,98 @@ class Stats {
 }
 
 class Lobby {
-    String hostName;
-    String clientName;
-    String number;
-    String message = null;
-    boolean isFull = false;
+
+    private int max;
+    private int timer;
+    private String hostName;
+    private String clientName;
+    private String number;
+    private String clientMessage;
+    private String hostMessage;
+    private String hostType;
+    private String startingType;
 
     public Lobby() {}
-    public Lobby(String number) {
+
+    public Lobby(String hostName, String number, String startingType, int timer, int max) {
+        this.hostName = hostName;
+        this.number = number;
+        this.startingType = startingType;
+        this.timer = timer;
+        this.max = max;
+        this.hostType = "O";
+    }
+
+    public int getMax() {
+        return max;
+    }
+
+    public void setMax(int max) {
+        this.max = max;
+    }
+
+    public int getTimer() {
+        return timer;
+    }
+
+    public void setTimer(int timer) {
+        this.timer = timer;
+    }
+
+    public String getHostName() {
+        return hostName;
+    }
+
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
+    }
+
+    public String getClientName() {
+        return clientName;
+    }
+
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
         this.number = number;
     }
 
-    public String getHostName() { return hostName; }
-    public void setHostName(String hostName) { this.hostName = hostName; }
-    public String getClientName() { return clientName; }
-    public void setClientName(String clientName) { this.clientName = clientName; }
-    public String getNumber() { return number; }
-    public void setNumber(String number) { this.number = number; }
-    public String getMessage() { return message; }
-    public void setMessage(String message) { this.message = message; }
-    public boolean getFull() { return isFull; }
-    public void setFull(boolean isFull) { this.isFull = isFull; }
+    public String getClientMessage() {
+        return clientMessage;
+    }
+
+    public void setClientMessage(String clientMessage) {
+        this.clientMessage = clientMessage;
+    }
+
+    public String getHostMessage() {
+        return hostMessage;
+    }
+
+    public void setHostMessage(String hostMessage) {
+        this.hostMessage = hostMessage;
+    }
+
+    public String getHostType() {
+        return hostType;
+    }
+
+    public void setHostType(String hostType) {
+        this.hostType = hostType;
+    }
+
+    public String getStartingType() {
+        return startingType;
+    }
+
+    public void setStartingType(String startingType) {
+        this.startingType = startingType;
+    }
 }
 

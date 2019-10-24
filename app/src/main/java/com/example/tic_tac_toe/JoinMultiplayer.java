@@ -1,7 +1,6 @@
 package com.example.tic_tac_toe;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,30 +9,77 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class JoinMultiplayer extends AppCompatActivity implements TextWatcher {
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+
+public class JoinMultiplayer extends AppCompatActivity {
+
+    DatabaseReference joinRef;
 
     Button btn_return_join;
     Button btn_join;
 
     EditText et_name_join;
-    EditText et_ip;
+    EditText et_lobby_number;
 
-    String client_name, lobby_ip;
+    String clientName;
+    String lobbyNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join_multiplayer);
 
+        joinRef = Database.dataRef.child("Lobbies");
+
         btn_return_join = findViewById(R.id.btn_return_join);
         btn_join = findViewById(R.id.btn_join);
         et_name_join = findViewById(R.id.et_name_join);
-        et_ip = findViewById(R.id.et_ip);
+        et_lobby_number = findViewById(R.id.et_lobby_number);
 
         btn_join.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                clientName = et_name_join.getText().toString();
+                lobbyNumber = et_lobby_number.getText().toString();
+
+                if (lobbyNumber.length() != "0000".length())
+                    Toast.makeText(JoinMultiplayer.this, getString(R.string.LobbyLength), Toast.LENGTH_LONG).show();
+                else {
+                    joinRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                            for (DataSnapshot data : dataSnapshot.getChildren()) {
+                                if (data.getKey().equals(lobbyNumber)) {
+
+                                    if (data.child("clientName").getValue(String.class) == null) {
+
+                                        startActivity(new Intent(JoinMultiplayer.this, LobbyActivity.class)
+                                                .putExtra("ClientName", clientName)
+                                                .putExtra("Multiplayer", "Client")
+                                                .putExtra("LobbyNumber", lobbyNumber));
+                                        joinRef.child(lobbyNumber).child("clientName").setValue(clientName);
+
+                                    }
+                                    break;
+                                } else
+                                    Toast.makeText(JoinMultiplayer.this, getString(R.string.LobbyNotFound), Toast.LENGTH_LONG).show();
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                        }
+                    });
+                }
             }
         });
         btn_return_join.setOnClickListener(new View.OnClickListener() {
@@ -43,29 +89,37 @@ public class JoinMultiplayer extends AppCompatActivity implements TextWatcher {
             }
         });
 
-        et_name_join.addTextChangedListener(this);
-        et_ip.addTextChangedListener(this);
+        et_name_join.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                btn_join.setEnabled(s.length() > 0 && et_lobby_number.length() > 0);
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+        et_lobby_number.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                btn_join.setEnabled(s.length() > 0 && et_name_join.length() > 0);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
 
         btn_join.setEnabled(false);
-
-    }
-
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-        if (et_name_join.getText().length() == 0 || et_ip.getText().length() == 0)
-            btn_join.setEnabled(false);
-        else
-            btn_join.setEnabled(true);
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-
     }
 }
 

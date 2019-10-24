@@ -61,4 +61,9 @@
     <string name="Enter_Name">Enter your name:</string>
     <string name="Play">Play</string>
     <string name="Loading">Loading</string>
+    <string name="Waiting">Waiting...</string>
+    <string name="LobbyLength">Lobby number should be exactly 4 number</string>
+    <string name="LobbyNotFound">No lobby with this number was found</string>
+    <string name="LobbyLeftMessage">The other player has left the lobby</string>
+    <string name="BackMainMenu">Back to main menu</string>
 </resources>

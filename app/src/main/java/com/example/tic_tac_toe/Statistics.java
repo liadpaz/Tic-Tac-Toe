@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 public class Statistics extends AppCompatActivity {
@@ -26,10 +25,6 @@ public class Statistics extends AppCompatActivity {
     TextView tv_globalX;
     TextView tv_localTime;
     TextView tv_globalTime;
-
-    static String globalXwins;
-    static String globalOwins;
-    static String globalTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +44,7 @@ public class Statistics extends AppCompatActivity {
         tv_localX.setText(Stats.readFile(Stats.Readables.Xwins));
         tv_localTime.setText(String.format("%s %s", Stats.readFile(Stats.Readables.Time), getString(R.string.Seconds)));
 
-        if (Utils.getIPAddress(true) != null) {
+        if (Utils.isConnected()) {
             getGlobals();
         } else {
             tv_globalO.setText(getString(R.string.not_available_offline));
@@ -72,7 +67,7 @@ public class Statistics extends AppCompatActivity {
                         .setPositiveButton(getString(R.string.Yes), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Stats.writeFileAll("0");
+                                Stats.resetFile();
                                 tv_localO.setText("0");
                                 tv_localX.setText("0");
                                 tv_localTime.setText("0");
