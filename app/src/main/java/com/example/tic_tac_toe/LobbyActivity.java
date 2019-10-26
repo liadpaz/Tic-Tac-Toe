@@ -268,6 +268,7 @@ public class LobbyActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        lobbyRef.setValue(null);
         writeDatabaseMessage("left");
         super.onBackPressed();
     }
