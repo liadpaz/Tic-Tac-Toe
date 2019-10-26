@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Tic-Tac-Toe</string>
-    <string name="title_activity_settings_global" translatable="false">Settings</string>
 
     <!-- Preference Titles -->
     <string name="messages_header" translatable="false">Messages</string>
@@ -45,7 +44,7 @@
     <string name="Tie">Tie</string>
     <string name="Choose_Player">"Choose player"</string>
     <string name="Player_Chooser">"Which player you wish to be?"</string>
-    <string name="not_available_offline">"Not available while offline…"</string>
+    <string name="NotAvailableOffline">"Not available while offline…"</string>
     <string name="Restart">Restart</string>
     <string name="Restart_question">"Are you sure you want to restart the current game?"</string>
     <string name="Yes">Yes</string>
@@ -79,4 +78,11 @@
     <string name="EnterRoomNumber">Enter the room number (ask your friend):</string>
     <string name="ResetData">Reset Local Data</string>
     <string name="ResetDataDialog">You are about to delete local stats. Are you sure?</string>
+    <string name="Its">It\'s</string>
+    <string name="Turn">\'s turn</string>
+    <string name="LobbyFull">Lobby is already full</string>
+    <string name="DevFirst" translatable="false">You are</string>
+    <string name="DevSecond" translatable="false">steps away from entering developer mode</string>
+    <string name="DevButton" translatable="false">Check credentials</string>
+    <string name="Delete" translatable="false">Delete</string>
 </resources>

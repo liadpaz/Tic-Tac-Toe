@@ -12,7 +12,11 @@
         android:roundIcon="@mipmap/tic_tac_toe_round"
         android:supportsRtl="false"
         android:theme="@style/AppTheme">
-        <activity android:name=".Statistics"
+        <activity android:name=".DeveloperActivity"
+            android:resizeableActivity="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Statistics"
             android:resizeableActivity="false"
             android:screenOrientation="portrait" />
         <activity

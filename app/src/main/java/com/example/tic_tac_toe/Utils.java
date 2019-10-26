@@ -68,7 +68,13 @@ class Database {
 class Cell {
     public enum Type {
         X,
-        O
+        O;
+
+        Type flip() {
+            if (this == X)
+                return O;
+            return X;
+        }
     }
 
     private ImageView[] XO;
@@ -152,23 +158,18 @@ class Stats {
     public enum Readables {
         Xwins,
         Owins,
-        Time;
-
-        String getRead() {
-            if (this == Xwins)  return "Xwins";
-            if (this == Owins)  return "Owins";
-                                return "Time";
-        }
+        Time
     }
+
     private static File file;
 
     static void setFile(File parent) {
         file = new File(parent, "tic-tac-toe");
-        if (readFile(Readables.Xwins) == null)
+        if (readFile(Readables.Xwins) == -1)
             resetFile();
     }
 
-    static String readFile(Readables param) {
+    static int readFile(Readables param) {
         StringBuffer stringBuffer = new StringBuffer();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line = reader.readLine();
@@ -176,51 +177,51 @@ class Stats {
             String[] contents = stringBuffer.toString().split(" ");
             switch (param) {
                 case Xwins:
-                    return contents[0];
+                    return Integer.parseInt(contents[0]);
 
                 case Owins:
-                    return contents[1];
+                    return Integer.parseInt(contents[1]);
 
                 case Time:
-                    return contents[2];
+                    return Integer.parseInt(contents[2]);
 
                 default:
-                    return null;
+                    return 0;
             }
         } catch (IOException error) {
-            return null;
+            return -1;
         }
     }
 
-    static private void writeFile(Readables type, String message) {
+    static private void writeFile(Readables type, int message) {
         try {
-            String Xwins = type == Readables.Xwins ? message : readFile(Readables.Xwins);
-            String Owins = type == Readables.Owins ? message : readFile(Readables.Owins);
-            String Time  = type == Readables.Time ? message : readFile(Readables.Time);
+            int Xwins = type == Readables.Xwins ? message : readFile(Readables.Xwins);
+            int Owins = type == Readables.Owins ? message : readFile(Readables.Owins);
+            int Time  = type == Readables.Time ? message : readFile(Readables.Time);
 
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(String.format("%s %s %s", Xwins, Owins, Time));
+            writer.write(String.format("%d %d %d", Xwins, Owins, Time));
             writer.close();
         } catch (Exception ignored) {
         }
     }
 
     static void addXwins() {
-        writeFile(Readables.Xwins, String.valueOf(Integer.parseInt(readFile(Readables.Xwins)) + 1));
+        writeFile(Readables.Xwins, readFile(Readables.Xwins) + 1);
     }
 
     static void addOwins() {
-        writeFile(Readables.Owins, String.valueOf(Integer.parseInt(readFile(Readables.Owins)) + 1));
+        writeFile(Readables.Owins, readFile(Readables.Owins) + 1);
     }
 
     static void addTime(long time) {
-        writeFile(Readables.Time, String.valueOf(Integer.parseInt(readFile(Readables.Time)) + (int) time));
+        writeFile(Readables.Time, readFile(Readables.Time) + (int) time);
     }
 
     static void resetFile() {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(String.format("%s %s %s", "0", "0", "0"));
+            writer.write(String.format("%d %d %d", 0, 0, 0));
             writer.close();
         } catch (Exception ignored) {
         }

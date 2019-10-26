@@ -12,9 +12,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 public class Statistics extends AppCompatActivity {
+
+    DatabaseReference statsRef;
+
+    int globalOwins;
+    int globalXwins;
+    int globalTime;
 
     Button btn_return;
     Button btn_reset;
@@ -40,16 +47,16 @@ public class Statistics extends AppCompatActivity {
         tv_localTime = findViewById(R.id.tv_local_time);
         tv_globalTime = findViewById(R.id.tv_global_time);
 
-        tv_localO.setText(Stats.readFile(Stats.Readables.Owins));
-        tv_localX.setText(Stats.readFile(Stats.Readables.Xwins));
-        tv_localTime.setText(String.format("%s %s", Stats.readFile(Stats.Readables.Time), getString(R.string.Seconds)));
+        tv_localO.setText(String.valueOf(Stats.readFile(Stats.Readables.Owins)));
+        tv_localX.setText(String.valueOf(Stats.readFile(Stats.Readables.Xwins)));
+        tv_localTime.setText(String.format("%s %s", String.valueOf(Stats.readFile(Stats.Readables.Time)), getString(R.string.Seconds)));
 
         if (Utils.isConnected()) {
             getGlobals();
         } else {
-            tv_globalO.setText(getString(R.string.not_available_offline));
-            tv_globalX.setText(getString(R.string.not_available_offline));
-            tv_globalTime.setText(getString(R.string.not_available_offline));
+            tv_globalO.setText(getString(R.string.NotAvailableOffline));
+            tv_globalX.setText(getString(R.string.NotAvailableOffline));
+            tv_globalTime.setText(getString(R.string.NotAvailableOffline));
         }
 
         btn_return.setOnClickListener(new View.OnClickListener() {
@@ -67,11 +74,34 @@ public class Statistics extends AppCompatActivity {
                         .setPositiveButton(getString(R.string.Yes), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Stats.resetFile();
-                                tv_localO.setText("0");
-                                tv_localX.setText("0");
-                                tv_localTime.setText("0");
-                                Utils.setTime();
+
+                                statsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                        globalOwins = dataSnapshot.child("Owins").getValue(Integer.class) - Stats.readFile(Stats.Readables.Owins);
+                                        globalXwins = dataSnapshot.child("Xwins").getValue(Integer.class) - Stats.readFile(Stats.Readables.Xwins);
+                                        globalTime = dataSnapshot.child("Time").getValue(Integer.class) - Stats.readFile(Stats.Readables.Time);
+
+                                        tv_globalO.setText(String.valueOf(globalOwins));
+                                        tv_globalX.setText(String.valueOf(globalXwins));
+                                        tv_globalTime.setText(String.format("%s %s", String.valueOf(globalTime), getString(R.string.Seconds)));
+
+                                        statsRef.child("Owins").setValue(globalOwins);
+                                        statsRef.child("Xwins").setValue(globalXwins);
+                                        statsRef.child("Time").setValue(globalTime);
+
+                                        Stats.resetFile();
+                                        tv_localO.setText("0");
+                                        tv_localX.setText("0");
+                                        tv_localTime.setText("0");
+                                        Utils.setTime();
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    }
+                                });
                             }
                         })
                         .setNegativeButton(getString(R.string.No), null)
@@ -87,12 +117,14 @@ public class Statistics extends AppCompatActivity {
         tv_globalX.setText(getString(R.string.Loading));
         tv_globalTime.setText(getString(R.string.Loading));
 
-        Database.dataRef.orderByValue().addListenerForSingleValueEvent(new ValueEventListener() {
+        statsRef = Database.dataRef;
+
+        statsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                tv_globalO.setText(dataSnapshot.child("Owins").getValue(String.class));
-                tv_globalX.setText(dataSnapshot.child("Xwins").getValue(String.class));
-                tv_globalTime.setText(String.format("%s %s", dataSnapshot.child("Time").getValue(String.class), getString(R.string.Seconds)));
+                tv_globalO.setText(String.valueOf(dataSnapshot.child("Owins").getValue(Integer.class)));
+                tv_globalX.setText(String.valueOf(dataSnapshot.child("Xwins").getValue(Integer.class)));
+                tv_globalTime.setText(String.format("%d %s", dataSnapshot.child("Time").getValue(Integer.class), getString(R.string.Seconds)));
             }
 
             @Override

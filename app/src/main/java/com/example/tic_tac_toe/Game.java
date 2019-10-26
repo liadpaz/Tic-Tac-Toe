@@ -34,7 +34,7 @@ public class Game extends AppCompatActivity {
 
     Type turn;
     Type thisType;
-    int maxgames;
+    int maxGames;
     int timer;
     Utils.Mode mode;
     Type startingType;
@@ -51,8 +51,9 @@ public class Game extends AppCompatActivity {
     String multiType;
     String lastHostMessage;
     String lastClientMessage;
-
+    String lastMessage;
     String exitStatus;
+    boolean canPlay;
 
     ImageView iv_board;
     Player[] players = new Player[2];
@@ -69,7 +70,7 @@ public class Game extends AppCompatActivity {
     TextView tv_playerO;
     TextView tv_playerOwins;
     TextView tv_maxgames;
-    TextView tv_multi_turn;
+    TextView tv_turn;
 
     boolean vs_multiplayer;
     boolean vs_computer;
@@ -80,7 +81,7 @@ public class Game extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        maxgames = getIntent().getIntExtra("Max", -1);
+        maxGames = getIntent().getIntExtra("Max", -1);
         timer = getIntent().getIntExtra("Timer", -1);
         mode = (Utils.Mode) getIntent().getSerializableExtra("Mode");
         startingType = (Cell.Type) getIntent().getSerializableExtra("Starting");
@@ -110,7 +111,7 @@ public class Game extends AppCompatActivity {
         tv_maxgames = findViewById(R.id.tv_maxgames);
         tv_time_text = findViewById(R.id.tv_time_text);
         tv_timer = findViewById(R.id.tv_timer);
-        tv_multi_turn = findViewById(R.id.tv_multi_turn);
+        tv_turn = findViewById(R.id.tv_turn);
 
         vs_multiplayer = mode == null;
 
@@ -119,6 +120,8 @@ public class Game extends AppCompatActivity {
             vs_on_this_device = mode == Utils.Mode.TwoPlayer;
             initialize();
         } else {
+
+            canPlay = true;
 
             btn_reset.setVisibility(View.INVISIBLE);
 
@@ -146,9 +149,9 @@ public class Game extends AppCompatActivity {
                         }
                     }
 
-                    if (timer == -1 || maxgames == -1 || thisName == null) {
+                    if (timer == -1 || maxGames == -1 || thisName == null) {
                         timer = dataSnapshot.child("timer").getValue(Integer.class);
-                        maxgames = dataSnapshot.child("max").getValue(Integer.class);
+                        maxGames = dataSnapshot.child("max").getValue(Integer.class);
 
                         players[0] = new Player(Player.Type.Human);
                         players[1] = new Player(Player.Type.Human);
@@ -164,6 +167,7 @@ public class Game extends AppCompatActivity {
                     if (startingType == null) {
                         startingType = dataSnapshot.child("startingType").getValue(String.class).equals("X") ? Type.X : Type.O;
                         turn = startingType;
+                        tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), thisType == startingType ? thisName : otherName, getString(R.string.Turn), startingType.toString()));
                     }
 
                     if (multiType.equals("Host")) {
@@ -186,6 +190,13 @@ public class Game extends AppCompatActivity {
                                     else
                                         Stats.addOwins();
                                     absoluteWinnerAlert(false, thisName).show();
+                                    break;
+
+                                case "go":
+                                    canPlay = true;
+                                    lastMessage = "go";
+                                    turn = startingType;
+                                    tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), thisType == startingType ? thisName : otherName, getString(R.string.Turn), startingType.toString()));
                                     break;
                             }
                         }
@@ -211,6 +222,13 @@ public class Game extends AppCompatActivity {
                                     else
                                         Stats.addOwins();
                                     absoluteWinnerAlert(false, thisName).show();
+                                    break;
+
+                                case "go":
+                                    canPlay = true;
+                                    lastMessage = "go";
+                                    turn = startingType;
+                                    tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), thisType == turn ? thisName : otherName, getString(R.string.Turn), turn.toString()));
                                     break;
                             }
                         }
@@ -240,7 +258,8 @@ public class Game extends AppCompatActivity {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 if (vs_multiplayer)
                                     exitStatus = "resign";
-                                finish();
+                                finishAffinity();
+                                startActivity(new Intent(Game.this, MainActivity.class));
                             }
                         })
                         .setNegativeButton(getString(R.string.No), null)
@@ -275,6 +294,8 @@ public class Game extends AppCompatActivity {
         int x = screen.widthPixels;
 
         iv_board.setLayoutParams(new ConstraintLayout.LayoutParams(x, x));
+        iv_board.setX(0);
+        iv_board.setY(0);
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -285,6 +306,8 @@ public class Game extends AppCompatActivity {
         }
 
         if (vs_computer) {
+
+            tv_turn.setVisibility(View.INVISIBLE);
 
             AlertDialog.Builder dialog = new AlertDialog.Builder(this)
                     .setCancelable(false)
@@ -333,6 +356,8 @@ public class Game extends AppCompatActivity {
 
         } else if (vs_on_this_device) {
 
+            tv_turn.setText(String.format("%s %s%s", getString(R.string.Its), turn.toString(), getString(R.string.Turn)));
+
             players[0] = new Player(Player.Type.Human);
             players[1] = new Player(Player.Type.Human);
             tv_playerO.setText("O");
@@ -346,7 +371,7 @@ public class Game extends AppCompatActivity {
     }
 
     /**
-     * This function gets triggered whenever the user touches the pScreen, and
+     * This function gets triggered whenever the user touches the screen, and
      * decides whether to count as a valid XO press, if so, it makes the X / O
      * visible and checks for winner / tie.
      *
@@ -359,9 +384,11 @@ public class Game extends AppCompatActivity {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
-                    if (over_cells[i][j].contains(touchX, touchY) && !cells[i][j].isVisible() && (!vs_multiplayer || turn == thisType)) {
+                    if (over_cells[i][j].contains(touchX, touchY) && !cells[i][j].isVisible() && (!vs_multiplayer || (turn == thisType && canPlay))) {
                         boolean isGameOver = play(i, j);
-                        if (vs_multiplayer) writeDatabaseMessage(String.format("turn %s %s", String.valueOf(i), String.valueOf(j)));
+                        if (vs_multiplayer) {
+                            writeDatabaseMessage(String.format("turn %s %s", String.valueOf(i), String.valueOf(j)));
+                        }
                         if (isGameOver) {
                             i = 3;
                             break;
@@ -384,7 +411,7 @@ public class Game extends AppCompatActivity {
         return new AlertDialog.Builder(this)
                 .setCancelable(false)
                 .setTitle(getString(R.string.Congratulations))
-                .setMessage(player ? String.format("%s %s %s", getString(R.string.Player), player_won, getString(R.string.Won)) : String.format("%s %s",player_won, getString(R.string.Won)))
+                .setMessage(player ? String.format("%s %s %s", getString(R.string.Player), player_won, getString(R.string.Won)) : String.format("%s %s", player_won, getString(R.string.Won)))
                 .setPositiveButton(getString(R.string.Continue), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -409,6 +436,11 @@ public class Game extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         resetGame(false);
+                        if (vs_multiplayer) {
+                            writeDatabaseMessage("go");
+                            canPlay = lastMessage != null;
+                            lastMessage = lastMessage == null ? "" : null;
+                        }
                         if (timer != 0 && notCPUturn())
                             counter.start();
                     }
@@ -432,11 +464,8 @@ public class Game extends AppCompatActivity {
                 .setPositiveButton(getString(R.string.Continue), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (vs_multiplayer) {
-                            finishAffinity();
-                            startActivity(new Intent(Game.this, MainActivity.class));
-                        } else
-                            finish();
+                    finishAffinity();
+                    startActivity(new Intent(Game.this, MainActivity.class));
                     }
                 });
     }
@@ -452,7 +481,9 @@ public class Game extends AppCompatActivity {
     @Nullable
     private Type winner() {
         if (checkWinner()) {
-            if (timer != 0) counter.cancel();
+            if (timer != 0) {
+                counter.cancel();
+            }
             Type winner = turn;
             if (winner == Type.O) {
                 players[0].won();
@@ -461,14 +492,19 @@ public class Game extends AppCompatActivity {
                 players[1].won();
                 tv_playerXwins.setText(players[1].getWins());
             }
-            if (!(Integer.parseInt(players[0].getWins()) == maxgames || Integer.parseInt(players[1].getWins()) == maxgames))
+            if (!(Integer.parseInt(players[0].getWins()) == maxGames || Integer.parseInt(players[1].getWins()) == maxGames)) {
                 winnerAlert(!vs_multiplayer, winner.toString()).show();
+                if (vs_multiplayer) {
+                    tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), thisType == turn ? thisName : otherName, getString(R.string.Turn), turn.toString()));
+                }
+            }
             else {
                 if (vs_on_this_device || notCPUturn() || (vs_multiplayer && (winner == thisType))) {
-                    if (winner == Type.X)
-                        Stats.addXwins();
-                    else if (winner == Type.O)
-                        Stats.addOwins();
+                    if (winner == Type.X) {
+                        addXwins();
+                    } else if (winner == Type.O) {
+                        addOwins();
+                    }
                 }
                 if (vs_multiplayer) {
                     absoluteWinnerAlert(false, thisType == winner ? thisName : otherName).show();
@@ -490,12 +526,14 @@ public class Game extends AppCompatActivity {
         if (hardReset) {
             players[0] = new Player(players[0].playerType);
             players[1] = new Player(players[1].playerType);
+            tv_playerOwins.setText("0");
+            tv_playerXwins.setText("0");
         }
         hideAll();
         turn = startingType;
         if ((players[0].playerType == Player.Type.CPU && turn == Type.O) || (players[1].playerType == Player.Type.CPU && turn == Type.X)) {
             putCPU();
-            turn = turn == Type.O ? Type.X : Type.O;
+            turn = turn.flip();
         }
     }
 
@@ -508,14 +546,17 @@ public class Game extends AppCompatActivity {
             while (!cells[rand[0]][rand[1]].setType(turn)) {
                 rand = players[0].getRandom();
             }
-            writeDatabaseMessage(String.format("turn %s %s", String.valueOf(rand[0]), String.valueOf(rand[1])));
+            if (vs_multiplayer) {
+                writeDatabaseMessage(String.format("turn %s %s", String.valueOf(rand[0]), String.valueOf(rand[1])));
+            }
         } else {
             int[] rand = players[1].getRandom();
             while (!cells[rand[0]][rand[1]].setType(turn)) {
                 rand = players[1].getRandom();
             }
-            if (vs_multiplayer)
+            if (vs_multiplayer) {
                 writeDatabaseMessage(String.format("turn %s %s", String.valueOf(rand[0]), String.valueOf(rand[1])));
+            }
         }
     }
 
@@ -529,7 +570,9 @@ public class Game extends AppCompatActivity {
         while (!cells[rand[0]][rand[1]].setType(turn)) {
             rand = players[playerIndex].getRandom();
         }
-        writeDatabaseMessage(String.format("turn %s %s", String.valueOf(rand[0]), String.valueOf(rand[1])));
+        if (vs_multiplayer) {
+            writeDatabaseMessage(String.format("turn %s %s", String.valueOf(rand[0]), String.valueOf(rand[1])));
+        }
     }
 
     /**
@@ -540,7 +583,9 @@ public class Game extends AppCompatActivity {
     private boolean allVisible() {
         for (Cell[] cellRow : cells) {
             for (Cell cell : cellRow) {
-                if (!cell.isVisible()) return false;
+                if (!cell.isVisible()) {
+                    return false;
+                }
             }
         }
         return true;
@@ -626,7 +671,8 @@ public class Game extends AppCompatActivity {
                 counter.cancel();
             return true;
         }                       //No winner is found
-        turn = turn == Cell.Type.X ? Cell.Type.O : Cell.Type.X; //Flip the turn
+        turn = turn.flip(); //Flip the turn
+        tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), vs_multiplayer ? (thisType == turn ? thisName : otherName) : turn.toString(), getString(R.string.Turn), turn.toString()));
         if (allVisible()) {     //No winner and the board is full (tie)
             if (timer != 0)
                 counter.cancel();
@@ -640,7 +686,7 @@ public class Game extends AppCompatActivity {
                 tieAlert().show();
                 return true;
             }
-            turn = turn == Cell.Type.X ? Cell.Type.O : Cell.Type.X;
+            turn = turn.flip();
         }
         if (timer != 0)
             counter.start();
@@ -666,7 +712,7 @@ public class Game extends AppCompatActivity {
      */
     private void initialize() {
 
-        tv_maxgames.setText(String.format("%s %s %s", getString(R.string.First_To), String.valueOf(maxgames), getString(R.string.Wins_wins)));
+        tv_maxgames.setText(String.format("%s %s %s", getString(R.string.First_To), String.valueOf(maxGames), getString(R.string.Wins_wins)));
 
         if (timer > 0) {
             tv_time_text.setVisibility(View.VISIBLE);
@@ -683,13 +729,13 @@ public class Game extends AppCompatActivity {
                     if (!vs_multiplayer || turn == thisType) {
                         putCPU(turn == Type.O ? 0 : 1);
                         if (winner() == null) {
-                            turn = turn == Type.O ? Type.X : Type.O;
+                            turn = turn.flip();
                             if (allVisible())
                                 tieAlert().show();
                             else if (vs_computer) {
                                 putCPU();
                                 if (winner() == null) {
-                                    turn = turn == Type.O ? Type.X : Type.O;
+                                    turn = turn.flip();
                                     if (allVisible())
                                         tieAlert().show();
                                     else
@@ -707,6 +753,34 @@ public class Game extends AppCompatActivity {
         }
     }
 
+    private void addXwins() {
+        Database.dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Database.dataRef.child("Xwins").setValue(dataSnapshot.child("Xwins").getValue(Integer.class) + 1);
+                Stats.addXwins();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+    }
+
+    private void addOwins() {
+        Database.dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Database.dataRef.child("Owins").setValue(dataSnapshot.child("Owins").getValue(Integer.class) + 1);
+                Stats.addOwins();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+    }
+
     /**
      * This function gets triggered when this activity is destroyed and
      * calls the 'resign' message to the database so the other player will
@@ -715,14 +789,19 @@ public class Game extends AppCompatActivity {
     @Override
     protected void onDestroy() {
 
-        if (exitStatus == null)
-            exitStatus = "exit";
-        writeDatabaseMessage(exitStatus);
-        gameRef.setValue(null);
-
+        if (vs_multiplayer) {
+            if (exitStatus == null)
+                exitStatus = "exit";
+            writeDatabaseMessage(exitStatus);
+            gameRef.setValue(null);
+        }
         super.onDestroy();
     }
 
+    /**
+     * This function gets called when the user pressed the 'back button' and it prevents
+     * the user from closing the lobby on multiplayer
+     */
     @Override
     public void onBackPressed() {
         if (!vs_multiplayer)

@@ -7,7 +7,7 @@
     <string name="Tie">תיקו</string>
     <string name="Won">ניצח</string>
     <string name="Won_The_Game">ניצח את המשחק</string>
-    <string name="not_available_offline">לא זמין במצב לא מקוון</string>
+    <string name="NotAvailableOffline">לא זמין במצב לא מקוון</string>
     <string name="Congratulations">מזל טוב!</string>
     <string name="Choose_Player">בחר שחקן</string>
     <string name="Player_Chooser">איזה שחקן את/ה רוצה להיות?</string>
@@ -64,4 +64,7 @@
     <string name="EnterRoomNumber">הכנס/הכניסי את מספר הלובי (שאל/י את חברך):</string>
     <string name="ResetData">איפוס נתונים מקומיים</string>
     <string name="ResetDataDialog">את/ה עומד/ת לאפס את הנתונים המקומיים. את/ה בטוח/ה?</string>
+    <string name="Its">זה תור</string>
+    <string name="Turn">.</string>
+    <string name="LobbyFull">הלובי כבר מלא</string>
 </resources>

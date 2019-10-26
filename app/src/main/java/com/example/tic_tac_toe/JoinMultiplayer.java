@@ -1,5 +1,6 @@
 package com.example.tic_tac_toe;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -10,14 +11,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
-public class JoinMultiplayer extends AppCompatActivity {
+public class JoinMultiplayer extends Activity {
 
     DatabaseReference joinRef;
 
@@ -56,8 +56,12 @@ public class JoinMultiplayer extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+                            boolean found = false;
+
                             for (DataSnapshot data : dataSnapshot.getChildren()) {
                                 if (data.getKey().equals(lobbyNumber)) {
+
+                                    found = true;
 
                                     if (data.child("clientName").getValue(String.class) == null) {
 
@@ -67,12 +71,15 @@ public class JoinMultiplayer extends AppCompatActivity {
                                                 .putExtra("LobbyNumber", lobbyNumber));
                                         joinRef.child(lobbyNumber).child("clientName").setValue(clientName);
 
+                                    } else {
+                                        Toast.makeText(JoinMultiplayer.this, getString(R.string.LobbyFull), Toast.LENGTH_LONG).show();
                                     }
                                     break;
-                                } else
-                                    Toast.makeText(JoinMultiplayer.this, getString(R.string.LobbyNotFound), Toast.LENGTH_LONG).show();
+                                }
                             }
-
+                            if (!found) {
+                                Toast.makeText(JoinMultiplayer.this, getString(R.string.LobbyNotFound), Toast.LENGTH_LONG).show();
+                            }
                         }
 
                         @Override
