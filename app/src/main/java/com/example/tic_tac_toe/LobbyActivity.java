@@ -42,118 +42,7 @@ public class LobbyActivity extends Activity {
     private String hostName;
     private String clientName;
 
-    private ValueEventListener valueEventListener = new ValueEventListener() {
-        @Override
-        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-            if (max == null || timer == null) {
-                max = dataSnapshot.child("max").getValue(Integer.class);
-                timer = dataSnapshot.child("timer").getValue(Integer.class);
-            }
-
-            if (multiplayerMode.equals("Host")) {
-
-                if (clientName == null) {
-
-                    clientName = dataSnapshot.child("clientName").getValue(String.class);
-                    if (clientName != null) {
-                        tv_client_name.setText(clientName);
-                        ckbx_ready.setEnabled(true);
-                    }
-                }
-
-                String clientMessage = dataSnapshot.child("clientMessage").getValue(String.class);
-                if (clientMessage != null) {
-                    switch (clientMessage) {
-                        case "ready":
-                            ready_client = true;
-                            if (ready_host) {
-
-                                writeDatabaseMessage("play");
-
-                                try {
-                                    startActivity(new Intent(LobbyActivity.this, Game.class)
-                                        .putExtra("LobbyNumber", lobbyNumber)
-                                        .putExtra("Multiplayer", "Host"));
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            break;
-
-                        case "not_ready":
-                            ready_client = false;
-                            break;
-
-                        case "left":
-                            AlertDialog.Builder alert = new AlertDialog.Builder(LobbyActivity.this)
-                                .setMessage(getString(R.string.LobbyLeftMessage))
-                                .setPositiveButton(getString(R.string.BackMainMenu), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-
-                                        lobbyRef.setValue(null);
-
-                                        finishAffinity();
-
-                                        startActivity(new Intent(LobbyActivity.this, MainActivity.class));
-
-                                    }
-                                })
-                                .setCancelable(false);
-                            alert.show();
-                            break;
-                    }
-                }
-            } else {
-
-                if (hostName == null) {
-
-                    hostName = dataSnapshot.child("hostName").getValue(String.class);
-                    clientName = dataSnapshot.child("clientName").getValue(String.class);
-                    tv_host_name.setText(hostName);
-                    tv_client_name.setText(clientName);
-
-                }
-
-                swapSwitches(dataSnapshot.child("hostType").getValue(String.class));
-
-                String hostMessage = dataSnapshot.child("hostMessage").getValue(String.class);
-                if (hostMessage != null) {
-
-                    if (hostMessage.equals("play")) {
-
-                        startActivity(new Intent(LobbyActivity.this, Game.class)
-                            .putExtra("LobbyNumber", lobbyNumber)
-                            .putExtra("Multiplayer", "Client"));
-
-                        finish();
-                    } else if (hostMessage.equals("left")) {
-                        AlertDialog.Builder alert = new AlertDialog.Builder(LobbyActivity.this)
-                                .setMessage(getString(R.string.LobbyLeftMessage))
-                                .setPositiveButton(getString(R.string.BackMainMenu), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-
-                                        lobbyRef.setValue(null);
-
-                                        finishAffinity();
-                                        startActivity(new Intent(LobbyActivity.this, MainActivity.class));
-
-                                    }
-                                })
-                                .setCancelable(false);
-                        alert.show();
-                    }
-                }
-
-            }
-        }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError databaseError) {
-        }
-    };
+    private ValueEventListener valueEventListener;
 
     private boolean ready_host = false;
     private boolean ready_client = false;
@@ -184,7 +73,7 @@ public class LobbyActivity extends Activity {
         sw_client.setEnabled(false);
         sw_client.setChecked(true);
 
-        if (multiplayerMode.equals("Host"))
+        if (multiplayerMode.equals("Host")) {
             sw_host.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -192,7 +81,7 @@ public class LobbyActivity extends Activity {
                     setHostType(isChecked);
                 }
             });
-        else {
+        } else {
             sw_host.setEnabled(false);
         }
 
@@ -234,7 +123,118 @@ public class LobbyActivity extends Activity {
 
         lobbyRef = Database.dataRef.child("Lobbies").child(lobbyNumber);
 
-        lobbyRef.addValueEventListener(valueEventListener);
+        valueEventListener = lobbyRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                if (max == null || timer == null) {
+                    max = dataSnapshot.child("max").getValue(Integer.class);
+                    timer = dataSnapshot.child("timer").getValue(Integer.class);
+                }
+
+                if (multiplayerMode.equals("Host")) {
+
+                    if (clientName == null) {
+
+                        clientName = dataSnapshot.child("clientName").getValue(String.class);
+                        if (clientName != null) {
+                            tv_client_name.setText(clientName);
+                            ckbx_ready.setEnabled(true);
+                        }
+                    }
+
+                    String clientMessage = dataSnapshot.child("clientMessage").getValue(String.class);
+                    if (clientMessage != null) {
+                        switch (clientMessage) {
+                            case "ready":
+                                ready_client = true;
+                                if (ready_host) {
+
+                                    writeDatabaseMessage("play");
+
+                                    try {
+                                        startActivity(new Intent(LobbyActivity.this, Game.class)
+                                                .putExtra("LobbyNumber", lobbyNumber)
+                                                .putExtra("Multiplayer", "Host"));
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                break;
+
+                            case "not_ready":
+                                ready_client = false;
+                                break;
+
+                            case "left":
+                                AlertDialog.Builder alert = new AlertDialog.Builder(LobbyActivity.this)
+                                        .setMessage(getString(R.string.LobbyLeftMessage))
+                                        .setPositiveButton(getString(R.string.BackMainMenu), new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+
+                                                lobbyRef.setValue(null);
+
+                                                finishAffinity();
+
+                                                startActivity(new Intent(LobbyActivity.this, MainActivity.class));
+
+                                            }
+                                        })
+                                        .setCancelable(false);
+                                alert.show();
+                                break;
+                        }
+                    }
+                } else {
+
+                    if (hostName == null) {
+
+                        hostName = dataSnapshot.child("hostName").getValue(String.class);
+                        clientName = dataSnapshot.child("clientName").getValue(String.class);
+                        tv_host_name.setText(hostName);
+                        tv_client_name.setText(clientName);
+
+                    }
+
+                    swapSwitches(dataSnapshot.child("hostType").getValue(String.class));
+
+                    String hostMessage = dataSnapshot.child("hostMessage").getValue(String.class);
+                    if (hostMessage != null) {
+
+                        if (hostMessage.equals("play")) {
+
+                            startActivity(new Intent(LobbyActivity.this, Game.class)
+                                    .putExtra("LobbyNumber", lobbyNumber)
+                                    .putExtra("Multiplayer", "Client"));
+
+                            finish();
+                        } else if (hostMessage.equals("left")) {
+                            AlertDialog.Builder alert = new AlertDialog.Builder(LobbyActivity.this)
+                                    .setMessage(getString(R.string.LobbyLeftMessage))
+                                    .setPositiveButton(getString(R.string.BackMainMenu), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+
+                                            lobbyRef.setValue(null);
+
+                                            finishAffinity();
+                                            startActivity(new Intent(LobbyActivity.this, MainActivity.class));
+
+                                        }
+                                    })
+                                    .setCancelable(false);
+                            alert.show();
+                        }
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
     }
 
     private void writeDatabaseMessage(String message) {
@@ -269,13 +269,15 @@ public class LobbyActivity extends Activity {
     @Override
     public void onBackPressed() {
         lobbyRef.setValue(null);
-        writeDatabaseMessage("left");
+        if (multiplayerMode.equals("Host") && clientName != null)
+            writeDatabaseMessage("left");
         super.onBackPressed();
     }
 
     @Override
     protected void onDestroy() {
-        writeDatabaseMessage("left");
+        if ((multiplayerMode.equals("Host") && clientName != null) || multiplayerMode.equals("Client"))
+            writeDatabaseMessage("left");
         super.onDestroy();
     }
 }

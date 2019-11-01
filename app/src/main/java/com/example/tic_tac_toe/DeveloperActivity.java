@@ -6,13 +6,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.common.internal.Objects;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -50,6 +47,8 @@ public class DeveloperActivity extends AppCompatActivity {
         btn_check_dev = findViewById(R.id.btn_check_dev);
         btn_delete = findViewById(R.id.btn_delete);
 
+        btn_delete.setEnabled(false);
+
         btn_check_dev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,6 +59,7 @@ public class DeveloperActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.child("Name").getValue(String.class).equals(et_dev_name.getText().toString()) && dataSnapshot.child("Password").getValue(String.class).equals(et_dev_password.getText().toString())) {
 
+                            btn_delete.setEnabled(true);
                             getLobbies();
 
                         }

@@ -17,6 +17,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Objects;
+
 public class JoinMultiplayer extends Activity {
 
     DatabaseReference joinRef;
@@ -49,19 +51,15 @@ public class JoinMultiplayer extends Activity {
                 clientName = et_name_join.getText().toString();
                 lobbyNumber = et_lobby_number.getText().toString();
 
-                if (lobbyNumber.length() != "0000".length())
+                if (lobbyNumber.length() != "0000".length()) {
                     Toast.makeText(JoinMultiplayer.this, getString(R.string.LobbyLength), Toast.LENGTH_LONG).show();
-                else {
+                } else {
                     joinRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                            boolean found = false;
-
                             for (DataSnapshot data : dataSnapshot.getChildren()) {
-                                if (data.getKey().equals(lobbyNumber)) {
-
-                                    found = true;
+                                if (Objects.equals(data.getKey(), lobbyNumber)) {
 
                                     if (data.child("clientName").getValue(String.class) == null) {
 
@@ -74,12 +72,10 @@ public class JoinMultiplayer extends Activity {
                                     } else {
                                         Toast.makeText(JoinMultiplayer.this, getString(R.string.LobbyFull), Toast.LENGTH_LONG).show();
                                     }
-                                    break;
+                                    return;
                                 }
                             }
-                            if (!found) {
-                                Toast.makeText(JoinMultiplayer.this, getString(R.string.LobbyNotFound), Toast.LENGTH_LONG).show();
-                            }
+                            Toast.makeText(JoinMultiplayer.this, getString(R.string.LobbyNotFound), Toast.LENGTH_LONG).show();
                         }
 
                         @Override
@@ -104,7 +100,6 @@ public class JoinMultiplayer extends Activity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 btn_join.setEnabled(s.length() > 0 && et_lobby_number.length() > 0);
-
             }
 
             @Override

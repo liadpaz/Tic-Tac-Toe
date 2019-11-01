@@ -150,9 +150,9 @@ public class SettingsActivity extends Activity {
         numpic_timer.setValue(timer);
         numpic_timer.setEnabled(false);
 
-        if (mode == Utils.Mode.Computer || mode == Utils.Mode.TwoPlayer)
+        if (mode == Utils.Mode.Computer || mode == Utils.Mode.TwoPlayer) {
             btn_play.setEnabled(true);
-        else /*if (mode == Utils.Mode.Multiplayer)*/ {
+        } else /*if (mode == Utils.Mode.Multiplayer)*/ {
             et_name_host.setVisibility(View.VISIBLE);
             tv_name_host.setVisibility(View.VISIBLE);
             btn_play.setEnabled(false);
@@ -169,8 +169,9 @@ public class SettingsActivity extends Activity {
 
                 String lobbyNumber = Utils.getRoomNumber();
 
-                while (dataSnapshot.hasChild(lobbyNumber))
+                while (dataSnapshot.hasChild(lobbyNumber)) {
                     lobbyNumber = Utils.getRoomNumber();
+                }
 
                 settingRef.child(lobbyNumber).setValue(new Lobby(et_name_host.getText().toString(), lobbyNumber, starting_player.toString(), timer, max_games));
                 settingRef.child(lobbyNumber).child("startingType").setValue(starting_player.toString());

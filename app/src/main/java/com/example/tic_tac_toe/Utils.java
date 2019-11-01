@@ -1,5 +1,6 @@
 package com.example.tic_tac_toe;
 
+import android.annotation.SuppressLint;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -50,14 +51,19 @@ class Utils {
                 List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
                 for (InetAddress addr : addrs) {
                     if (!addr.isLoopbackAddress()) {
-                        return addr.getHostAddress() != null;
+                        return true;
                     }
                 }
             }
             return false;
-        } catch (Exception ignored) {
+        } catch (Exception e) {
             return false;
         }
+    }
+
+    static int[] getRandom() {
+        Random rnd = new Random();
+        return new int[] {rnd.nextInt(3), rnd.nextInt(3)};
     }
 }
 
@@ -147,11 +153,6 @@ class Player {
     String getWins() {
         return String.valueOf(wins);
     }
-
-    int[] getRandom() {
-        Random rnd = new Random();
-        return new int[] {rnd.nextInt(3), rnd.nextInt(3)};
-    }
 }
 
 class Stats {
@@ -170,11 +171,11 @@ class Stats {
     }
 
     static int readFile(Readables param) {
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder stringBuilder = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line = reader.readLine();
-            stringBuffer.append(line);
-            String[] contents = stringBuffer.toString().split(" ");
+            stringBuilder.append(line);
+            String[] contents = stringBuilder.toString().split(" ");
             switch (param) {
                 case Xwins:
                     return Integer.parseInt(contents[0]);
@@ -193,6 +194,7 @@ class Stats {
         }
     }
 
+    @SuppressLint("DefaultLocale")
     static private void writeFile(Readables type, int message) {
         try {
             int Xwins = type == Readables.Xwins ? message : readFile(Readables.Xwins);
@@ -218,6 +220,7 @@ class Stats {
         writeFile(Readables.Time, readFile(Readables.Time) + (int) time);
     }
 
+    @SuppressLint("DefaultLocale")
     static void resetFile() {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
@@ -233,16 +236,11 @@ class Lobby {
     private int max;
     private int timer;
     private String hostName;
-    private String clientName;
     private String number;
-    private String clientMessage;
-    private String hostMessage;
     private String hostType;
     private String startingType;
 
-    public Lobby() {}
-
-    public Lobby(String hostName, String number, String startingType, int timer, int max) {
+    Lobby(String hostName, String number, String startingType, int timer, int max) {
         this.hostName = hostName;
         this.number = number;
         this.startingType = startingType;
@@ -275,36 +273,12 @@ class Lobby {
         this.hostName = hostName;
     }
 
-    public String getClientName() {
-        return clientName;
-    }
-
-    public void setClientName(String clientName) {
-        this.clientName = clientName;
-    }
-
     public String getNumber() {
         return number;
     }
 
     public void setNumber(String number) {
         this.number = number;
-    }
-
-    public String getClientMessage() {
-        return clientMessage;
-    }
-
-    public void setClientMessage(String clientMessage) {
-        this.clientMessage = clientMessage;
-    }
-
-    public String getHostMessage() {
-        return hostMessage;
-    }
-
-    public void setHostMessage(String hostMessage) {
-        this.hostMessage = hostMessage;
     }
 
     public String getHostType() {

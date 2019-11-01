@@ -26,6 +26,8 @@ import com.google.firebase.database.ValueEventListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class Game extends AppCompatActivity {
 
     DatabaseReference gameRef;
@@ -132,7 +134,7 @@ public class Game extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                     if (Xname == null || Oname == null) {
-                        if (dataSnapshot.child("hostType").getValue(String.class).equals("X")) {
+                        if (Objects.equals(dataSnapshot.child("hostType").getValue(String.class), "X")) {
                             thisType = multiType.equals("Host") ? Type.X : Type.O;
                             Xname = dataSnapshot.child("hostName").getValue(String.class);
                             Oname = dataSnapshot.child("clientName").getValue(String.class);
@@ -150,8 +152,8 @@ public class Game extends AppCompatActivity {
                     }
 
                     if (timer == -1 || maxGames == -1 || thisName == null) {
-                        timer = dataSnapshot.child("timer").getValue(Integer.class);
-                        maxGames = dataSnapshot.child("max").getValue(Integer.class);
+                        timer = Objects.requireNonNull(dataSnapshot.child("timer").getValue(Integer.class));
+                        maxGames = Objects.requireNonNull(dataSnapshot.child("max").getValue(Integer.class));
 
                         players[0] = new Player(Player.Type.Human);
                         players[1] = new Player(Player.Type.Human);
@@ -165,7 +167,7 @@ public class Game extends AppCompatActivity {
                     }
 
                     if (startingType == null) {
-                        startingType = dataSnapshot.child("startingType").getValue(String.class).equals("X") ? Type.X : Type.O;
+                        startingType = Objects.equals(dataSnapshot.child("startingType").getValue(String.class), "X") ? Type.X : Type.O;
                         turn = startingType;
                         tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), thisType == startingType ? thisName : otherName, getString(R.string.Turn), startingType.toString()));
                     }
@@ -494,11 +496,7 @@ public class Game extends AppCompatActivity {
             }
             if (!(Integer.parseInt(players[0].getWins()) == maxGames || Integer.parseInt(players[1].getWins()) == maxGames)) {
                 winnerAlert(!vs_multiplayer, winner.toString()).show();
-                if (vs_multiplayer) {
-                    tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), thisType == turn ? thisName : otherName, getString(R.string.Turn), turn.toString()));
-                }
-            }
-            else {
+            } else {
                 if (vs_on_this_device || notCPUturn() || (vs_multiplayer && (winner == thisType))) {
                     if (winner == Type.X) {
                         addXwins();
@@ -541,37 +539,28 @@ public class Game extends AppCompatActivity {
      * This function plays a CPU turn
      */
     private void putCPU() {
+        int[] rand = Utils.getRandom();
         if (players[0].playerType == Player.Type.CPU) {
-            int[] rand = players[0].getRandom();
             while (!cells[rand[0]][rand[1]].setType(turn)) {
-                rand = players[0].getRandom();
+                rand = Utils.getRandom();
+            }
+            if (vs_multiplayer) {
+                writeDatabaseMessage(String.format("turn %s %s", String.valueOf(rand[0]), String.valueOf(rand[1])));
+            }
+        } else if (players[1].playerType == Player.Type.CPU) {
+            while (!cells[rand[0]][rand[1]].setType(turn)) {
+                rand = Utils.getRandom();
             }
             if (vs_multiplayer) {
                 writeDatabaseMessage(String.format("turn %s %s", String.valueOf(rand[0]), String.valueOf(rand[1])));
             }
         } else {
-            int[] rand = players[1].getRandom();
             while (!cells[rand[0]][rand[1]].setType(turn)) {
-                rand = players[1].getRandom();
+                rand = Utils.getRandom();
             }
             if (vs_multiplayer) {
                 writeDatabaseMessage(String.format("turn %s %s", String.valueOf(rand[0]), String.valueOf(rand[1])));
             }
-        }
-    }
-
-    /**
-     * This function plays a player who runs out of time turn
-     *
-     * @param playerIndex player index from {@code players} to play
-     */
-    private void putCPU(int playerIndex) {
-        int[] rand = players[playerIndex].getRandom();
-        while (!cells[rand[0]][rand[1]].setType(turn)) {
-            rand = players[playerIndex].getRandom();
-        }
-        if (vs_multiplayer) {
-            writeDatabaseMessage(String.format("turn %s %s", String.valueOf(rand[0]), String.valueOf(rand[1])));
         }
     }
 
@@ -672,7 +661,11 @@ public class Game extends AppCompatActivity {
             return true;
         }                       //No winner is found
         turn = turn.flip(); //Flip the turn
-        tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), vs_multiplayer ? (thisType == turn ? thisName : otherName) : turn.toString(), getString(R.string.Turn), turn.toString()));
+        if (vs_multiplayer) {
+            tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), thisType == turn ? thisName : otherName, getString(R.string.Turn), turn.toString()));
+        } else {
+            tv_turn.setText(String.format("%s %s%s", getString(R.string.Its), turn.toString(), getString(R.string.Turn)));
+        }
         if (allVisible()) {     //No winner and the board is full (tie)
             if (timer != 0)
                 counter.cancel();
@@ -727,7 +720,7 @@ public class Game extends AppCompatActivity {
                 @Override
                 public void onFinish() {
                     if (!vs_multiplayer || turn == thisType) {
-                        putCPU(turn == Type.O ? 0 : 1);
+                        putCPU();
                         if (winner() == null) {
                             turn = turn.flip();
                             if (allVisible())
@@ -753,11 +746,14 @@ public class Game extends AppCompatActivity {
         }
     }
 
+    /**
+     * This function adds X wins to the local and global X wins
+     */
     private void addXwins() {
         Database.dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Database.dataRef.child("Xwins").setValue(dataSnapshot.child("Xwins").getValue(Integer.class) + 1);
+                Database.dataRef.child("Xwins").setValue(Objects.requireNonNull(dataSnapshot.child("Xwins").getValue(Integer.class)) + 1);
                 Stats.addXwins();
             }
 
@@ -767,11 +763,14 @@ public class Game extends AppCompatActivity {
         });
     }
 
+    /**
+     * This function adds O wins to the local and global O wins
+     */
     private void addOwins() {
         Database.dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Database.dataRef.child("Owins").setValue(dataSnapshot.child("Owins").getValue(Integer.class) + 1);
+                Database.dataRef.child("Owins").setValue(Objects.requireNonNull(dataSnapshot.child("Owins").getValue(Integer.class)) + 1);
                 Stats.addOwins();
             }
 
