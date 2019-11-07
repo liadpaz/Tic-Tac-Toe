@@ -1,4 +1,4 @@
-package com.example.tic_tac_toe;
+package com.liadpaz.tic_tac_toe;
 
 import org.junit.Test;
 

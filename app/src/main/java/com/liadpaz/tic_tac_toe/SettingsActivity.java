@@ -1,4 +1,4 @@
-package com.example.tic_tac_toe;
+package com.liadpaz.tic_tac_toe;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -159,6 +159,9 @@ public class SettingsActivity extends Activity {
         }
     }
 
+    /**
+     * This function initializes a lobby
+     */
     private void initializeLobby() {
 
         settingRef = Database.dataRef.child("Lobbies");

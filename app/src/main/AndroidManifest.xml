@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.tic_tac_toe">
+    package="com.liadpaz.tic_tac_toe">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -12,35 +12,43 @@
         android:roundIcon="@mipmap/tic_tac_toe_round"
         android:supportsRtl="false"
         android:theme="@style/AppTheme">
-        <activity android:name=".DeveloperActivity"
+        <activity android:name="com.liadpaz.tic_tac_toe.DeveloperActivity"
+            android:launchMode="singleTask"
             android:resizeableActivity="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Statistics"
+            android:name="com.liadpaz.tic_tac_toe.Statistics"
+            android:launchMode="singleTask"
             android:resizeableActivity="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".LobbyActivity"
+            android:name="com.liadpaz.tic_tac_toe.LobbyActivity"
+            android:launchMode="singleTask"
             android:resizeableActivity="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".JoinMultiplayer"
+            android:name="com.liadpaz.tic_tac_toe.JoinMultiplayer"
+            android:launchMode="singleTask"
             android:resizeableActivity="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Game"
+            android:name="com.liadpaz.tic_tac_toe.Game"
+            android:launchMode="singleTask"
             android:resizeableActivity="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".SettingsActivity"
+            android:name="com.liadpaz.tic_tac_toe.SettingsActivity"
+            android:launchMode="singleTask"
             android:resizeableActivity="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".MainActivity"
+            android:name="com.liadpaz.tic_tac_toe.MainActivity"
+            android:launchMode="singleTask"
             android:resizeableActivity="false"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>

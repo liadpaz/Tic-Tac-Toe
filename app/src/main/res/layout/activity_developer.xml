@@ -65,6 +65,7 @@
         android:ems="10"
         android:inputType="number|textPersonName"
         android:maxLength="4"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/btn_delete"
         app:layout_constraintEnd_toEndOf="parent" />
 

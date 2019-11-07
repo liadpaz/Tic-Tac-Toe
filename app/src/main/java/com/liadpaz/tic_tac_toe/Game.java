@@ -1,4 +1,4 @@
-package com.example.tic_tac_toe;
+package com.liadpaz.tic_tac_toe;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,7 +17,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.example.tic_tac_toe.Cell.Type;
+import com.liadpaz.tic_tac_toe.Cell.Type;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -489,12 +489,12 @@ public class Game extends AppCompatActivity {
             Type winner = turn;
             if (winner == Type.O) {
                 players[0].won();
-                tv_playerOwins.setText(players[0].getWins());
+                tv_playerOwins.setText(String.valueOf(players[0].getWins()));
             } else {
                 players[1].won();
-                tv_playerXwins.setText(players[1].getWins());
+                tv_playerXwins.setText(String.valueOf(players[1].getWins()));
             }
-            if (!(Integer.parseInt(players[0].getWins()) == maxGames || Integer.parseInt(players[1].getWins()) == maxGames)) {
+            if (!(players[0].getWins() == maxGames || players[1].getWins() == maxGames)) {
                 winnerAlert(!vs_multiplayer, winner.toString()).show();
             } else {
                 if (vs_on_this_device || notCPUturn() || (vs_multiplayer && (winner == thisType))) {
@@ -540,27 +540,11 @@ public class Game extends AppCompatActivity {
      */
     private void putCPU() {
         int[] rand = Utils.getRandom();
-        if (players[0].playerType == Player.Type.CPU) {
-            while (!cells[rand[0]][rand[1]].setType(turn)) {
-                rand = Utils.getRandom();
-            }
-            if (vs_multiplayer) {
-                writeDatabaseMessage(String.format("turn %s %s", String.valueOf(rand[0]), String.valueOf(rand[1])));
-            }
-        } else if (players[1].playerType == Player.Type.CPU) {
-            while (!cells[rand[0]][rand[1]].setType(turn)) {
-                rand = Utils.getRandom();
-            }
-            if (vs_multiplayer) {
-                writeDatabaseMessage(String.format("turn %s %s", String.valueOf(rand[0]), String.valueOf(rand[1])));
-            }
-        } else {
-            while (!cells[rand[0]][rand[1]].setType(turn)) {
-                rand = Utils.getRandom();
-            }
-            if (vs_multiplayer) {
-                writeDatabaseMessage(String.format("turn %s %s", String.valueOf(rand[0]), String.valueOf(rand[1])));
-            }
+        while (!cells[rand[0]][rand[1]].setType(turn)) {
+            rand = Utils.getRandom();
+        }
+        if (vs_multiplayer) {
+            writeDatabaseMessage(String.format("turn %d %d", rand[0], rand[1]));
         }
     }
 
@@ -659,8 +643,8 @@ public class Game extends AppCompatActivity {
             if (timer != 0)
                 counter.cancel();
             return true;
-        }                       //No winner is found
-        turn = turn.flip(); //Flip the turn
+        }
+        turn = turn.flip();
         if (vs_multiplayer) {
             tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), thisType == turn ? thisName : otherName, getString(R.string.Turn), turn.toString()));
         } else {
@@ -750,11 +734,11 @@ public class Game extends AppCompatActivity {
      * This function adds X wins to the local and global X wins
      */
     private void addXwins() {
+        Stats.addXwins();
         Database.dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Database.dataRef.child("Xwins").setValue(Objects.requireNonNull(dataSnapshot.child("Xwins").getValue(Integer.class)) + 1);
-                Stats.addXwins();
             }
 
             @Override
@@ -767,11 +751,11 @@ public class Game extends AppCompatActivity {
      * This function adds O wins to the local and global O wins
      */
     private void addOwins() {
+        Stats.addOwins();
         Database.dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Database.dataRef.child("Owins").setValue(Objects.requireNonNull(dataSnapshot.child("Owins").getValue(Integer.class)) + 1);
-                Stats.addOwins();
             }
 
             @Override
@@ -792,7 +776,7 @@ public class Game extends AppCompatActivity {
             if (exitStatus == null)
                 exitStatus = "exit";
             writeDatabaseMessage(exitStatus);
-            gameRef.setValue(null);
+            gameRef.removeValue();
         }
         super.onDestroy();
     }

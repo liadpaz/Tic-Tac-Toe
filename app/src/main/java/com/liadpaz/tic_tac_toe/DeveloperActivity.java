@@ -1,4 +1,4 @@
-package com.example.tic_tac_toe;
+package com.liadpaz.tic_tac_toe;
 
 import android.os.Bundle;
 import android.view.View;
@@ -47,8 +47,6 @@ public class DeveloperActivity extends AppCompatActivity {
         btn_check_dev = findViewById(R.id.btn_check_dev);
         btn_delete = findViewById(R.id.btn_delete);
 
-        btn_delete.setEnabled(false);
-
         btn_check_dev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,7 +57,8 @@ public class DeveloperActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.child("Name").getValue(String.class).equals(et_dev_name.getText().toString()) && dataSnapshot.child("Password").getValue(String.class).equals(et_dev_password.getText().toString())) {
 
-                            btn_delete.setEnabled(true);
+                            btn_delete.setVisibility(View.VISIBLE);
+                            et_lobby.setVisibility(View.VISIBLE);
                             getLobbies();
 
                         }
@@ -94,6 +93,7 @@ public class DeveloperActivity extends AppCompatActivity {
                 }
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(DeveloperActivity.this, R.layout.support_simple_spinner_dropdown_item, lobbiesNumber);
+
 
                 lv_lobbies.setAdapter(adapter);
 

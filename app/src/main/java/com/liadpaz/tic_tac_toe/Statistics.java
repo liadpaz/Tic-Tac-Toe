@@ -1,4 +1,4 @@
-package com.example.tic_tac_toe;
+package com.liadpaz.tic_tac_toe;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -18,10 +18,6 @@ import com.google.firebase.database.ValueEventListener;
 public class Statistics extends AppCompatActivity {
 
     DatabaseReference statsRef;
-
-    int globalOwins;
-    int globalXwins;
-    int globalTime;
 
     Button btn_return;
     Button btn_reset;
@@ -74,34 +70,11 @@ public class Statistics extends AppCompatActivity {
                         .setPositiveButton(getString(R.string.Yes), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-
-                                statsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                                        globalOwins = dataSnapshot.child("Owins").getValue(Integer.class) - Stats.readFile(Stats.Readables.Owins);
-                                        globalXwins = dataSnapshot.child("Xwins").getValue(Integer.class) - Stats.readFile(Stats.Readables.Xwins);
-                                        globalTime = dataSnapshot.child("Time").getValue(Integer.class) - Stats.readFile(Stats.Readables.Time);
-
-                                        tv_globalO.setText(String.valueOf(globalOwins));
-                                        tv_globalX.setText(String.valueOf(globalXwins));
-                                        tv_globalTime.setText(String.format("%s %s", String.valueOf(globalTime), getString(R.string.Seconds)));
-
-                                        statsRef.child("Owins").setValue(globalOwins);
-                                        statsRef.child("Xwins").setValue(globalXwins);
-                                        statsRef.child("Time").setValue(globalTime);
-
-                                        Stats.resetFile();
-                                        tv_localO.setText("0");
-                                        tv_localX.setText("0");
-                                        tv_localTime.setText("0");
-                                        Utils.setTime();
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                                    }
-                                });
+                                Stats.resetFile();
+                                tv_localO.setText("0");
+                                tv_localX.setText("0");
+                                tv_localTime.setText("0");
+                                Utils.setTime();
                             }
                         })
                         .setNegativeButton(getString(R.string.No), null)
@@ -111,6 +84,9 @@ public class Statistics extends AppCompatActivity {
         });
     }
 
+    /**
+     * This function gets the global stats and writes them
+     */
     void getGlobals() {
 
         tv_globalO.setText(getString(R.string.Loading));

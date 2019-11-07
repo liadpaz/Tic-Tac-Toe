@@ -1,4 +1,4 @@
-package com.example.tic_tac_toe;
+package com.liadpaz.tic_tac_toe;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,8 +18,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
-import static com.example.tic_tac_toe.Utils.Mode;
-import static com.example.tic_tac_toe.Utils.isConnected;
+import static com.liadpaz.tic_tac_toe.Utils.Mode;
+import static com.liadpaz.tic_tac_toe.Utils.isConnected;
 
 public class MainActivity extends AppCompatActivity {
 
