@@ -387,14 +387,12 @@ public class Game extends AppCompatActivity {
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
                     if (over_cells[i][j].contains(touchX, touchY) && !cells[i][j].isVisible() && (!vs_multiplayer || (turn == thisType && canPlay))) {
-                        boolean isGameOver = play(i, j);
+                        play(i, j);
                         if (vs_multiplayer) {
                             writeDatabaseMessage(String.format("turn %s %s", String.valueOf(i), String.valueOf(j)));
                         }
-                        if (isGameOver) {
-                            i = 3;
-                            break;
-                        }
+                        i = 3;
+                        break;
                     }
                 }
             }
@@ -442,6 +440,11 @@ public class Game extends AppCompatActivity {
                             writeDatabaseMessage("go");
                             canPlay = lastMessage != null;
                             lastMessage = lastMessage == null ? "" : null;
+                        }
+                        if (vs_multiplayer) {
+                            tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), thisType == turn ? thisName : otherName, getString(R.string.Turn), turn.toString()));
+                        } else {
+                            tv_turn.setText(String.format("%s %s%s", getString(R.string.Its), turn.toString(), getString(R.string.Turn)));
                         }
                         if (timer != 0 && notCPUturn())
                             counter.start();
@@ -635,14 +638,14 @@ public class Game extends AppCompatActivity {
      *
      * @return  true if no more turns allowed, otherwise false
      */
-    private boolean play(int i, int j) {
+    private void play(int i, int j) {
         if (timer != 0)
             counter.cancel();
         cells[i][j].setType(turn);
         if (winner() != null) { //Winner is found
             if (timer != 0)
                 counter.cancel();
-            return true;
+            return;
         }
         turn = turn.flip();
         if (vs_multiplayer) {
@@ -654,20 +657,60 @@ public class Game extends AppCompatActivity {
             if (timer != 0)
                 counter.cancel();
             tieAlert().show();
-            return true;
+            return;
         }
         if (vs_computer) {      //One of the players is CPU
             putCPU();
             if (winner() == null && allVisible()) { //If no winner and no vacant place
                 if (timer != 0) counter.cancel();
                 tieAlert().show();
-                return true;
+                return;
             }
             turn = turn.flip();
         }
-        if (timer != 0)
+        if (timer != 0) {
             counter.start();
-        return false;
+        }
+    }
+
+    /**
+     * This function plays a random turn, if needed a CPU turn afterwards it does this
+     *
+     * @return  true if no more turns allowed, otherwise false
+     */
+    private void play() {
+        if (timer != 0)
+            counter.cancel();
+        putCPU();
+        if (winner() != null) { //Winner is found
+            if (timer != 0)
+                counter.cancel();
+            return;
+        }
+        turn = turn.flip();
+        if (vs_multiplayer) {
+            tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), thisType == turn ? thisName : otherName, getString(R.string.Turn), turn.toString()));
+        } else {
+            tv_turn.setText(String.format("%s %s%s", getString(R.string.Its), turn.toString(), getString(R.string.Turn)));
+        }
+        if (allVisible()) {     //No winner and the board is full (tie)
+            if (timer != 0)
+                counter.cancel();
+            tieAlert().show();
+            return;
+        }
+        if (vs_computer) {      //One of the players is CPU
+            putCPU();
+            if (winner() == null && allVisible()) { //If no winner and no vacant place
+                if (timer != 0) counter.cancel();
+                tieAlert().show();
+                return;
+            }
+            turn = turn.flip();
+        }
+        if (timer != 0) {
+            counter.start();
+        }
     }
 
     /**
@@ -704,23 +747,13 @@ public class Game extends AppCompatActivity {
                 @Override
                 public void onFinish() {
                     if (!vs_multiplayer || turn == thisType) {
-                        putCPU();
-                        if (winner() == null) {
-                            turn = turn.flip();
-                            if (allVisible())
-                                tieAlert().show();
-                            else if (vs_computer) {
-                                putCPU();
-                                if (winner() == null) {
-                                    turn = turn.flip();
-                                    if (allVisible())
-                                        tieAlert().show();
-                                    else
-                                        this.start();
-                                }
-                            } else {
-                                this.start();
-                            }
+                        int[] rand = Utils.getRandom();
+                        while (cells[rand[0]][rand[1]].isVisible()) {
+                            rand = Utils.getRandom();
+                        }
+                        play(rand[0], rand[1]);
+                        if (vs_multiplayer) {
+                            writeDatabaseMessage(String.format("turn %d %d", rand[0], rand[1]));
                         }
                     } else {
                         this.start();

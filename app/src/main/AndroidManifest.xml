@@ -6,12 +6,13 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:allowBackup="true"
         android:icon="@mipmap/tic_tac_toe"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/tic_tac_toe_round"
-        android:supportsRtl="false"
-        android:theme="@style/AppTheme">
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:fullBackupContent="@xml/backup_descriptor"
+        android:allowBackup="true">
         <activity android:name="com.liadpaz.tic_tac_toe.DeveloperActivity"
             android:launchMode="singleTask"
             android:resizeableActivity="false"
