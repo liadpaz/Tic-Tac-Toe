@@ -639,52 +639,14 @@ public class Game extends AppCompatActivity {
      * @return  true if no more turns allowed, otherwise false
      */
     private void play(int i, int j) {
-        if (timer != 0)
+        if (timer != 0) {
             counter.cancel();
+        }
         cells[i][j].setType(turn);
         if (winner() != null) { //Winner is found
-            if (timer != 0)
+            if (timer != 0) {
                 counter.cancel();
-            return;
-        }
-        turn = turn.flip();
-        if (vs_multiplayer) {
-            tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), thisType == turn ? thisName : otherName, getString(R.string.Turn), turn.toString()));
-        } else {
-            tv_turn.setText(String.format("%s %s%s", getString(R.string.Its), turn.toString(), getString(R.string.Turn)));
-        }
-        if (allVisible()) {     //No winner and the board is full (tie)
-            if (timer != 0)
-                counter.cancel();
-            tieAlert().show();
-            return;
-        }
-        if (vs_computer) {      //One of the players is CPU
-            putCPU();
-            if (winner() == null && allVisible()) { //If no winner and no vacant place
-                if (timer != 0) counter.cancel();
-                tieAlert().show();
-                return;
             }
-            turn = turn.flip();
-        }
-        if (timer != 0) {
-            counter.start();
-        }
-    }
-
-    /**
-     * This function plays a random turn, if needed a CPU turn afterwards it does this
-     *
-     * @return  true if no more turns allowed, otherwise false
-     */
-    private void play() {
-        if (timer != 0)
-            counter.cancel();
-        putCPU();
-        if (winner() != null) { //Winner is found
-            if (timer != 0)
-                counter.cancel();
             return;
         }
         turn = turn.flip();
@@ -694,8 +656,9 @@ public class Game extends AppCompatActivity {
             tv_turn.setText(String.format("%s %s%s", getString(R.string.Its), turn.toString(), getString(R.string.Turn)));
         }
         if (allVisible()) {     //No winner and the board is full (tie)
-            if (timer != 0)
+            if (timer != 0) {
                 counter.cancel();
+            }
             tieAlert().show();
             return;
         }
