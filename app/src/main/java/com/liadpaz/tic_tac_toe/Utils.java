@@ -97,6 +97,11 @@ class Utils {
         Random rnd = new Random();
         return new int[] {rnd.nextInt(3), rnd.nextInt(3)};
     }
+
+    static int[] getSmartTurn(Cell[][] cells) {
+        return null;
+//        return new int[] {1, 1};
+    }
 }
 
 /**

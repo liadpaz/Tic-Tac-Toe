@@ -85,4 +85,7 @@
     <string name="DevSecond" translatable="false">steps away from entering developer mode</string>
     <string name="DevButton" translatable="false">Check credentials</string>
     <string name="Delete" translatable="false">Delete</string>
+    <string name="Easy">Easy</string>
+    <string name="ComputerDifficulty">Choose the computer diffuculty:</string>
+    <string name="Hard">Hard</string>
 </resources>

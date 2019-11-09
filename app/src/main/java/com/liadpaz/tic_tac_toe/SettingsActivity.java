@@ -29,17 +29,22 @@ public class SettingsActivity extends Activity {
     int timer = 0;
     Utils.Mode mode;
     Cell.Type starting_player = Cell.Type.X;
+    boolean difficulty = false;
 
     NumberPicker numpic_maxgames;
     NumberPicker numpic_timer;
 
-    TextView tv_player_start;
     Switch sw_player_start;
+
+    TextView tv_difficulty;
+    TextView tv_easy;
+    TextView tv_hard;
+    Switch sw_difficulty;
 
     TextView tv_name_host;
     EditText et_name_host;
 
-    CheckBox sw_timer;
+    CheckBox chck_timer;
 
     Button btn_return;
     Button btn_play;
@@ -53,13 +58,16 @@ public class SettingsActivity extends Activity {
 
         numpic_maxgames = findViewById(R.id.numpic_games);
         numpic_timer = findViewById(R.id.numpic_timer);
-        sw_timer = findViewById(R.id.sw_timer);
+        chck_timer = findViewById(R.id.sw_timer);
         btn_return = findViewById(R.id.btn_return_settigns);
         btn_play = findViewById(R.id.btn_play);
         et_name_host = findViewById(R.id.et_name_host);
         tv_name_host = findViewById(R.id.tv_name_host);
-        tv_player_start = findViewById(R.id.tv_player_start);
         sw_player_start = findViewById(R.id.sw_player_start);
+        sw_difficulty = findViewById(R.id.sw_difficulty);
+        tv_difficulty = findViewById(R.id.tv_difficulty);
+        tv_easy = findViewById(R.id.tv_easy);
+        tv_hard = findViewById(R.id.tv_hard);
 
         numpic_maxgames.setMinValue(1);
         numpic_maxgames.setMaxValue(10);
@@ -83,39 +91,40 @@ public class SettingsActivity extends Activity {
         sw_player_start.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) starting_player = Cell.Type.O;
-                else starting_player = Cell.Type.X;
+                starting_player = isChecked ? Cell.Type.O : Cell.Type.X;
             }
         });
-        sw_timer.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        sw_difficulty.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                difficulty = isChecked;
+            }
+        });
+
+        chck_timer.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 numpic_timer.setEnabled(isChecked);
-                if (!isChecked)
+                if (!isChecked) {
                     timer = 0;
-                else
+                } else {
                     timer = numpic_timer.getValue();
+                }
             }
         });
 
         btn_play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mode == Utils.Mode.Computer) {
-                    startActivity(new Intent(getApplicationContext(), Game.class)
-                            .putExtra("Mode", Utils.Mode.Computer)
-                            .putExtra("Max", max_games)
-                            .putExtra("Timer", timer)
-                            .putExtra("Starting", starting_player));
-                } else if (mode == Utils.Mode.TwoPlayer) {
-                    startActivity(new Intent(getApplicationContext(), Game.class)
-                            .putExtra("Mode", Utils.Mode.TwoPlayer)
-                            .putExtra("Max", max_games)
-                            .putExtra("Timer", timer)
-                            .putExtra("Starting", starting_player));
-
-                } else if (mode == Utils.Mode.Multiplayer) {
+                if (mode == Utils.Mode.Multiplayer) {
                     initializeLobby();
+                } else {
+                    startActivity(new Intent(getApplicationContext(), Game.class)
+                            .putExtra("Mode", mode)
+                            .putExtra("Max", max_games)
+                            .putExtra("Timer", timer)
+                            .putExtra("Starting", starting_player)
+                            .putExtra("Difficulty", difficulty));
                 }
             }
         });
@@ -150,9 +159,15 @@ public class SettingsActivity extends Activity {
         numpic_timer.setValue(timer);
         numpic_timer.setEnabled(false);
 
-        if (mode == Utils.Mode.Computer || mode == Utils.Mode.TwoPlayer) {
+        if (mode == Utils.Mode.Computer) {
+            tv_difficulty.setVisibility(View.VISIBLE);
+            tv_easy.setVisibility(View.VISIBLE);
+            tv_hard.setVisibility(View.VISIBLE);
+            sw_difficulty.setVisibility(View.VISIBLE);
             btn_play.setEnabled(true);
-        } else /*if (mode == Utils.Mode.Multiplayer)*/ {
+        } else if (mode == Utils.Mode.TwoPlayer) {
+            btn_play.setEnabled(true);
+        } else {/*if (mode == Utils.Mode.Multiplayer)*/
             et_name_host.setVisibility(View.VISIBLE);
             tv_name_host.setVisibility(View.VISIBLE);
             btn_play.setEnabled(false);

@@ -67,4 +67,7 @@
     <string name="Its">זה תור</string>
     <string name="Turn">.</string>
     <string name="LobbyFull">הלובי כבר מלא</string>
+    <string name="Easy">קל</string>
+    <string name="ComputerDifficulty">בחר/י את רמת המחשב:</string>
+    <string name="Hard">קשה</string>
 </resources>

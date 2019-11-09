@@ -41,6 +41,7 @@ public class Game extends AppCompatActivity {
     Utils.Mode mode;
     Type startingType;
     CountDownTimer counter;
+    boolean difficulty;
 
     DisplayMetrics screen;
     int topScreen;
@@ -59,7 +60,7 @@ public class Game extends AppCompatActivity {
 
     ImageView iv_board;
     Player[] players = new Player[2];
-    volatile Cell[][] cells = new Cell[3][3];
+    Cell[][] cells = new Cell[3][3];
     Rect[][] over_cells = new Rect[3][3];
 
     Button btn_resign;
@@ -89,6 +90,7 @@ public class Game extends AppCompatActivity {
         startingType = (Cell.Type) getIntent().getSerializableExtra("Starting");
         lobbyNumber = getIntent().getStringExtra("LobbyNumber");
         multiType = getIntent().getStringExtra("Multiplayer");
+        difficulty = getIntent().getBooleanExtra("Difficulty", false);
 
         turn = startingType;
 
@@ -635,8 +637,6 @@ public class Game extends AppCompatActivity {
      *
      * @param i the y index of the cell
      * @param j the x index of the cell
-     *
-     * @return  true if no more turns allowed, otherwise false
      */
     private void play(int i, int j) {
         if (timer != 0) {
