@@ -300,9 +300,6 @@ public class LobbyActivity extends Activity {
         } else {
             lobbyRef.removeValue();
         }
-        if (!Stats.readPrivacy()) {
-            storageRef.delete();
-        }
         super.onDestroy();
     }
 }
