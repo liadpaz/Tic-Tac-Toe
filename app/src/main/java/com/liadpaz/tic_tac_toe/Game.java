@@ -16,35 +16,39 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.FileProvider;
 
-import com.liadpaz.tic_tac_toe.Cell.Type;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.Objects;
 
 public class Game extends AppCompatActivity {
 
     DatabaseReference gameRef;
+    StorageReference storageRef;
 
-    ConstraintLayout layout_game;
-
-    Type turn;
-    Type thisType;
+    Cell.Type turn;
+    Cell.Type thisType;
     int maxGames;
     int timer;
     Utils.Mode mode;
-    Type startingType;
+    Cell.Type startingType;
     CountDownTimer counter;
     boolean difficulty;
 
     DisplayMetrics screen;
-    int topScreen;
 
     String thisName;
     String otherName;
@@ -57,11 +61,15 @@ public class Game extends AppCompatActivity {
     String lastMessage;
     String exitStatus;
     boolean canPlay;
+    Boolean privacy;
 
     ImageView iv_board;
     Player[] players = new Player[2];
     Cell[][] cells = new Cell[3][3];
     Rect[][] over_cells = new Rect[3][3];
+
+    ImageView iv_playerX;
+    ImageView iv_playerO;
 
     Button btn_resign;
     Button btn_reset;
@@ -94,22 +102,22 @@ public class Game extends AppCompatActivity {
 
         turn = startingType;
 
-        layout_game = findViewById(R.id.activity_game);
-
         iv_board = findViewById(R.id.iv_board);
-        cells[0][0] = new Cell(new ImageView[]{findViewById(R.id.iv_Xtl), findViewById(R.id.iv_Otl)});
-        cells[0][1] = new Cell(new ImageView[]{findViewById(R.id.iv_Xtm), findViewById(R.id.iv_Otm)});
-        cells[0][2] = new Cell(new ImageView[]{findViewById(R.id.iv_Xtr), findViewById(R.id.iv_Otr)});
-        cells[1][0] = new Cell(new ImageView[]{findViewById(R.id.iv_Xml), findViewById(R.id.iv_Oml)});
-        cells[1][1] = new Cell(new ImageView[]{findViewById(R.id.iv_Xmm), findViewById(R.id.iv_Omm)});
-        cells[1][2] = new Cell(new ImageView[]{findViewById(R.id.iv_Xmr), findViewById(R.id.iv_Omr)});
-        cells[2][0] = new Cell(new ImageView[]{findViewById(R.id.iv_Xbl), findViewById(R.id.iv_Obl)});
-        cells[2][1] = new Cell(new ImageView[]{findViewById(R.id.iv_Xbm), findViewById(R.id.iv_Obm)});
-        cells[2][2] = new Cell(new ImageView[]{findViewById(R.id.iv_Xbr), findViewById(R.id.iv_Obr)});
+        cells[0][0] = new Cell(new ImageView[] {findViewById(R.id.iv_Xtl), findViewById(R.id.iv_Otl)} );
+        cells[0][1] = new Cell(new ImageView[] {findViewById(R.id.iv_Xtm), findViewById(R.id.iv_Otm)} );
+        cells[0][2] = new Cell(new ImageView[] {findViewById(R.id.iv_Xtr), findViewById(R.id.iv_Otr)} );
+        cells[1][0] = new Cell(new ImageView[] {findViewById(R.id.iv_Xml), findViewById(R.id.iv_Oml)} );
+        cells[1][1] = new Cell(new ImageView[] {findViewById(R.id.iv_Xmm), findViewById(R.id.iv_Omm)} );
+        cells[1][2] = new Cell(new ImageView[] {findViewById(R.id.iv_Xmr), findViewById(R.id.iv_Omr)} );
+        cells[2][0] = new Cell(new ImageView[] {findViewById(R.id.iv_Xbl), findViewById(R.id.iv_Obl)} );
+        cells[2][1] = new Cell(new ImageView[] {findViewById(R.id.iv_Xbm), findViewById(R.id.iv_Obm)} );
+        cells[2][2] = new Cell(new ImageView[] {findViewById(R.id.iv_Xbr), findViewById(R.id.iv_Obr)} );
         btn_resign = findViewById(R.id.btn_resign);
         btn_reset = findViewById(R.id.btn_reset);
+        iv_playerX = findViewById(R.id.iv_playerX);
         tv_playerX = findViewById(R.id.tv_playerX);
         tv_playerXwins = findViewById(R.id.tv_playerXwins);
+        iv_playerO = findViewById(R.id.iv_playerO);
         tv_playerO = findViewById(R.id.tv_playerO);
         tv_playerOwins = findViewById(R.id.tv_playerOwins);
         tv_maxgames = findViewById(R.id.tv_maxgames);
@@ -129,22 +137,29 @@ public class Game extends AppCompatActivity {
 
             btn_reset.setVisibility(View.INVISIBLE);
 
-            gameRef = Database.dataRef.child("Lobbies").child(lobbyNumber);
+            gameRef = Firebase.dataRef.child("Lobbies").child(lobbyNumber);
 
             gameRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (privacy == null) {
+                        privacy = dataSnapshot.child("privacy").getValue(Boolean.class);
+                        if (!privacy) {
+                            storageRef = FirebaseStorage.getInstance().getReference().child("Lobbies").child(lobbyNumber);
+                            putPhotos();
+                        }
+                    }
 
                     if (Xname == null || Oname == null) {
                         if (Objects.equals(dataSnapshot.child("hostType").getValue(String.class), "X")) {
-                            thisType = multiType.equals("Host") ? Type.X : Type.O;
+                            thisType = multiType.equals("Host") ? Cell.Type.X : Cell.Type.O;
                             Xname = dataSnapshot.child("hostName").getValue(String.class);
                             Oname = dataSnapshot.child("clientName").getValue(String.class);
 
                             thisName = multiType.equals("Host") ? Xname : Oname;
                             otherName = multiType.equals("Host") ? Oname : Xname;
                         } else {
-                            thisType = multiType.equals("Host") ? Type.O : Type.X;
+                            thisType = multiType.equals("Host") ? Cell.Type.O : Cell.Type.X;
                             Xname = dataSnapshot.child("clientName").getValue(String.class);
                             Oname = dataSnapshot.child("hostName").getValue(String.class);
 
@@ -169,27 +184,25 @@ public class Game extends AppCompatActivity {
                     }
 
                     if (startingType == null) {
-                        startingType = Objects.equals(dataSnapshot.child("startingType").getValue(String.class), "X") ? Type.X : Type.O;
+                        startingType = Objects.equals(dataSnapshot.child("startingType").getValue(String.class), "X") ? Cell.Type.X : Cell.Type.O;
                         turn = startingType;
                         tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), thisType == startingType ? thisName : otherName, getString(R.string.Turn), startingType.toString()));
                     }
 
                     if (multiType.equals("Host")) {
-
                         String message = dataSnapshot.child("clientMessage").getValue(String.class);
-                        if (lastClientMessage == null)
+                        if (lastClientMessage == null) {
                             lastClientMessage = message;
-
+                        }
                         if (message != null && !message.equals(lastClientMessage)) {
                             String[] messages = message.split(" ");
-
                             switch (messages[0]) {
                                 case "turn":
                                     play(Integer.parseInt(messages[1]), Integer.parseInt(messages[2]));
                                     break;
 
                                 case "resign":
-                                    if (thisType == Type.X)
+                                    if (thisType == Cell.Type.X)
                                         Stats.addXwins();
                                     else
                                         Stats.addOwins();
@@ -207,21 +220,19 @@ public class Game extends AppCompatActivity {
 
                         lastClientMessage = message;
                     } else {
-
                         String message = dataSnapshot.child("hostMessage").getValue(String.class);
-                        if (lastHostMessage == null)
+                        if (lastHostMessage == null) {
                             lastHostMessage = message;
-
+                        }
                         if (message != null && !message.equals(lastHostMessage)) {
                             String[] messages = message.split(" ");
-
                             switch (messages[0]) {
                                 case "turn":
                                     play(Integer.parseInt(messages[1]), Integer.parseInt(messages[2]));
                                     break;
 
                                 case "resign":
-                                    if (thisType == Type.X)
+                                    if (thisType == Cell.Type.X)
                                         Stats.addXwins();
                                     else
                                         Stats.addOwins();
@@ -294,7 +305,6 @@ public class Game extends AppCompatActivity {
 
         screen = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(screen);
-        topScreen = screen.densityDpi / 2;
         int x = screen.widthPixels;
 
         iv_board.setLayoutParams(new ConstraintLayout.LayoutParams(x, x));
@@ -303,9 +313,9 @@ public class Game extends AppCompatActivity {
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                over_cells[i][j] = new Rect(j * (x / 3), i * (x / 3) + topScreen, (j + 1) * (x / 3), (i + 1) * (x / 3) + topScreen);
+                over_cells[i][j] = new Rect(j * (x / 3), i * (x / 3), (j + 1) * (x / 3), (i + 1) * (x / 3));
                 cells[i][j].setSize(x / 3);
-                cells[i][j].setLocation(j * (x / 3), i * (x / 3) + topScreen / 100);
+                cells[i][j].setLocation(j * (x / 3), i * (x / 3));
             }
         }
 
@@ -330,7 +340,7 @@ public class Game extends AppCompatActivity {
                             tv_playerOwins.setVisibility(View.VISIBLE);
                             if (startingType == Cell.Type.O) {
                                 putCPU();
-                                turn = Type.X;
+                                turn = Cell.Type.X;
                             }
                             if (timer != 0)
                                 counter.start();
@@ -349,7 +359,7 @@ public class Game extends AppCompatActivity {
                             tv_playerOwins.setVisibility(View.VISIBLE);
                             if (startingType == Cell.Type.X) {
                                 putCPU();
-                                turn = Type.O;
+                                turn = Cell.Type.O;
                             }
                             if (timer != 0)
                                 counter.start();
@@ -486,13 +496,13 @@ public class Game extends AppCompatActivity {
      * @return type of the winner if there is one, otherwise null
      */
     @Nullable
-    private Type winner() {
+    private Cell.Type winner() {
         if (checkWinner()) {
             if (timer != 0) {
                 counter.cancel();
             }
-            Type winner = turn;
-            if (winner == Type.O) {
+            Cell.Type winner = turn;
+            if (winner == Cell.Type.O) {
                 players[0].won();
                 tv_playerOwins.setText(String.valueOf(players[0].getWins()));
             } else {
@@ -503,9 +513,9 @@ public class Game extends AppCompatActivity {
                 winnerAlert(!vs_multiplayer, winner.toString()).show();
             } else {
                 if (vs_on_this_device || notCPUturn() || (vs_multiplayer && (winner == thisType))) {
-                    if (winner == Type.X) {
+                    if (winner == Cell.Type.X) {
                         addXwins();
-                    } else if (winner == Type.O) {
+                    } else if (winner == Cell.Type.O) {
                         addOwins();
                     }
                 }
@@ -534,7 +544,7 @@ public class Game extends AppCompatActivity {
         }
         hideAll();
         turn = startingType;
-        if ((players[0].playerType == Player.Type.CPU && turn == Type.O) || (players[1].playerType == Player.Type.CPU && turn == Type.X)) {
+        if ((players[0].playerType == Player.Type.CPU && turn == Cell.Type.O) || (players[1].playerType == Player.Type.CPU && turn == Cell.Type.X)) {
             putCPU();
             turn = turn.flip();
         }
@@ -629,7 +639,7 @@ public class Game extends AppCompatActivity {
      * @return true if it's a CPU turn, otherwise false
      */
     private boolean notCPUturn() {
-        return (((turn != Type.O || players[0].playerType != Player.Type.CPU) && (turn != Type.X || players[1].playerType != Player.Type.CPU)) || !vs_computer);
+        return (((turn != Cell.Type.O || players[0].playerType != Player.Type.CPU) && (turn != Cell.Type.X || players[1].playerType != Player.Type.CPU)) || !vs_computer);
     }
 
     /**
@@ -731,10 +741,10 @@ public class Game extends AppCompatActivity {
      */
     private void addXwins() {
         Stats.addXwins();
-        Database.dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        Firebase.dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Database.dataRef.child("Xwins").setValue(Objects.requireNonNull(dataSnapshot.child("Xwins").getValue(Integer.class)) + 1);
+                Firebase.dataRef.child("Xwins").setValue(Objects.requireNonNull(dataSnapshot.child("Xwins").getValue(Integer.class)) + 1);
             }
 
             @Override
@@ -748,16 +758,57 @@ public class Game extends AppCompatActivity {
      */
     private void addOwins() {
         Stats.addOwins();
-        Database.dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        Firebase.dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Database.dataRef.child("Owins").setValue(Objects.requireNonNull(dataSnapshot.child("Owins").getValue(Integer.class)) + 1);
+                Firebase.dataRef.child("Owins").setValue(Objects.requireNonNull(dataSnapshot.child("Owins").getValue(Integer.class)) + 1);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
+    }
+
+    private void putPhotos() {
+        final File remotePhoto = new File(getFilesDir(), "Photo1.jpg");
+        if (multiType.equals("Host")) {
+            storageRef.child("Client").getFile(remotePhoto).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
+                    Utils.remotePhotoUri = FileProvider.getUriForFile(Game.this, "com.liadpaz.tic_tac_toe.fileprovider", remotePhoto);
+                    if (thisType == Cell.Type.X) {
+                        iv_playerX.setImageURI(Utils.localPhotoUri);
+                        iv_playerX.setVisibility(View.VISIBLE);
+                        iv_playerO.setImageURI(Utils.remotePhotoUri);
+                        iv_playerO.setVisibility(View.VISIBLE);
+                    } else {
+                        iv_playerX.setImageURI(Utils.remotePhotoUri);
+                        iv_playerX.setVisibility(View.VISIBLE);
+                        iv_playerO.setImageURI(Utils.localPhotoUri);
+                        iv_playerO.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+        } else {
+            storageRef.child("Host").getFile(remotePhoto).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
+                    Utils.remotePhotoUri = FileProvider.getUriForFile(Game.this, "com.liadpaz.tic_tac_toe.fileprovider", remotePhoto);
+                    if (thisType == Cell.Type.X) {
+                        iv_playerX.setImageURI(Utils.localPhotoUri);
+                        iv_playerX.setVisibility(View.VISIBLE);
+                        iv_playerO.setImageURI(Utils.remotePhotoUri);
+                        iv_playerO.setVisibility(View.VISIBLE);
+                    } else {
+                        iv_playerX.setImageURI(Utils.remotePhotoUri);
+                        iv_playerX.setVisibility(View.VISIBLE);
+                        iv_playerO.setImageURI(Utils.localPhotoUri);
+                        iv_playerO.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -767,11 +818,7 @@ public class Game extends AppCompatActivity {
      */
     @Override
     protected void onDestroy() {
-
         if (vs_multiplayer) {
-            if (exitStatus == null)
-                exitStatus = "exit";
-            writeDatabaseMessage(exitStatus);
             gameRef.removeValue();
         }
         super.onDestroy();

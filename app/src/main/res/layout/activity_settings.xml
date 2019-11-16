@@ -7,11 +7,63 @@
     android:background="@android:color/background_light"
     tools:context=".SettingsActivity">
 
-    <NumberPicker
-        android:id="@+id/numpic_games"
+    <Switch
+        android:id="@+id/sw_singleplayer_mode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="56dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_singleplayer_mode" />
+
+    <TextView
+        android:id="@+id/tv_setting_computer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:text="@string/Computer"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/sw_singleplayer_mode"
+        app:layout_constraintEnd_toStartOf="@+id/tv_setting_two_players"
+        app:layout_constraintTop_toBottomOf="@+id/tv_singleplayer_mode"
+        app:layout_constraintVertical_bias="0.523" />
+
+    <TextView
+        android:id="@+id/tv_setting_two_players"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="@string/Two_Players"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/sw_singleplayer_mode"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_singleplayer_mode"
+        app:layout_constraintVertical_bias="0.523" />
+
+    <TextView
+        android:id="@+id/tv_singleplayer_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="10dp"
+        android:text="@string/Play_Local_Message"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textSize="15sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_settings" />
+
+    <NumberPicker
+        android:id="@+id/numpic_maxgames"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
         android:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_maxgames"></NumberPicker>
@@ -20,8 +72,7 @@
         android:id="@+id/numpic_timer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
+        android:layout_marginStart="10dp"
         android:layout_marginBottom="80dp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -31,20 +82,20 @@
         android:id="@+id/tv_maxgames"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="8dp"
         android:text="@string/Number_Wins"
         android:textAlignment="center"
         android:textColor="@android:color/black"
         android:textSize="15sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_settings" />
 
     <TextView
         android:id="@+id/tv_timer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="10dp"
         android:text="@string/Max_Time"
         android:textColor="@android:color/black"
         android:textSize="15sp"
@@ -87,10 +138,10 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <CheckBox
-        android:id="@+id/sw_timer"
+        android:id="@+id/chck_timer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="10dp"
         android:text="@string/Toggle_Time"
         android:textColorHighlight="@color/colorPrimary"
         android:textColorLink="@color/colorPrimary"
@@ -127,38 +178,85 @@
         android:id="@+id/sw_player_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:layout_marginEnd="55dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="56dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_player_start" />
 
-    <Switch
-        android:id="@+id/sw_difficulty"
+    <TextView
+        android:id="@+id/tv_easy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:layout_marginEnd="56dp"
+        android:layout_marginEnd="12dp"
+        android:text="@string/Easy"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
         android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/sw_difficulty"
+        app:layout_constraintEnd_toStartOf="@+id/tv_hard"
+        app:layout_constraintTop_toBottomOf="@+id/tv_difficulty"
+        app:layout_constraintVertical_bias="0.523" />
+
+    <TextView
+        android:id="@+id/tv_settingX2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="64dp"
+        android:text="O"
+        android:textColor="@android:color/black"
+        app:layout_constraintBottom_toTopOf="@+id/sw_player_start"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_difficulty" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_player_start"
+        app:layout_constraintVertical_bias="0.523"
+        tools:text="O" />
+
+    <TextView
+        android:id="@+id/tv_hard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="40dp"
+        android:text="@string/Hard"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/sw_difficulty"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_difficulty"
+        app:layout_constraintVertical_bias="0.523" />
+
+    <TextView
+        android:id="@+id/tv_settingX"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:text="X"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        app:layout_constraintBottom_toTopOf="@+id/sw_player_start"
+        app:layout_constraintEnd_toStartOf="@+id/tv_settingX2"
+        app:layout_constraintTop_toBottomOf="@+id/tv_player_start"
+        app:layout_constraintVertical_bias="0.523"
+        tools:text="X" />
 
     <TextView
         android:id="@+id/tv_player_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="12dp"
         android:text="@string/Start_Player"
         android:textAlignment="center"
         android:textColor="@android:color/black"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/sw_singleplayer_mode" />
 
     <TextView
         android:id="@+id/tv_difficulty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="12dp"
         android:text="@string/ComputerDifficulty"
         android:textAlignment="center"
         android:textColor="@android:color/black"
@@ -167,55 +265,32 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sw_player_start" />
 
-    <TextView
-        android:id="@+id/tv_settingX"
+    <Switch
+        android:id="@+id/sw_difficulty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="14dp"
-        android:text="X"
-        android:textAlignment="center"
-        android:textColor="@android:color/black"
-        app:layout_constraintBottom_toTopOf="@+id/sw_player_start"
-        app:layout_constraintEnd_toStartOf="@+id/tv_settingX2"
-        app:layout_constraintTop_toBottomOf="@+id/tv_player_start"
-        tools:text="X" />
-
-    <TextView
-        android:id="@+id/tv_easy"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="14dp"
-        android:text="@string/Easy"
-        android:textAlignment="center"
-        android:textColor="@android:color/black"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/sw_difficulty"
-        app:layout_constraintEnd_toStartOf="@+id/tv_hard"
-        app:layout_constraintTop_toBottomOf="@+id/tv_difficulty" />
-
-    <TextView
-        android:id="@+id/tv_hard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="35dp"
-        android:text="@string/Hard"
-        android:textAlignment="center"
-        android:textColor="@android:color/black"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/sw_difficulty"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_difficulty" />
-
-    <TextView
-        android:id="@+id/tv_settingX2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
         android:layout_marginEnd="60dp"
-        android:text="O"
-        android:textColor="@android:color/black"
-        app:layout_constraintBottom_toTopOf="@+id/sw_player_start"
+        android:textIsSelectable="false"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_player_start"
-        tools:text="O" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_difficulty" />
+
+    <Button
+        android:id="@+id/btn_settings_camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="20dp"
+        android:text="@string/Camera"
+        android:textAllCaps="false"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/tv_name_host"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

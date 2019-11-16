@@ -18,14 +18,18 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.StorageReference;
 
 public class LobbyActivity extends Activity {
 
     DatabaseReference lobbyRef;
+    StorageReference storageRef;
 
     private Integer max;
     private Integer timer;
 
+    private boolean isHost;
+    private boolean isClient;
 
     private Button btn_exit_lobby;
 
@@ -38,12 +42,12 @@ public class LobbyActivity extends Activity {
 
     private CheckBox ckbx_ready;
 
-    private String multiplayerMode;
     private String lobbyNumber;
     private String hostName;
     private String clientName;
 
-    private ValueEventListener valueEventListener;
+    private ValueEventListener templateValueListener;
+    private ValueEventListener valueListener;
 
     private boolean ready_host = false;
     private boolean ready_client = false;
@@ -54,7 +58,8 @@ public class LobbyActivity extends Activity {
         setContentView(R.layout.activity_lobby);
 
         lobbyNumber = getIntent().getStringExtra("LobbyNumber");
-        multiplayerMode = getIntent().getStringExtra("Multiplayer");
+        isHost = getIntent().getStringExtra("Multiplayer").equals("Host");
+        isClient = !isHost;
         hostName = getIntent().getStringExtra("HostName");
 
         btn_exit_lobby = findViewById(R.id.btn_exit_lobby);
@@ -73,7 +78,7 @@ public class LobbyActivity extends Activity {
         sw_client.setEnabled(false);
         sw_client.setChecked(true);
 
-        if (multiplayerMode.equals("Host")) {
+        if (isHost) {
             sw_host.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -88,30 +93,29 @@ public class LobbyActivity extends Activity {
         ckbx_ready.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (multiplayerMode.equals("Host")) {
+                if (isHost) {
                     ready_host = isChecked;
                     sw_host.setEnabled(!isChecked);
                     if (ready_host && ready_client) {
-
                         writeDatabaseMessage("play");
-
                         startActivity(new Intent(LobbyActivity.this, Game.class)
                             .putExtra("lobbyNumber", lobbyNumber)
                             .putExtra("Multiplayer", "Host"));
 
                     }
                 } else {
-                    if (isChecked)
+                    if (isChecked) {
                         writeDatabaseMessage("ready");
-                    else
+                    } else {
                         writeDatabaseMessage("not_ready");
+                    }
                 }
             }
         });
         btn_exit_lobby.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (multiplayerMode.equals("Host")) {
+                if (isHost) {
                     if (clientName == null) {
                         lobbyRef.removeValue();
                     } else {
@@ -124,24 +128,19 @@ public class LobbyActivity extends Activity {
             }
         });
 
-        if (multiplayerMode.equals("Host"))
-            ckbx_ready.setEnabled(false);
+        ckbx_ready.setEnabled(!isHost);
 
-        lobbyRef = Database.dataRef.child("Lobbies").child(lobbyNumber);
+        lobbyRef = Firebase.dataRef.child("Lobbies").child(lobbyNumber);
 
-        valueEventListener = lobbyRef.addValueEventListener(new ValueEventListener() {
+        templateValueListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
                 if (max == null || timer == null) {
                     max = dataSnapshot.child("max").getValue(Integer.class);
                     timer = dataSnapshot.child("timer").getValue(Integer.class);
                 }
-
-                if (multiplayerMode.equals("Host")) {
-
+                if (isHost) {
                     if (clientName == null) {
-
                         clientName = dataSnapshot.child("clientName").getValue(String.class);
                         if (clientName != null) {
                             tv_client_name.setText(clientName);
@@ -149,16 +148,12 @@ public class LobbyActivity extends Activity {
                         }
                     } else {
                         String clientMessage = dataSnapshot.child("clientMessage").getValue(String.class);
-
                         if (clientMessage != null) {
                             switch (clientMessage) {
-
                                 case "ready":
                                     ready_client = true;
                                     if (ready_host) {
-
                                         writeDatabaseMessage("play");
-
                                         startActivity(new Intent(LobbyActivity.this, Game.class)
                                                 .putExtra("LobbyNumber", lobbyNumber)
                                                 .putExtra("Multiplayer", "Host"));
@@ -175,11 +170,8 @@ public class LobbyActivity extends Activity {
                                             .setPositiveButton(getString(R.string.BackMainMenu), new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
-
                                                     lobbyRef.removeValue();
-
                                                     startActivity(new Intent(LobbyActivity.this, MainActivity.class));
-
                                                 }
                                             })
                                             .setCancelable(false);
@@ -189,9 +181,7 @@ public class LobbyActivity extends Activity {
                         }
                     }
                 } else {
-
                     if (hostName == null) {
-
                         hostName = dataSnapshot.child("hostName").getValue(String.class);
                         clientName = dataSnapshot.child("clientName").getValue(String.class);
                         tv_host_name.setText(hostName);
@@ -203,7 +193,6 @@ public class LobbyActivity extends Activity {
 
                     String hostMessage = dataSnapshot.child("hostMessage").getValue(String.class);
                     if (hostMessage != null) {
-
                         switch (hostMessage) {
 
                             case "play":
@@ -233,14 +222,23 @@ public class LobbyActivity extends Activity {
                                 break;
                         }
                     }
-
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
-        });
+        };
+
+        if (!Stats.readPrivacy()) {
+            uploadPhoto();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        valueListener = lobbyRef.addValueEventListener(templateValueListener);
+        super.onResume();
     }
 
     /**
@@ -249,10 +247,11 @@ public class LobbyActivity extends Activity {
      * @param message the message to write
      */
     private void writeDatabaseMessage(String message) {
-        if (multiplayerMode.equals("Host"))
+        if (isHost) {
             lobbyRef.child("hostMessage").setValue(message);
-        else
+        } else {
             lobbyRef.child("clientMessage").setValue(message);
+        }
     }
 
     /**
@@ -279,29 +278,31 @@ public class LobbyActivity extends Activity {
         }
     }
 
-    @Override
-    protected void onStop() {
-
-        lobbyRef.removeEventListener(valueEventListener);
-
-        super.onStop();
+    private void uploadPhoto() {
+        storageRef = Firebase.storeRef.child("Lobbies").child(lobbyNumber);
+        if (isHost) {
+            storageRef.child("Host").putFile(Utils.localPhotoUri);
+        } else {
+            storageRef.child("Client").putFile(Utils.localPhotoUri);
+        }
     }
 
     @Override
-    public void onBackPressed() {
-        if (multiplayerMode.equals("Host") && clientName != null)
-            writeDatabaseMessage("left");
-        else
-            lobbyRef.removeValue();
-        super.onBackPressed();
+    protected void onPause() {
+        lobbyRef.removeEventListener(valueListener);
+        super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        if ((multiplayerMode.equals("Host") && clientName != null) || multiplayerMode.equals("Client"))
+        if ((isHost && clientName != null) || isClient) {
             writeDatabaseMessage("left");
-        else
+        } else {
             lobbyRef.removeValue();
+        }
+        if (!Stats.readPrivacy()) {
+            storageRef.delete();
+        }
         super.onDestroy();
     }
 }

@@ -50,7 +50,7 @@ public class DeveloperActivity extends AppCompatActivity {
         btn_check_dev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                devRef = Database.dataRef.child("DevUser");
+                devRef = Firebase.dataRef.child("DevUser");
 
                 devRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -74,7 +74,7 @@ public class DeveloperActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Database.dataRef.child("Lobbies").child(et_lobby.getText().toString()).setValue(null);
+                Firebase.dataRef.child("Lobbies").child(et_lobby.getText().toString()).setValue(null);
                 getLobbies();
             }
         });
@@ -82,7 +82,7 @@ public class DeveloperActivity extends AppCompatActivity {
 
     private void getLobbies() {
 
-        Database.dataRef.child("Lobbies").addListenerForSingleValueEvent(new ValueEventListener() {
+        Firebase.dataRef.child("Lobbies").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 

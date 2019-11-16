@@ -61,7 +61,7 @@
         android:id="@+id/tv_lobby_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="90dp"
         android:text="@string/EnterRoomNumber"
         android:textAlignment="center"
         android:textColor="@android:color/black"
@@ -93,4 +93,17 @@
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btn_join_camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:text="@string/Camera"
+        android:textAllCaps="false"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_lobby_number" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

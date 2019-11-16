@@ -93,7 +93,7 @@ public class Statistics extends AppCompatActivity {
         tv_globalX.setText(getString(R.string.Loading));
         tv_globalTime.setText(getString(R.string.Loading));
 
-        statsRef = Database.dataRef;
+        statsRef = Firebase.dataRef;
 
         statsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

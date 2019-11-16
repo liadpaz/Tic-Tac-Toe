@@ -1,6 +1,7 @@
 package com.liadpaz.tic_tac_toe;
 
 import android.annotation.SuppressLint;
+import android.net.Uri;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -8,6 +9,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -19,7 +22,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -30,6 +32,9 @@ class Utils {
      * This enum is to differ a 'TwoPlayer', 'Computer' or Multiplayer gamemode
      */
     public enum Mode {TwoPlayer, Computer, Multiplayer}
+
+    static Uri localPhotoUri;
+    static Uri remotePhotoUri;
 
     /**
      * This variable is the last time that was recorded
@@ -73,17 +78,15 @@ class Utils {
      */
     static boolean isConnected() {
         try {
-            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
-            for (NetworkInterface intf : interfaces) {
-                List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
-                for (InetAddress addr : addrs) {
+            for (NetworkInterface intf : Collections.list(NetworkInterface.getNetworkInterfaces())) {
+                for (InetAddress addr : Collections.list(intf.getInetAddresses())) {
                     if (!addr.isLoopbackAddress()) {
                         return true;
                     }
                 }
             }
             return false;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             return false;
         }
     }
@@ -98,20 +101,23 @@ class Utils {
         return new int[] {rnd.nextInt(3), rnd.nextInt(3)};
     }
 
-    static int[] getSmartTurn(Cell[][] cells) {
-        return null;
-//        return new int[] {1, 1};
-    }
+//    static int[] getSmartTurn(Cell[][] cells) {
+//        return null;
+//    }
 }
 
 /**
- * This class contains the main reference to the FireBase DataBase
+ * This class contains the main reference to the Firebase Firebase and Firebase Storage
  */
-class Database {
+class Firebase {
     /**
-     * The main reference to the FireBase DataBase
+     * The main reference to the Firebase Database
      */
     static DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference();
+    /**
+     * The main reference to the Firebase Storage
+     */
+    static StorageReference storeRef = FirebaseStorage.getInstance().getReference();
 }
 
 /**
@@ -265,7 +271,7 @@ class Player {
 }
 
 /**
- * This class is for the statistics activity
+ * This class is for the statistics
  */
 class Stats {
     /**
@@ -286,8 +292,41 @@ class Stats {
      */
     static void setFile(File parent) {
         file = new File(parent, "tic-tac-toe");
-        if (readFile(Readables.Xwins) == -1)
+        try {
+            if (readFile(Readables.Xwins) == -1) {
+                resetFile();
+            }
+        } catch (Exception ignored) {
             resetFile();
+        }
+    }
+
+    static boolean flipPrivacy() {
+        boolean privacy = readPrivacy();
+        writePrivacy(!privacy);
+        return !privacy;
+    }
+
+    static boolean readPrivacy() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            return Boolean.parseBoolean(reader.readLine().split(" ")[3]);
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    @SuppressLint("DefaultLocale")
+    private static void writePrivacy(boolean privacy) {
+        try {
+            int Xwins = readFile(Readables.Xwins);
+            int Owins = readFile(Readables.Owins);
+            int Time = readFile(Readables.Time);
+
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(String.format("%d %d %d %s", Xwins, Owins, Time, String.valueOf(privacy)));
+            writer.close();
+        } catch (Exception ignored) {
+        }
     }
 
     /**
@@ -298,11 +337,8 @@ class Stats {
      * @return the stat from the file
      */
     static int readFile(Readables param) {
-        StringBuilder stringBuilder = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line = reader.readLine();
-            stringBuilder.append(line);
-            String[] contents = stringBuilder.toString().split(" ");
+            String[] contents = reader.readLine().split(" ");
             switch (param) {
                 case Xwins:
                     return Integer.parseInt(contents[0]);
@@ -326,14 +362,16 @@ class Stats {
      * @param type      the type to write to
      * @param message   the message to write to the type
      */
+    @SuppressLint("DefaultLocale")
     static private void writeFile(Readables type, int message) {
         try {
             int Xwins = type == Readables.Xwins ? message : readFile(Readables.Xwins);
             int Owins = type == Readables.Owins ? message : readFile(Readables.Owins);
             int Time  = type == Readables.Time ? message : readFile(Readables.Time);
+            boolean privacy = readPrivacy();
 
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(String.format("%d %d %d", Xwins, Owins, Time));
+            writer.write(String.format("%d %d %d %s", Xwins, Owins, Time, String.valueOf(privacy)));
             writer.close();
         } catch (Exception ignored) {
         }
@@ -367,7 +405,7 @@ class Stats {
     static void resetFile() {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(String.format("%d %d %d", 0, 0, 0));
+            writer.write(String.format("%d %d %d %s", 0, 0, 0, String.valueOf(false)));
             writer.close();
         } catch (Exception ignored) {
         }
@@ -381,17 +419,19 @@ class Lobby {
 
     private int max;
     private int timer;
+    private boolean privacy;
     private String hostName;
     private String number;
     private String hostType;
     private String startingType;
 
-    Lobby(String hostName, String number, String startingType, int timer, int max) {
+    Lobby(String hostName, String number, String startingType, int timer, int max, boolean privacy) {
         this.hostName = hostName;
         this.number = number;
         this.startingType = startingType;
         this.timer = timer;
         this.max = max;
+        this.privacy = privacy;
         this.hostType = "O";
     }
 
@@ -409,6 +449,14 @@ class Lobby {
 
     public void setTimer(int timer) {
         this.timer = timer;
+    }
+
+    public boolean isPrivacy() {
+        return privacy;
+    }
+
+    public void setPrivacy(boolean privacy) {
+        this.privacy = privacy;
     }
 
     public String getHostName() {

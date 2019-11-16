@@ -3,6 +3,7 @@ package com.liadpaz.tic_tac_toe;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -15,19 +16,25 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.File;
+
 public class SettingsActivity extends Activity {
 
     DatabaseReference settingRef;
 
+    File photo;
+    boolean photoOk = false;
+
     int max_games = 1;
     int timer = 0;
-    Utils.Mode mode;
+    Utils.Mode mode = Utils.Mode.Computer;
     Cell.Type starting_player = Cell.Type.X;
     boolean difficulty = false;
 
@@ -36,6 +43,11 @@ public class SettingsActivity extends Activity {
 
     Switch sw_player_start;
 
+    TextView tv_setting_computer;
+    TextView tv_setting_two_players;
+    TextView tv_singleplayer_mode;
+    Switch sw_singleplayer_mode;
+
     TextView tv_difficulty;
     TextView tv_easy;
     TextView tv_hard;
@@ -43,11 +55,13 @@ public class SettingsActivity extends Activity {
 
     TextView tv_name_host;
     EditText et_name_host;
+    boolean nameOk = false;
 
     CheckBox chck_timer;
 
     Button btn_return;
     Button btn_play;
+    Button btn_camera;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -56,13 +70,18 @@ public class SettingsActivity extends Activity {
 
         mode = (Utils.Mode) getIntent().getSerializableExtra("Mode");
 
-        numpic_maxgames = findViewById(R.id.numpic_games);
+        numpic_maxgames = findViewById(R.id.numpic_maxgames);
         numpic_timer = findViewById(R.id.numpic_timer);
-        chck_timer = findViewById(R.id.sw_timer);
+        chck_timer = findViewById(R.id.chck_timer);
         btn_return = findViewById(R.id.btn_return_settigns);
         btn_play = findViewById(R.id.btn_play);
+        btn_camera = findViewById(R.id.btn_settings_camera);
         et_name_host = findViewById(R.id.et_name_host);
         tv_name_host = findViewById(R.id.tv_name_host);
+        tv_singleplayer_mode = findViewById(R.id.tv_singleplayer_mode);
+        tv_setting_computer = findViewById(R.id.tv_setting_computer);
+        tv_setting_two_players = findViewById(R.id.tv_setting_two_players);
+        sw_singleplayer_mode = findViewById(R.id.sw_singleplayer_mode);
         sw_player_start = findViewById(R.id.sw_player_start);
         sw_difficulty = findViewById(R.id.sw_difficulty);
         tv_difficulty = findViewById(R.id.tv_difficulty);
@@ -134,24 +153,36 @@ public class SettingsActivity extends Activity {
                 finish();
             }
         });
+        btn_camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                photo = new File(getFilesDir(), "Photo.jpg");
+
+                Utils.localPhotoUri = FileProvider.getUriForFile(SettingsActivity.this, "com.liadpaz.tic_tac_toe.fileprovider", photo);
+
+                startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(MediaStore.EXTRA_OUTPUT, Utils.localPhotoUri), 0);
+            }
+        });
 
         et_name_host.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
             }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (charSequence.length() == 0)
+                if (charSequence.length() == 0) {
+                    nameOk = false;
                     btn_play.setEnabled(false);
-                else
-                    btn_play.setEnabled(true);
+                } else {
+                    nameOk = true;
+                    btn_play.setEnabled(photoOk || Stats.readPrivacy());
+                }
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
-
             }
         });
 
@@ -159,18 +190,33 @@ public class SettingsActivity extends Activity {
         numpic_timer.setValue(timer);
         numpic_timer.setEnabled(false);
 
-        if (mode == Utils.Mode.Computer) {
+        if (mode == Utils.Mode.Multiplayer) {
+            et_name_host.setVisibility(View.VISIBLE);
+            tv_name_host.setVisibility(View.VISIBLE);
+            if (!Stats.readPrivacy()) {
+                btn_camera.setVisibility(View.VISIBLE);
+            }
+            btn_play.setEnabled(false);
+        } else {
+            tv_singleplayer_mode.setVisibility(View.VISIBLE);
+            tv_setting_two_players.setVisibility(View.VISIBLE);
+            tv_setting_computer.setVisibility(View.VISIBLE);
+            sw_singleplayer_mode.setVisibility(View.VISIBLE);
+            sw_singleplayer_mode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    mode = isChecked ? Utils.Mode.TwoPlayer : Utils.Mode.Computer;
+                    tv_difficulty.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
+                    tv_easy.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
+                    tv_hard.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
+                    sw_difficulty.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
+                }
+            });
+            mode = Utils.Mode.Computer;
             tv_difficulty.setVisibility(View.VISIBLE);
             tv_easy.setVisibility(View.VISIBLE);
             tv_hard.setVisibility(View.VISIBLE);
             sw_difficulty.setVisibility(View.VISIBLE);
-            btn_play.setEnabled(true);
-        } else if (mode == Utils.Mode.TwoPlayer) {
-            btn_play.setEnabled(true);
-        } else {/*if (mode == Utils.Mode.Multiplayer)*/
-            et_name_host.setVisibility(View.VISIBLE);
-            tv_name_host.setVisibility(View.VISIBLE);
-            btn_play.setEnabled(false);
         }
     }
 
@@ -179,7 +225,7 @@ public class SettingsActivity extends Activity {
      */
     private void initializeLobby() {
 
-        settingRef = Database.dataRef.child("Lobbies");
+        settingRef = Firebase.dataRef.child("Lobbies");
 
         settingRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -191,7 +237,7 @@ public class SettingsActivity extends Activity {
                     lobbyNumber = Utils.getRoomNumber();
                 }
 
-                settingRef.child(lobbyNumber).setValue(new Lobby(et_name_host.getText().toString(), lobbyNumber, starting_player.toString(), timer, max_games));
+                settingRef.child(lobbyNumber).setValue(new Lobby(et_name_host.getText().toString(), lobbyNumber, starting_player.toString(), timer, max_games, Stats.readPrivacy()));
                 settingRef.child(lobbyNumber).child("startingType").setValue(starting_player.toString());
 
                 startActivity(new Intent(SettingsActivity.this, LobbyActivity.class)
@@ -205,5 +251,15 @@ public class SettingsActivity extends Activity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 0 && resultCode == RESULT_OK) {
+            photoOk = true;
+            btn_play.setEnabled(nameOk);
+        }
     }
 }

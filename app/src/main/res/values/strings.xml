@@ -51,7 +51,7 @@
     <string name="No">No</string>
     <string name="First_To">First to</string>
     <string name="Wins_wins">wins, wins!</string>
-    <string name="Play_Local_Message">Choose if you want to play VS a computer or 2 players on this device</string>
+    <string name="Play_Local_Message">VS Computer / 2 Players</string>
     <string name="Two_Players">2 Players</string>
     <string name="Number_Wins">Number of wins, to win:</string>
     <string name="Start_Player">Choose starting player:</string>
@@ -86,6 +86,10 @@
     <string name="DevButton" translatable="false">Check credentials</string>
     <string name="Delete" translatable="false">Delete</string>
     <string name="Easy">Easy</string>
-    <string name="ComputerDifficulty">Choose the computer diffuculty:</string>
+    <string name="ComputerDifficulty">Choose the computer difficulty:</string>
     <string name="Hard">Hard</string>
+    <string name="Camera">Take Photo</string>
+    <string name="Privacy">Privacy</string>
+    <string name="PrivacyActivated">You won\'t be able to see other player\'s photos</string>
+    <string name="PrivacyDeactivated">You will see other player\'s photos</string>
 </resources>
