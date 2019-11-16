@@ -24,6 +24,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 import static com.liadpaz.tic_tac_toe.Utils.Mode;
 
 public class MainActivity extends AppCompatActivity {
@@ -153,9 +155,9 @@ public class MainActivity extends AppCompatActivity {
                 int localXwins = Stats.readFile(Stats.Readables.Xwins);
                 int localTime  = Stats.readFile(Stats.Readables.Time);
 
-                int globalOwins = dataSnapshot.child("Owins").getValue(Integer.class);
-                int globalXwins = dataSnapshot.child("Xwins").getValue(Integer.class);
-                int globalTime  = dataSnapshot.child("Time").getValue(Integer.class);
+                int globalOwins = Objects.requireNonNull(dataSnapshot.child("Owins").getValue(Integer.class));
+                int globalXwins = Objects.requireNonNull(dataSnapshot.child("Xwins").getValue(Integer.class));
+                int globalTime  = Objects.requireNonNull(dataSnapshot.child("Time").getValue(Integer.class));
 
                 Stats.addTime(Utils.getTime());
 

@@ -1,5 +1,6 @@
 package com.liadpaz.tic_tac_toe;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Rect;
@@ -144,7 +145,7 @@ public class Game extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (privacy == null) {
                         privacy = dataSnapshot.child("privacy").getValue(Boolean.class);
-                        if (!privacy) {
+                        if (privacy != null && privacy) {
                             storageRef = FirebaseStorage.getInstance().getReference().child("Lobbies").child(lobbyNumber);
                             putPhotos();
                         }
@@ -553,6 +554,7 @@ public class Game extends AppCompatActivity {
     /**
      * This function plays a CPU turn
      */
+    @SuppressLint("DefaultLocale")
     private void putCPU() {
         int[] rand = Utils.getRandom();
         while (!cells[rand[0]][rand[1]].setType(turn)) {
@@ -703,6 +705,7 @@ public class Game extends AppCompatActivity {
      * This function initialize all components that require local variables that may be stored
      * in the database
      */
+    @SuppressLint("DefaultLocale")
     private void initialize() {
 
         tv_maxgames.setText(String.format("%s %s %s", getString(R.string.First_To), String.valueOf(maxGames), getString(R.string.Wins_wins)));
