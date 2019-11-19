@@ -1,7 +1,9 @@
 package com.liadpaz.tic_tac_toe;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.Menu;
@@ -24,9 +26,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.net.InetAddress;
 import java.util.Objects;
-
-import static com.liadpaz.tic_tac_toe.Utils.Mode;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -87,29 +88,45 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         btn_mutltiplayer.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("StaticFieldLeak")
             @Override
             public void onClick(View v) {
-                if (Utils.isConnected()) {
-                    AlertDialog.Builder multiplayer = new AlertDialog.Builder(MainActivity.this)
-                            .setNegativeButton(getString(R.string.HostGame), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    startActivity(new Intent(getApplicationContext(), SettingsActivity.class)
-                                            .putExtra("Mode", Mode.Multiplayer));
-                                }
-                            })
-                            .setPositiveButton(getString(R.string.JoinGame), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    startActivity(new Intent(MainActivity.this, JoinMultiplayer.class));
-                                }
-                            })
-                            .setTitle(getString(R.string.MultiplayerOptions))
-                            .setMessage(R.string.MultiplayerDialog);
-                    multiplayer.show();
-                } else {
-                    Toast.makeText(MainActivity.this, getString(R.string.NotAvailableOffline), Toast.LENGTH_LONG).show();
-                }
+                new AsyncTask<Void, Void, Boolean>() {
+                    @Override
+                    protected Boolean doInBackground(Void... voids) {
+                        try {
+                            return InetAddress.getByName("www.google.com").isReachable(1000);
+                        } catch (Exception ignored) {
+                            return false;
+                        }
+                    }
+
+                    @Override
+                    protected void onPostExecute(Boolean aBoolean) {
+                        if (aBoolean) {
+                            AlertDialog.Builder multiplayer = new AlertDialog.Builder(MainActivity.this)
+                                    .setNegativeButton(getString(R.string.HostGame), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            startActivity(new Intent(MainActivity.this, SettingsActivity.class)
+                                                    .putExtra("Mode", Utils.Mode.Multiplayer));
+                                        }
+                                    })
+                                    .setPositiveButton(getString(R.string.JoinGame), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            startActivity(new Intent(MainActivity.this, JoinMultiplayer.class));
+                                        }
+                                    })
+                                    .setTitle(getString(R.string.MultiplayerOptions))
+                                    .setMessage(R.string.MultiplayerDialog);
+                            multiplayer.show();
+                        } else {
+                            Toast.makeText(MainActivity.this, getString(R.string.NotAvailableOffline), Toast.LENGTH_LONG).show();
+                        }
+                        super.onPostExecute(aBoolean);
+                    }
+                }.execute();
             }
         });
 
@@ -120,33 +137,34 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.tictactoe_menu, menu);
+        menu.findItem(R.id.menu_privacy).setChecked(Stats.readPrivacy());
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NotNull MenuItem item) {
         switch (item.getItemId()) {
-
             case R.id.menu_statistics:
                 startActivity(new Intent(MainActivity.this, Statistics.class));
                 return true;
 
             case R.id.menu_privacy:
                 boolean privacy = Stats.flipPrivacy();
+                item.setChecked(privacy);
                 Toast.makeText(MainActivity.this, privacy ? getString(R.string.PrivacyActivated) : getString(R.string.PrivacyDeactivated), Toast.LENGTH_LONG).show();
                 return true;
 
-            case R.id.menu_exit:
-                System.exit(0);
+            case R.id.menu_about:
+                startActivity(new Intent(MainActivity.this, AboutActivity.class));
                 return true;
 
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
     protected void onPause() {
-
         mainRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -171,7 +189,6 @@ public class MainActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
-
         super.onPause();
     }
 }

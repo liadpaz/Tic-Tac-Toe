@@ -206,17 +206,17 @@ public class SettingsActivity extends Activity {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     mode = isChecked ? Utils.Mode.TwoPlayer : Utils.Mode.Computer;
-                    tv_difficulty.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
-                    tv_easy.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
-                    tv_hard.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
-                    sw_difficulty.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
+//                    tv_difficulty.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
+//                    tv_easy.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
+//                    tv_hard.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
+//                    sw_difficulty.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
                 }
             });
             mode = Utils.Mode.Computer;
-            tv_difficulty.setVisibility(View.VISIBLE);
-            tv_easy.setVisibility(View.VISIBLE);
-            tv_hard.setVisibility(View.VISIBLE);
-            sw_difficulty.setVisibility(View.VISIBLE);
+//            tv_difficulty.setVisibility(View.VISIBLE);
+//            tv_easy.setVisibility(View.VISIBLE);
+//            tv_hard.setVisibility(View.VISIBLE);
+//            sw_difficulty.setVisibility(View.VISIBLE);
         }
     }
 

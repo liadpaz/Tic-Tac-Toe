@@ -5,8 +5,9 @@
         android:title="@string/Statistics" />
     <item
         android:id="@+id/menu_privacy"
-        android:title="@string/Privacy" />
+        android:title="@string/Privacy"
+        android:checkable="true" />
     <item
-        android:id="@+id/menu_exit"
-        android:title="@string/Exit" />
+        android:id="@+id/menu_about"
+        android:title="@string/About" />
 </menu>

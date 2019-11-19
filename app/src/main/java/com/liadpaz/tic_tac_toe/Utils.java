@@ -18,10 +18,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Random;
 
 /**
@@ -69,26 +66,6 @@ class Utils {
         for (int i = 0; i < 4; i++)
             number.append((new Random()).nextInt(10));
         return number.toString();
-    }
-
-    /**
-     * This function checks if the user has internet connection
-     *
-     * @return true if the user has internet connection, otherwise false
-     */
-    static boolean isConnected() {
-        try {
-            for (NetworkInterface intf : Collections.list(NetworkInterface.getNetworkInterfaces())) {
-                for (InetAddress addr : Collections.list(intf.getInetAddresses())) {
-                    if (!addr.isLoopbackAddress()) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        } catch (Exception ignored) {
-            return false;
-        }
     }
 
     /**

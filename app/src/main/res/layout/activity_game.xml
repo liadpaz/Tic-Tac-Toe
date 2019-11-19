@@ -358,7 +358,7 @@
         android:layout_height="0dp"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/tv_playerX"
-        app:layout_constraintEnd_toStartOf="@+id/tv_turn"
+        app:layout_constraintEnd_toStartOf="@+id/tv_maxgames"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/iv_board"
         app:srcCompat="@color/colorAccent" />
@@ -370,23 +370,8 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/tv_playerO"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/tv_turn"
+        app:layout_constraintStart_toEndOf="@+id/tv_maxgames"
         app:layout_constraintTop_toBottomOf="@+id/iv_board"
         app:srcCompat="@color/colorAccent" />
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/group"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/group2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/group3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,8 @@
 package com.liadpaz.tic_tac_toe;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -14,6 +16,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+
+import java.net.InetAddress;
 
 public class Statistics extends AppCompatActivity {
 
@@ -29,6 +33,7 @@ public class Statistics extends AppCompatActivity {
     TextView tv_localTime;
     TextView tv_globalTime;
 
+    @SuppressLint("StaticFieldLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,14 +52,46 @@ public class Statistics extends AppCompatActivity {
         tv_localX.setText(String.valueOf(Stats.readFile(Stats.Readables.Xwins)));
         tv_localTime.setText(String.format("%s %s", String.valueOf(Stats.readFile(Stats.Readables.Time)), getString(R.string.Seconds)));
 
-        if (Utils.isConnected()) {
-            getGlobals();
-        } else {
-            tv_globalO.setText(getString(R.string.NotAvailableOffline));
-            tv_globalX.setText(getString(R.string.NotAvailableOffline));
-            tv_globalTime.setText(getString(R.string.NotAvailableOffline));
-        }
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... voids) {
+                try {
+                    return InetAddress.getByName("www.google.com").isReachable(1000);
+                } catch (Exception ignored) {
+                    return false;
+                }
+            }
 
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                if (aBoolean) {
+                    tv_globalO.setText(getString(R.string.Loading));
+                    tv_globalX.setText(getString(R.string.Loading));
+                    tv_globalTime.setText(getString(R.string.Loading));
+
+                    statsRef = Firebase.dataRef;
+
+                    statsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @SuppressLint("DefaultLocale")
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            tv_globalO.setText(String.valueOf(dataSnapshot.child("Owins").getValue(Integer.class)));
+                            tv_globalX.setText(String.valueOf(dataSnapshot.child("Xwins").getValue(Integer.class)));
+                            tv_globalTime.setText(String.format("%d %s", dataSnapshot.child("Time").getValue(Integer.class), getString(R.string.Seconds)));
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                        }
+                    });
+                } else {
+                    tv_globalO.setText(getString(R.string.NotAvailableOffline));
+                    tv_globalX.setText(getString(R.string.NotAvailableOffline));
+                    tv_globalTime.setText(getString(R.string.NotAvailableOffline));
+                }
+                super.onPostExecute(aBoolean);
+            }
+        }.execute();
         btn_return.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
