@@ -6,6 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".DeveloperActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_developer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="@string/Developer" />
+
     <ListView
         android:id="@+id/lv_lobbies"
         android:layout_width="0dp"
@@ -14,10 +26,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" >
-
-    </ListView>
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_developer"
+        app:layout_constraintVertical_bias="0.5" />
 
     <EditText
         android:id="@+id/et_dev_name"
@@ -27,7 +37,7 @@
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_developer" />
 
     <EditText
         android:id="@+id/et_dev_password"

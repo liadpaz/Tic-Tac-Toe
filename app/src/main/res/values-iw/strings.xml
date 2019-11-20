@@ -74,4 +74,7 @@
     <string name="Privacy">פרטיות</string>
     <string name="PrivacyActivated">לא תוכל/י לראות תמונות של שחקנים אחרים</string>
     <string name="PrivacyDeactivated">את/ה תוכל/י לראות תמונות של שחקנים אחרים</string>
+    <string name="AppVersion">גרסא: 1.1</string>
+    <string name="MadeBy">פותח על ידי ליעד פז</string>
+    <string name="AboutApp">" עשיתי את האפליקציה הזאת בתור פרויקט לבית ספר בפיתוח אפליקציה לאנדרויד. עשיתי את האפליקציה בערך בחודשיים, אם את/ה מוצא/ת באגים או גליצ'ים לא צפויים בבקשה שלח/י לי מייל. תודה שאת/ה משחק!"</string>
 </resources>

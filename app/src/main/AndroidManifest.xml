@@ -14,17 +14,39 @@
         android:roundIcon="@mipmap/tic_tac_toe_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AboutActivity"></activity>
+        <activity
+            android:name=".AboutActivity"
+            android:launchMode="singleTask"
+            android:resizeableActivity="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName="com.liadpaz.tic_tac_toe.MainActivity" >
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.liadpaz.tic_tac_toe.MainActivity" />
+        </activity>
         <activity
             android:name=".DeveloperActivity"
             android:launchMode="singleTask"
             android:resizeableActivity="false"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:parentActivityName="com.liadpaz.tic_tac_toe.MainActivity" >
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.liadpaz.tic_tac_toe.MainActivity" />
+        </activity>
         <activity
             android:name=".Statistics"
             android:launchMode="singleTask"
             android:resizeableActivity="false"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:parentActivityName="com.liadpaz.tic_tac_toe.MainActivity" >
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.liadpaz.tic_tac_toe.MainActivity"/>
+        </activity>
         <activity
             android:name=".LobbyActivity"
             android:launchMode="singleTask"
