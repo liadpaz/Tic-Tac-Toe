@@ -83,9 +83,9 @@ public class JoinMultiplayer extends Activity {
                                                 .putExtra("Multiplayer", "Client")
                                                 .putExtra("LobbyNumber", lobbyNumber));
                                         joinRef.child(lobbyNumber).child("clientName").setValue(clientName);
-                                        if (!data.child("privacy").getValue(Boolean.class))
+                                        if (!Objects.requireNonNull(data.child("privacy").getValue(Boolean.class))) {
                                             joinRef.child(lobbyNumber).child("privacy").setValue(Stats.readPrivacy());
-
+                                        }
                                     } else {
                                         Toast.makeText(JoinMultiplayer.this, getString(R.string.LobbyFull), Toast.LENGTH_LONG).show();
                                     }

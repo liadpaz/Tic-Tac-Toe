@@ -70,25 +70,26 @@ public class Statistics extends AppCompatActivity {
             @Override
             protected void onPostExecute(Boolean aBoolean) {
                 if (aBoolean) {
-                    tv_globalO.setText(getString(R.string.Loading));
-                    tv_globalX.setText(getString(R.string.Loading));
-                    tv_globalTime.setText(getString(R.string.Loading));
-
-                    statsRef = Firebase.dataRef;
-
-                    statsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @SuppressLint("DefaultLocale")
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            tv_globalO.setText(String.valueOf(dataSnapshot.child("Owins").getValue(Integer.class)));
-                            tv_globalX.setText(String.valueOf(dataSnapshot.child("Xwins").getValue(Integer.class)));
-                            tv_globalTime.setText(String.format("%d %s", dataSnapshot.child("Time").getValue(Integer.class), getString(R.string.Seconds)));
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                        }
-                    });
+                    getGlobals();
+//                    tv_globalO.setText(getString(R.string.Loading));
+//                    tv_globalX.setText(getString(R.string.Loading));
+//                    tv_globalTime.setText(getString(R.string.Loading));
+//
+//                    statsRef = Firebase.dataRef;
+//
+//                    statsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                        @SuppressLint("DefaultLocale")
+//                        @Override
+//                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                            tv_globalO.setText(String.valueOf(dataSnapshot.child("Owins").getValue(Integer.class)));
+//                            tv_globalX.setText(String.valueOf(dataSnapshot.child("Xwins").getValue(Integer.class)));
+//                            tv_globalTime.setText(String.format("%d %s", dataSnapshot.child("Time").getValue(Integer.class), getString(R.string.Seconds)));
+//                        }
+//
+//                        @Override
+//                        public void onCancelled(@NonNull DatabaseError databaseError) {
+//                        }
+//                    });
                 } else {
                     tv_globalO.setText(getString(R.string.NotAvailableOffline));
                     tv_globalX.setText(getString(R.string.NotAvailableOffline));
@@ -138,6 +139,7 @@ public class Statistics extends AppCompatActivity {
         statsRef = Firebase.dataRef;
 
         statsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @SuppressLint("DefaultLocale")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 tv_globalO.setText(String.valueOf(dataSnapshot.child("Owins").getValue(Integer.class)));

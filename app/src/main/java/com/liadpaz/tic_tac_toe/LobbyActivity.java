@@ -20,6 +20,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.Objects;
+
 public class LobbyActivity extends Activity {
 
     DatabaseReference lobbyRef;
@@ -31,11 +33,8 @@ public class LobbyActivity extends Activity {
     private boolean isHost;
     private boolean isClient;
 
-    private Button btn_exit_lobby;
-
     private TextView tv_host_name;
     private TextView tv_client_name;
-    private TextView tv_room_number;
 
     private Switch sw_host;
     private Switch sw_client;
@@ -58,14 +57,14 @@ public class LobbyActivity extends Activity {
         setContentView(R.layout.activity_lobby);
 
         lobbyNumber = getIntent().getStringExtra("LobbyNumber");
-        isHost = getIntent().getStringExtra("Multiplayer").equals("Host");
+        isHost = Objects.equals(getIntent().getStringExtra("Multiplayer"), "Host");
         isClient = !isHost;
         hostName = getIntent().getStringExtra("HostName");
 
-        btn_exit_lobby = findViewById(R.id.btn_exit_lobby);
+        Button btn_exit_lobby = findViewById(R.id.btn_exit_lobby);
         tv_host_name = findViewById(R.id.tv_host_name);
         tv_client_name = findViewById(R.id.tv_client_name);
-        tv_room_number = findViewById(R.id.tv_room_ip);
+        TextView tv_room_number = findViewById(R.id.tv_room_ip);
         sw_host = findViewById(R.id.sw_host_side);
         sw_client = findViewById(R.id.sw_client_side);
         ckbx_ready = findViewById(R.id.ckbx_ready);
@@ -189,7 +188,7 @@ public class LobbyActivity extends Activity {
 
                     }
 
-                    swapSwitches(dataSnapshot.child("hostType").getValue(String.class));
+                    swapSwitches(Objects.requireNonNull(dataSnapshot.child("hostType").getValue(String.class)));
 
                     String hostMessage = dataSnapshot.child("hostMessage").getValue(String.class);
                     if (hostMessage != null) {

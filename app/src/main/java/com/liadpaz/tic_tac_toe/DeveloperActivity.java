@@ -59,12 +59,10 @@ public class DeveloperActivity extends AppCompatActivity {
                 devRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.child("Name").getValue(String.class).equals(et_dev_name.getText().toString()) && dataSnapshot.child("Password").getValue(String.class).equals(et_dev_password.getText().toString())) {
-
+                        if (Objects.equals(dataSnapshot.child("Name").getValue(String.class), et_dev_name.getText().toString()) && Objects.equals(dataSnapshot.child("Password").getValue(String.class), et_dev_password.getText().toString())) {
                             btn_delete.setVisibility(View.VISIBLE);
                             et_lobby.setVisibility(View.VISIBLE);
                             getLobbies();
-
                         }
                     }
 

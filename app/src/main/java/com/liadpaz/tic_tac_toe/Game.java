@@ -144,7 +144,7 @@ public class Game extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (privacy == null) {
-                        privacy = dataSnapshot.child("privacy").getValue(Boolean.class);
+                        privacy = Objects.requireNonNull(dataSnapshot.child("privacy").getValue(Boolean.class));
                         if (!privacy) {
                             storageRef = FirebaseStorage.getInstance().getReference().child("Lobbies").child(lobbyNumber);
                             putPhotos();
