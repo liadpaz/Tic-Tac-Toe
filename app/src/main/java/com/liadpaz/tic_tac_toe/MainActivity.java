@@ -45,8 +45,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar_main);
-        setSupportActionBar(toolbar);
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar_main));
 
         Utils.setTime();
         Stats.setFile(getFilesDir());
@@ -136,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.tictactoe_menu, menu);
+        inflater.inflate(R.menu.menu_main, menu);
         menu.findItem(R.id.menu_privacy).setChecked(Stats.readPrivacy());
         return super.onCreateOptionsMenu(menu);
     }

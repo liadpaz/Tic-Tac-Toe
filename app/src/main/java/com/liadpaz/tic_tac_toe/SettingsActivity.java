@@ -1,6 +1,5 @@
 package com.liadpaz.tic_tac_toe;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -16,6 +15,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import com.google.firebase.database.DataSnapshot;
@@ -25,7 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 
-public class SettingsActivity extends Activity {
+public class SettingsActivity extends AppCompatActivity {
 
     DatabaseReference settingRef;
 
