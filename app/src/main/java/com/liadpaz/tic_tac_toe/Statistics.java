@@ -62,7 +62,7 @@ public class Statistics extends AppCompatActivity {
             @Override
             protected Boolean doInBackground(Void... voids) {
                 try {
-                    return InetAddress.getByName("www.google.com").isReachable(1000);
+                    return InetAddress.getByName("www.google.com").isReachable(2000);
                 } catch (Exception ignored) {
                     return false;
                 }

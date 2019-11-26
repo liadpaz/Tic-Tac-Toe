@@ -93,7 +93,10 @@
     <string name="PrivacyActivated">You won\'t be able to see other player\'s photos</string>
     <string name="PrivacyDeactivated">You will see other player\'s photos</string>
     <string name="Developer" translatable="false">Developer</string>
-    <string name="AppVersion">Version: 1.1</string>
+    <string name="AppVersion">Version:</string>
     <string name="MadeBy">Made by Liad Paz</string>
     <string name="AboutApp">I made this app as a school project in app development in Android. I made this in about two months, if you find any bugs or glitches please send me an email. Thanks for playing!</string>
+    <string name="O" translatable="false">O</string>
+    <string name="X" translatable="false">X</string>
+    <string name="Game">Game</string>
 </resources>

@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 
 import com.google.firebase.database.DataSnapshot;
@@ -24,6 +25,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
+import java.util.Objects;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -59,7 +61,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     CheckBox chck_timer;
 
-    Button btn_return;
     Button btn_play;
     Button btn_camera;
 
@@ -67,13 +68,16 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar_setting));
+
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.Settings));
 
         mode = (Utils.Mode) getIntent().getSerializableExtra("Mode");
 
         numpic_maxgames = findViewById(R.id.numpic_maxgames);
         numpic_timer = findViewById(R.id.numpic_timer);
         chck_timer = findViewById(R.id.chck_timer);
-        btn_return = findViewById(R.id.btn_return_settigns);
         btn_play = findViewById(R.id.btn_play);
         btn_camera = findViewById(R.id.btn_settings_camera);
         et_name_host = findViewById(R.id.et_name_host);
@@ -147,12 +151,6 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             }
         });
-        btn_return.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
         btn_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -224,7 +222,6 @@ public class SettingsActivity extends AppCompatActivity {
      * This function initializes a lobby
      */
     private void initializeLobby() {
-
         settingRef = Firebase.dataRef.child("Lobbies");
 
         settingRef.addListenerForSingleValueEvent(new ValueEventListener() {

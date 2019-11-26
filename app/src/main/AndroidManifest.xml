@@ -17,33 +17,33 @@
             android:launchMode="singleTask"
             android:resizeableActivity="false"
             android:screenOrientation="portrait"
-            android:parentActivityName="com.liadpaz.tic_tac_toe.MainActivity" >
+            android:parentActivityName=".MainActivity" >
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.liadpaz.tic_tac_toe.MainActivity" />
+                android:value=".MainActivity" />
         </activity>
         <activity
             android:name=".DeveloperActivity"
             android:launchMode="singleTask"
             android:resizeableActivity="false"
             android:screenOrientation="portrait"
-            android:parentActivityName="com.liadpaz.tic_tac_toe.MainActivity" >
+            android:parentActivityName=".MainActivity" >
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.liadpaz.tic_tac_toe.MainActivity" />
+                android:value=".MainActivity" />
         </activity>
         <activity
             android:name=".Statistics"
             android:launchMode="singleTask"
             android:resizeableActivity="false"
             android:screenOrientation="portrait"
-            android:parentActivityName="com.liadpaz.tic_tac_toe.MainActivity" >
+            android:parentActivityName=".MainActivity" >
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.liadpaz.tic_tac_toe.MainActivity"/>
+                android:value=".MainActivity"/>
         </activity>
         <activity
             android:name=".LobbyActivity"
@@ -54,17 +54,35 @@
             android:name=".JoinMultiplayer"
             android:launchMode="singleTask"
             android:resizeableActivity="false"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" >
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <activity
             android:name=".Game"
             android:launchMode="singleTask"
             android:resizeableActivity="false"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:parentActivityName=".SettingsActivity" >
+
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".SettingsActivity" />
+        </activity>
         <activity
             android:name=".SettingsActivity"
             android:launchMode="singleTask"
             android:resizeableActivity="false"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" >
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTask"

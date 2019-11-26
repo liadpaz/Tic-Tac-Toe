@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.view.View;
 import android.widget.ImageView;
 
+import androidx.annotation.Keep;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.firebase.database.DatabaseReference;
@@ -392,15 +393,15 @@ class Stats {
 /**
  * This class represents the lobby
  */
+@Keep
 class Lobby {
-
-    private int max;
-    private int timer;
-    private boolean privacy;
-    private String hostName;
-    private String number;
-    private String hostType;
-    private String startingType;
+    public int max;
+    public int timer;
+    public boolean privacy;
+    public String hostName;
+    public String number;
+    public String hostType;
+    public String startingType;
 
     Lobby(String hostName, String number, String startingType, int timer, int max, boolean privacy) {
         this.hostName = hostName;
@@ -410,61 +411,5 @@ class Lobby {
         this.max = max;
         this.privacy = privacy;
         this.hostType = "O";
-    }
-
-    public int getMax() {
-        return max;
-    }
-
-    public void setMax(int max) {
-        this.max = max;
-    }
-
-    public int getTimer() {
-        return timer;
-    }
-
-    public void setTimer(int timer) {
-        this.timer = timer;
-    }
-
-    public boolean isPrivacy() {
-        return privacy;
-    }
-
-    public void setPrivacy(boolean privacy) {
-        this.privacy = privacy;
-    }
-
-    public String getHostName() {
-        return hostName;
-    }
-
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public String getHostType() {
-        return hostType;
-    }
-
-    public void setHostType(String hostType) {
-        this.hostType = hostType;
-    }
-
-    public String getStartingType() {
-        return startingType;
-    }
-
-    public void setStartingType(String startingType) {
-        this.startingType = startingType;
     }
 }

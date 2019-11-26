@@ -27,29 +27,28 @@ public class LobbyActivity extends AppCompatActivity {
     DatabaseReference lobbyRef;
     StorageReference storageRef;
 
-    private Integer max;
-    private Integer timer;
+    Integer max;
+    Integer timer;
 
-    private boolean isHost;
-    private boolean isClient;
+    boolean isHost;
+    boolean isClient;
 
-    private TextView tv_host_name;
-    private TextView tv_client_name;
+    TextView tv_host_name;
+    TextView tv_client_name;
 
-    private Switch sw_host;
-    private Switch sw_client;
+    Switch sw_host;
+    Switch sw_client;
 
-    private CheckBox ckbx_ready;
+    CheckBox ckbx_ready;
 
-    private String lobbyNumber;
-    private String hostName;
-    private String clientName;
+    String lobbyNumber;
+    String hostName;
+    String clientName;
 
-    private ValueEventListener templateValueListener;
-    private ValueEventListener valueListener;
+    ValueEventListener listener;
 
-    private boolean ready_host = false;
-    private boolean ready_client = false;
+    boolean ready_host = false;
+    boolean ready_client = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,8 +97,8 @@ public class LobbyActivity extends AppCompatActivity {
                     if (ready_host && ready_client) {
                         writeDatabaseMessage("play");
                         startActivity(new Intent(LobbyActivity.this, Game.class)
-                            .putExtra("lobbyNumber", lobbyNumber)
-                            .putExtra("Multiplayer", "Host"));
+                                .putExtra("lobbyNumber", lobbyNumber)
+                                .putExtra("Multiplayer", "Host"));
 
                     }
                 } else {
@@ -123,7 +122,7 @@ public class LobbyActivity extends AppCompatActivity {
                 } else {
                     writeDatabaseMessage("left");
                 }
-                LobbyActivity.this.finish();
+                finish();
             }
         });
 
@@ -131,7 +130,7 @@ public class LobbyActivity extends AppCompatActivity {
 
         lobbyRef = Firebase.dataRef.child("Lobbies").child(lobbyNumber);
 
-        templateValueListener = new ValueEventListener() {
+        listener = lobbyRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (max == null || timer == null) {
@@ -156,6 +155,7 @@ public class LobbyActivity extends AppCompatActivity {
                                         startActivity(new Intent(LobbyActivity.this, Game.class)
                                                 .putExtra("LobbyNumber", lobbyNumber)
                                                 .putExtra("Multiplayer", "Host"));
+                                        finish();
                                     }
                                     break;
 
@@ -170,6 +170,7 @@ public class LobbyActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     lobbyRef.removeValue();
+                                                    finishAffinity();
                                                     startActivity(new Intent(LobbyActivity.this, MainActivity.class));
                                                 }
                                             })
@@ -188,18 +189,19 @@ public class LobbyActivity extends AppCompatActivity {
 
                     }
 
-                    swapSwitches(Objects.requireNonNull(dataSnapshot.child("hostType").getValue(String.class)));
+                    String hostType;
+                    if ((hostType = dataSnapshot.child("hostType").getValue(String.class)) != null) {
+                        swapSwitches(hostType);
+                    }
 
                     String hostMessage = dataSnapshot.child("hostMessage").getValue(String.class);
                     if (hostMessage != null) {
                         switch (hostMessage) {
-
                             case "play":
-
                                 startActivity(new Intent(LobbyActivity.this, Game.class)
                                         .putExtra("LobbyNumber", lobbyNumber)
                                         .putExtra("Multiplayer", "Client"));
-
+                                finish();
                                 break;
 
                             case "left":
@@ -208,16 +210,13 @@ public class LobbyActivity extends AppCompatActivity {
                                         .setPositiveButton(getString(R.string.BackMainMenu), new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
-
                                                 lobbyRef.removeValue();
-
+                                                finishAffinity();
                                                 startActivity(new Intent(LobbyActivity.this, MainActivity.class));
-
                                             }
                                         })
                                         .setCancelable(false);
                                 alert.show();
-
                                 break;
                         }
                     }
@@ -227,17 +226,11 @@ public class LobbyActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
-        };
+        });
 
         if (!Stats.readPrivacy()) {
             uploadPhoto();
         }
-    }
-
-    @Override
-    protected void onResume() {
-        valueListener = lobbyRef.addValueEventListener(templateValueListener);
-        super.onResume();
     }
 
     /**
@@ -277,28 +270,23 @@ public class LobbyActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * This function uploads the photo the player took to the Firebase Storage
+     */
     private void uploadPhoto() {
         storageRef = Firebase.storeRef.child("Lobbies").child(lobbyNumber);
-        if (isHost) {
-            storageRef.child("Host").putFile(Utils.localPhotoUri);
-        } else {
-            storageRef.child("Client").putFile(Utils.localPhotoUri);
-        }
+        storageRef.child(isHost ? "Host" : "Client").putFile(Utils.localPhotoUri);
     }
 
     @Override
-    protected void onPause() {
-        lobbyRef.removeEventListener(valueListener);
-        super.onPause();
+    public void onBackPressed() {
+        writeDatabaseMessage("left");
+        super.onBackPressed();
     }
 
     @Override
     protected void onDestroy() {
-        if ((isHost && clientName != null) || isClient) {
-            writeDatabaseMessage("left");
-        } else {
-            lobbyRef.removeValue();
-        }
+        lobbyRef.removeEventListener(listener);
         super.onDestroy();
     }
 }

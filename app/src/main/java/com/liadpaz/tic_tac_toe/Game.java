@@ -3,6 +3,7 @@ package com.liadpaz.tic_tac_toe;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.FileProvider;
 
@@ -49,6 +51,7 @@ public class Game extends AppCompatActivity {
     CountDownTimer counter;
     boolean difficulty;
 
+    int topScreen = 0;
     DisplayMetrics screen;
 
     String thisName;
@@ -60,7 +63,6 @@ public class Game extends AppCompatActivity {
     String lastHostMessage;
     String lastClientMessage;
     String lastMessage;
-    String exitStatus;
     boolean canPlay;
     Boolean privacy;
 
@@ -129,11 +131,20 @@ public class Game extends AppCompatActivity {
         vs_multiplayer = mode == null;
 
         if (!vs_multiplayer) {
+            findViewById(R.id.toolbar_game).setVisibility(View.VISIBLE);
+            setSupportActionBar((Toolbar) findViewById(R.id.toolbar_game));
+            Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.Game);
+            Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
+            TypedArray ta = obtainStyledAttributes(new int[] { R.attr.actionBarSize});
+            topScreen = ta.getDimensionPixelSize(0, -1);
+            ta.recycle();
+            iv_board.setTop(-topScreen);
+
             vs_computer = mode == Utils.Mode.Computer;
             vs_on_this_device = mode == Utils.Mode.TwoPlayer;
             initialize();
         } else {
-
             canPlay = true;
 
             btn_reset.setVisibility(View.INVISIBLE);
@@ -202,11 +213,13 @@ public class Game extends AppCompatActivity {
                                     play(Integer.parseInt(messages[1]), Integer.parseInt(messages[2]));
                                     break;
 
-                                case "resign":
-                                    if (thisType == Cell.Type.X)
+                                case "left":
+                                    if (thisType == Cell.Type.X) {
                                         Stats.addXwins();
-                                    else
+                                    } else {
                                         Stats.addOwins();
+                                    }
+                                    gameRef.removeValue();
                                     absoluteWinnerAlert(false, thisName).show();
                                     break;
 
@@ -218,7 +231,6 @@ public class Game extends AppCompatActivity {
                                     break;
                             }
                         }
-
                         lastClientMessage = message;
                     } else {
                         String message = dataSnapshot.child("hostMessage").getValue(String.class);
@@ -232,11 +244,13 @@ public class Game extends AppCompatActivity {
                                     play(Integer.parseInt(messages[1]), Integer.parseInt(messages[2]));
                                     break;
 
-                                case "resign":
-                                    if (thisType == Cell.Type.X)
+                                case "left":
+                                    if (thisType == Cell.Type.X) {
                                         Stats.addXwins();
-                                    else
+                                    } else {
                                         Stats.addOwins();
+                                    }
+                                    gameRef.removeValue();
                                     absoluteWinnerAlert(false, thisName).show();
                                     break;
 
@@ -272,9 +286,12 @@ public class Game extends AppCompatActivity {
                         .setPositiveButton(getString(R.string.Yes), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                if (vs_multiplayer)
-                                    exitStatus = "resign";
-                                finishAffinity();
+                                if (vs_multiplayer) {
+                                    writeDatabaseMessage("left");
+                                    finish();
+                                } else {
+                                    finishAffinity();
+                                }
                                 startActivity(new Intent(Game.this, MainActivity.class));
                             }
                         })
@@ -314,16 +331,14 @@ public class Game extends AppCompatActivity {
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                over_cells[i][j] = new Rect(j * (x / 3), i * (x / 3), (j + 1) * (x / 3), (i + 1) * (x / 3));
+                over_cells[i][j] = new Rect(j * (x / 3), i * (x / 3) + topScreen, (j + 1) * (x / 3), (i + 1) * (x / 3) + topScreen);
                 cells[i][j].setSize(x / 3);
-                cells[i][j].setLocation(j * (x / 3), i * (x / 3));
+                cells[i][j].setLocation(j * (x / 3), i * (x / 3) + topScreen);
             }
         }
 
         if (vs_computer) {
-
             tv_turn.setVisibility(View.INVISIBLE);
-
             AlertDialog.Builder dialog = new AlertDialog.Builder(this)
                     .setCancelable(false)
                     .setMessage(getString(R.string.Player_Chooser))
@@ -343,8 +358,9 @@ public class Game extends AppCompatActivity {
                                 putCPU();
                                 turn = Cell.Type.X;
                             }
-                            if (timer != 0)
+                            if (timer != 0) {
                                 counter.start();
+                            }
                         }
                     })
                     .setNegativeButton("O", new DialogInterface.OnClickListener() {
@@ -362,15 +378,13 @@ public class Game extends AppCompatActivity {
                                 putCPU();
                                 turn = Cell.Type.O;
                             }
-                            if (timer != 0)
+                            if (timer != 0) {
                                 counter.start();
-
+                            }
                         }
                     });
             dialog.show();
-
         } else if (vs_on_this_device) {
-
             tv_turn.setText(String.format("%s %s%s", getString(R.string.Its), turn.toString(), getString(R.string.Turn)));
 
             players[0] = new Player(Player.Type.Human);
@@ -381,7 +395,6 @@ public class Game extends AppCompatActivity {
             tv_playerO.setVisibility(View.VISIBLE);
             tv_playerXwins.setVisibility(View.VISIBLE);
             tv_playerOwins.setVisibility(View.VISIBLE);
-
         }
     }
 
@@ -392,6 +405,7 @@ public class Game extends AppCompatActivity {
      *
      * @param event touch location and info about the touch
     */
+    @SuppressLint("DefaultLocale")
     @Override
     public boolean onTouchEvent(@NotNull MotionEvent event) {
         final int touchX = (int) event.getRawX();
@@ -402,7 +416,7 @@ public class Game extends AppCompatActivity {
                     if (over_cells[i][j].contains(touchX, touchY) && !cells[i][j].isVisible() && (!vs_multiplayer || (turn == thisType && canPlay))) {
                         play(i, j);
                         if (vs_multiplayer) {
-                            writeDatabaseMessage(String.format("turn %s %s", String.valueOf(i), String.valueOf(j)));
+                            writeDatabaseMessage(String.format("turn %d %d", i, j));
                         }
                         i = 3;
                         break;
@@ -470,11 +484,15 @@ public class Game extends AppCompatActivity {
      *
      * <p>This function builds and returns an absolute winner AlertDialog with the winner name in it</p>
      *
+     * @param player        true to show 'player' at the start
      * @param player_won    a String contains the player name
      *
      * @return              absolute winner AlertDialog
      */
     private AlertDialog.Builder absoluteWinnerAlert(boolean player, String player_won) {
+        if (vs_multiplayer) {
+            setResult(RESULT_OK, new Intent().putExtra("WRITE", false));
+        }
         return new AlertDialog.Builder(this)
                 .setCancelable(false)
                 .setTitle(getString(R.string.Winner))
@@ -482,8 +500,8 @@ public class Game extends AppCompatActivity {
                 .setPositiveButton(getString(R.string.Continue), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                    finishAffinity();
-                    startActivity(new Intent(Game.this, MainActivity.class));
+                        finish();
+                        startActivity(new Intent(Game.this, MainActivity.class));
                     }
                 });
     }
@@ -775,42 +793,33 @@ public class Game extends AppCompatActivity {
 
     private void putPhotos() {
         final File remotePhoto = new File(getFilesDir(), "Photo1.jpg");
-        if (multiType.equals("Host")) {
-            storageRef.child("Client").getFile(remotePhoto).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
-                    Utils.remotePhotoUri = FileProvider.getUriForFile(Game.this, "com.liadpaz.tic_tac_toe.fileprovider", remotePhoto);
-                    if (thisType == Cell.Type.X) {
-                        iv_playerX.setImageURI(Utils.localPhotoUri);
-                        iv_playerX.setVisibility(View.VISIBLE);
-                        iv_playerO.setImageURI(Utils.remotePhotoUri);
-                        iv_playerO.setVisibility(View.VISIBLE);
-                    } else {
-                        iv_playerX.setImageURI(Utils.remotePhotoUri);
-                        iv_playerX.setVisibility(View.VISIBLE);
-                        iv_playerO.setImageURI(Utils.localPhotoUri);
-                        iv_playerO.setVisibility(View.VISIBLE);
-                    }
+        storageRef.child(multiType.equals("Host") ? "Client" : "Host").getFile(remotePhoto).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
+                Utils.remotePhotoUri = FileProvider.getUriForFile(Game.this, "com.liadpaz.tic_tac_toe.fileprovider", remotePhoto);
+                if (thisType == Cell.Type.X) {
+                    iv_playerX.setImageURI(Utils.localPhotoUri);
+                    iv_playerX.setVisibility(View.VISIBLE);
+                    iv_playerO.setImageURI(Utils.remotePhotoUri);
+                    iv_playerO.setVisibility(View.VISIBLE);
+                } else {
+                    iv_playerX.setImageURI(Utils.remotePhotoUri);
+                    iv_playerX.setVisibility(View.VISIBLE);
+                    iv_playerO.setImageURI(Utils.localPhotoUri);
+                    iv_playerO.setVisibility(View.VISIBLE);
                 }
-            });
-        } else {
-            storageRef.child("Host").getFile(remotePhoto).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
-                    Utils.remotePhotoUri = FileProvider.getUriForFile(Game.this, "com.liadpaz.tic_tac_toe.fileprovider", remotePhoto);
-                    if (thisType == Cell.Type.X) {
-                        iv_playerX.setImageURI(Utils.localPhotoUri);
-                        iv_playerX.setVisibility(View.VISIBLE);
-                        iv_playerO.setImageURI(Utils.remotePhotoUri);
-                        iv_playerO.setVisibility(View.VISIBLE);
-                    } else {
-                        iv_playerX.setImageURI(Utils.remotePhotoUri);
-                        iv_playerX.setVisibility(View.VISIBLE);
-                        iv_playerO.setImageURI(Utils.localPhotoUri);
-                        iv_playerO.setVisibility(View.VISIBLE);
-                    }
-                }
-            });
+            }
+        });
+    }
+
+    /**
+     * This function gets called when the user pressed the 'back button' and it prevents
+     * the user from closing the lobby on multiplayer
+     */
+    @Override
+    public void onBackPressed() {
+        if (!vs_multiplayer) {
+            super.onBackPressed();
         }
     }
 
@@ -821,19 +830,6 @@ public class Game extends AppCompatActivity {
      */
     @Override
     protected void onDestroy() {
-        if (vs_multiplayer) {
-            gameRef.removeValue();
-        }
         super.onDestroy();
-    }
-
-    /**
-     * This function gets called when the user pressed the 'back button' and it prevents
-     * the user from closing the lobby on multiplayer
-     */
-    @Override
-    public void onBackPressed() {
-        if (!vs_multiplayer)
-            super.onBackPressed();
     }
 }
