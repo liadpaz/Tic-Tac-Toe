@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
                 count.cancel();
                 devCounter++;
                 if (devCounter != 5) {
-                    Toast.makeText(MainActivity.this, String.format("%s %s %s", getString(R.string.DevFirst), String.valueOf(5 - devCounter), getString(R.string.DevSecond)), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, String.format("%s %s %s", R.string.DevFirst, String.valueOf(5 - devCounter), R.string.DevSecond), Toast.LENGTH_SHORT).show();
                     count.start();
                 } else {
                     devCounter = 0;
@@ -104,24 +104,24 @@ public class MainActivity extends AppCompatActivity {
                     protected void onPostExecute(Boolean aBoolean) {
                         if (aBoolean) {
                             AlertDialog.Builder multiplayer = new AlertDialog.Builder(MainActivity.this)
-                                    .setNegativeButton(getString(R.string.HostGame), new DialogInterface.OnClickListener() {
+                                    .setNegativeButton(R.string.HostGame, new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
                                             startActivity(new Intent(MainActivity.this, SettingsActivity.class)
                                                     .putExtra("Mode", Utils.Mode.Multiplayer));
                                         }
                                     })
-                                    .setPositiveButton(getString(R.string.JoinGame), new DialogInterface.OnClickListener() {
+                                    .setPositiveButton(R.string.JoinGame, new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
                                             startActivity(new Intent(MainActivity.this, JoinMultiplayer.class));
                                         }
                                     })
-                                    .setTitle(getString(R.string.MultiplayerOptions))
+                                    .setTitle(R.string.MultiplayerOptions)
                                     .setMessage(R.string.MultiplayerDialog);
                             multiplayer.show();
                         } else {
-                            Toast.makeText(MainActivity.this, getString(R.string.NotAvailableOffline), Toast.LENGTH_LONG).show();
+                            Toast.makeText(MainActivity.this, R.string.NotAvailableOffline, Toast.LENGTH_LONG).show();
                         }
                         super.onPostExecute(aBoolean);
                     }
@@ -145,43 +145,33 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_statistics:
                 startActivity(new Intent(MainActivity.this, Statistics.class));
-                return true;
+                break;
 
             case R.id.menu_privacy:
                 boolean privacy = Stats.flipPrivacy();
                 item.setChecked(privacy);
-                Toast.makeText(MainActivity.this, privacy ? getString(R.string.PrivacyActivated) : getString(R.string.PrivacyDeactivated), Toast.LENGTH_LONG).show();
-                return true;
+                Toast.makeText(MainActivity.this, privacy ? R.string.PrivacyActivated : R.string.PrivacyDeactivated, Toast.LENGTH_LONG).show();
+                break;
 
             case R.id.menu_about:
                 startActivity(new Intent(MainActivity.this, AboutActivity.class));
-                return true;
+                break;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
+        return true;
     }
 
     @Override
     protected void onPause() {
+        final long time = Utils.getTime();
+        Stats.addTime(time);
         mainRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                int localOwins = Stats.readFile(Stats.Readables.Owins);
-                int localXwins = Stats.readFile(Stats.Readables.Xwins);
-                int localTime  = Stats.readFile(Stats.Readables.Time);
-
-                int globalOwins = Objects.requireNonNull(dataSnapshot.child("Owins").getValue(Integer.class));
-                int globalXwins = Objects.requireNonNull(dataSnapshot.child("Xwins").getValue(Integer.class));
                 int globalTime  = Objects.requireNonNull(dataSnapshot.child("Time").getValue(Integer.class));
-
-                Stats.addTime(Utils.getTime());
-
-                mainRef.child("Owins").setValue(globalOwins - localOwins + Stats.readFile(Stats.Readables.Owins));
-                mainRef.child("Xwins").setValue(globalXwins - localXwins + Stats.readFile(Stats.Readables.Xwins));
-                mainRef.child("Time").setValue(globalTime - localTime + Stats.readFile(Stats.Readables.Time));
-
+                mainRef.child("Time").setValue(globalTime + time);
             }
 
             @Override

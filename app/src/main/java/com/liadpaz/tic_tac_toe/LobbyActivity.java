@@ -31,7 +31,6 @@ public class LobbyActivity extends AppCompatActivity {
     Integer timer;
 
     boolean isHost;
-    boolean isClient;
 
     TextView tv_host_name;
     TextView tv_client_name;
@@ -57,7 +56,6 @@ public class LobbyActivity extends AppCompatActivity {
 
         lobbyNumber = getIntent().getStringExtra("LobbyNumber");
         isHost = Objects.equals(getIntent().getStringExtra("Multiplayer"), "Host");
-        isClient = !isHost;
         hostName = getIntent().getStringExtra("HostName");
 
         Button btn_exit_lobby = findViewById(R.id.btn_exit_lobby);
@@ -71,7 +69,7 @@ public class LobbyActivity extends AppCompatActivity {
         tv_room_number.setText(lobbyNumber);
 
         tv_host_name.setText(hostName);
-        tv_client_name.setText(getString(R.string.Waiting));
+        tv_client_name.setText(R.string.Waiting);
 
         sw_client.setEnabled(false);
         sw_client.setChecked(true);
@@ -102,11 +100,7 @@ public class LobbyActivity extends AppCompatActivity {
 
                     }
                 } else {
-                    if (isChecked) {
-                        writeDatabaseMessage("ready");
-                    } else {
-                        writeDatabaseMessage("not_ready");
-                    }
+                    writeDatabaseMessage(isChecked ? "ready" : "not_ready");
                 }
             }
         });
@@ -114,9 +108,7 @@ public class LobbyActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isHost) {
-                    if (clientName == null) {
-                        lobbyRef.removeValue();
-                    } else {
+                    if (clientName != null) {
                         writeDatabaseMessage("left");
                     }
                 } else {
@@ -165,8 +157,8 @@ public class LobbyActivity extends AppCompatActivity {
 
                                 case "left":
                                     AlertDialog.Builder alert = new AlertDialog.Builder(LobbyActivity.this)
-                                            .setMessage(getString(R.string.LobbyLeftMessage))
-                                            .setPositiveButton(getString(R.string.BackMainMenu), new DialogInterface.OnClickListener() {
+                                            .setMessage(R.string.LobbyLeftMessage)
+                                            .setPositiveButton(R.string.BackMainMenu, new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     lobbyRef.removeValue();
@@ -186,7 +178,6 @@ public class LobbyActivity extends AppCompatActivity {
                         clientName = dataSnapshot.child("clientName").getValue(String.class);
                         tv_host_name.setText(hostName);
                         tv_client_name.setText(clientName);
-
                     }
 
                     String hostType;
@@ -206,8 +197,8 @@ public class LobbyActivity extends AppCompatActivity {
 
                             case "left":
                                 AlertDialog.Builder alert = new AlertDialog.Builder(LobbyActivity.this)
-                                        .setMessage(getString(R.string.LobbyLeftMessage))
-                                        .setPositiveButton(getString(R.string.BackMainMenu), new DialogInterface.OnClickListener() {
+                                        .setMessage(R.string.LobbyLeftMessage)
+                                        .setPositiveButton(R.string.BackMainMenu, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                 lobbyRef.removeValue();
@@ -279,14 +270,11 @@ public class LobbyActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        writeDatabaseMessage("left");
-        super.onBackPressed();
-    }
-
-    @Override
     protected void onDestroy() {
         lobbyRef.removeEventListener(listener);
+        if (isHost && clientName == null) {
+            lobbyRef.removeValue();
+        }
         super.onDestroy();
     }
 }

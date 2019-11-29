@@ -22,7 +22,7 @@ public class AboutActivity extends AppCompatActivity {
 
         tv_about_version = findViewById(R.id.tv_about_version);
         try {
-        tv_about_version.setText(String.format("%s %s", getString(R.string.AppVersion), getPackageManager().getPackageInfo(getPackageName(), 0).versionName));
+        tv_about_version.setText(String.format("%s %s", R.string.AppVersion, getPackageManager().getPackageInfo(getPackageName(), 0).versionName));
         } catch (Exception ignored) {
         }
 

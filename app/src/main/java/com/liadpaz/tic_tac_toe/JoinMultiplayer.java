@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 
 import com.google.firebase.database.DataSnapshot;
@@ -28,7 +29,6 @@ public class JoinMultiplayer extends AppCompatActivity {
 
     File photo;
 
-    Button btn_return_join;
     Button btn_join;
     Button btn_camera;
 
@@ -46,21 +46,18 @@ public class JoinMultiplayer extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join_multiplayer);
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar_join));
+
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.JoinLobby);
 
         joinRef = Firebase.dataRef.child("Lobbies");
 
-        btn_return_join = findViewById(R.id.btn_return_join);
         btn_join = findViewById(R.id.btn_join);
         btn_camera = findViewById(R.id.btn_join_camera);
         et_name_join = findViewById(R.id.et_name_join);
         et_lobby_number = findViewById(R.id.et_lobby_number);
 
-        btn_return_join.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
         btn_join.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,7 +66,7 @@ public class JoinMultiplayer extends AppCompatActivity {
                 lobbyNumber = et_lobby_number.getText().toString();
 
                 if (lobbyNumber.length() != 4) {
-                    Toast.makeText(JoinMultiplayer.this, getString(R.string.LobbyLength), Toast.LENGTH_LONG).show();
+                    Toast.makeText(JoinMultiplayer.this, R.string.LobbyLength, Toast.LENGTH_LONG).show();
                 } else {
                     joinRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -87,12 +84,12 @@ public class JoinMultiplayer extends AppCompatActivity {
                                             joinRef.child(lobbyNumber).child("privacy").setValue(Stats.readPrivacy());
                                         }
                                     } else {
-                                        Toast.makeText(JoinMultiplayer.this, getString(R.string.LobbyFull), Toast.LENGTH_LONG).show();
+                                        Toast.makeText(JoinMultiplayer.this, R.string.LobbyFull, Toast.LENGTH_LONG).show();
                                     }
                                     return;
                                 }
                             }
-                            Toast.makeText(JoinMultiplayer.this, getString(R.string.LobbyNotFound), Toast.LENGTH_LONG).show();
+                            Toast.makeText(JoinMultiplayer.this, R.string.LobbyNotFound, Toast.LENGTH_LONG).show();
                         }
 
                         @Override
@@ -148,16 +145,6 @@ public class JoinMultiplayer extends AppCompatActivity {
         });
 
         btn_join.setEnabled(false);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 0 && resultCode == RESULT_OK) {
-            photoOk = true;
-            btn_join.setEnabled(nameOk && numberOk);
-        }
     }
 }
 

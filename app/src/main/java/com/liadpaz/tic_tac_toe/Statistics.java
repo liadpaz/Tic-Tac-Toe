@@ -98,9 +98,9 @@ public class Statistics extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         AlertDialog.Builder alert = new AlertDialog.Builder(Statistics.this)
-                .setTitle(getString(R.string.ResetData))
-                .setMessage(getString(R.string.ResetDataDialog))
-                .setPositiveButton(getString(R.string.Yes), new DialogInterface.OnClickListener() {
+                .setTitle(R.string.ResetData)
+                .setMessage(R.string.ResetDataDialog)
+                .setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Stats.resetFile();
@@ -110,7 +110,7 @@ public class Statistics extends AppCompatActivity {
                         Utils.setTime();
                     }
                 })
-                .setNegativeButton(getString(R.string.No), null)
+                .setNegativeButton(R.string.No, null)
                 .setCancelable(true);
         alert.show();
         return super.onOptionsItemSelected(item);
@@ -121,9 +121,9 @@ public class Statistics extends AppCompatActivity {
      */
     void getGlobals() {
 
-        tv_globalO.setText(getString(R.string.Loading));
-        tv_globalX.setText(getString(R.string.Loading));
-        tv_globalTime.setText(getString(R.string.Loading));
+        tv_globalO.setText(R.string.Loading);
+        tv_globalX.setText(R.string.Loading);
+        tv_globalTime.setText(R.string.Loading);
 
         statsRef = Firebase.dataRef;
 
@@ -133,7 +133,7 @@ public class Statistics extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 tv_globalO.setText(String.valueOf(dataSnapshot.child("Owins").getValue(Integer.class)));
                 tv_globalX.setText(String.valueOf(dataSnapshot.child("Xwins").getValue(Integer.class)));
-                tv_globalTime.setText(String.format("%d %s", dataSnapshot.child("Time").getValue(Integer.class), getString(R.string.Seconds)));
+                tv_globalTime.setText(String.format("%d %s", dataSnapshot.child("Time").getValue(Integer.class), R.string.Seconds));
             }
 
             @Override

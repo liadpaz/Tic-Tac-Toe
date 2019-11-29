@@ -71,7 +71,7 @@ public class SettingsActivity extends AppCompatActivity {
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar_setting));
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.Settings));
+        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.Settings);
 
         mode = (Utils.Mode) getIntent().getSerializableExtra("Mode");
 
@@ -227,7 +227,6 @@ public class SettingsActivity extends AppCompatActivity {
         settingRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
                 String lobbyNumber = Utils.getRoomNumber();
 
                 while (dataSnapshot.hasChild(lobbyNumber)) {

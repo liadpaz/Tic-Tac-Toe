@@ -119,8 +119,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:text="@string/Toggle_Time"
-        android:textColorHighlight="@color/colorPrimary"
-        android:textColorLink="@color/colorPrimary"
+        android:textColorHighlight="@color/colorLightPrimary"
+        android:textColorLink="@color/colorLightPrimary"
         app:layout_constraintBottom_toTopOf="@+id/tv_timer"
         app:layout_constraintStart_toStartOf="parent" />
 
