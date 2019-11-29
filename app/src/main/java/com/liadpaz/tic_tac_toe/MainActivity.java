@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
                 count.cancel();
                 devCounter++;
                 if (devCounter != 5) {
-                    Toast.makeText(MainActivity.this, String.format("%s %s %s", R.string.DevFirst, String.valueOf(5 - devCounter), R.string.DevSecond), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, String.format("%s %s %s", getString(R.string.DevFirst), String.valueOf(5 - devCounter), getString(R.string.DevSecond)), Toast.LENGTH_SHORT).show();
                     count.start();
                 } else {
                     devCounter = 0;

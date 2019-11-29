@@ -205,7 +205,7 @@ public class Game extends AppCompatActivity {
 
                         startingType = Objects.equals(dataSnapshot.child("startingType").getValue(String.class), "X") ? Cell.Type.X : Cell.Type.O;
                         turn = startingType;
-                        tv_turn.setText(String.format("%s %s%s (%s)", R.string.Its, thisType == startingType ? thisName : otherName, R.string.Turn, startingType.toString()));
+                        tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), thisType == startingType ? thisName : otherName, getString(R.string.Turn), startingType.toString()));
                     }
 
                     @Override
@@ -242,7 +242,7 @@ public class Game extends AppCompatActivity {
                                         canPlay = true;
                                         lastMessage = "go";
                                         turn = startingType;
-                                        tv_turn.setText(String.format("%s %s%s (%s)", R.string.Its, thisType == startingType ? thisName : otherName, R.string.Turn, startingType.toString()));
+                                        tv_turn.setText(String.format("%s %s%s (%s)", R.string.Its, thisType == startingType ? thisName : otherName, getString(R.string.Turn), startingType.toString()));
                                         break;
                                 }
                             }
@@ -273,7 +273,7 @@ public class Game extends AppCompatActivity {
                                         canPlay = true;
                                         lastMessage = "go";
                                         turn = startingType;
-                                        tv_turn.setText(String.format("%s %s%s (%s)", R.string.Its, thisType == turn ? thisName : otherName, R.string.Turn, turn.toString()));
+                                        tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), thisType == turn ? thisName : otherName, getString(R.string.Turn), turn.toString()));
                                         break;
                                 }
                             }
@@ -398,7 +398,7 @@ public class Game extends AppCompatActivity {
                         });
                 dialog.show();
             } else if (vs_on_this_device) {
-                tv_turn.setText(String.format("%s %s%s", R.string.Its, turn.toString(), R.string.Turn));
+                tv_turn.setText(String.format("%s %s%s", getString(R.string.Its), turn.toString(), getString(R.string.Turn)));
 
                 players[0] = new Player(Player.Type.Human);
                 players[1] = new Player(Player.Type.Human);
@@ -452,7 +452,7 @@ public class Game extends AppCompatActivity {
         return new AlertDialog.Builder(this)
                 .setCancelable(false)
                 .setTitle(R.string.Congratulations)
-                .setMessage(player ? String.format("%s %s %s", R.string.Player, player_won, R.string.Won) : String.format("%s %s", player_won, R.string.Won))
+                .setMessage(player ? String.format("%s %s %s", getString(R.string.Player), player_won, getString(R.string.Won)) : String.format("%s %s", player_won, getString(R.string.Won)))
                 .setPositiveButton(R.string.Continue, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -483,9 +483,9 @@ public class Game extends AppCompatActivity {
                             lastMessage = lastMessage == null ? "" : null;
                         }
                         if (vs_multiplayer) {
-                            tv_turn.setText(String.format("%s %s%s (%s)", R.string.Its, thisType == turn ? thisName : otherName, R.string.Turn, turn.toString()));
+                            tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), thisType == turn ? thisName : otherName, getString(R.string.Turn), turn.toString()));
                         } else {
-                            tv_turn.setText(String.format("%s %s%s", R.string.Its, turn.toString(), R.string.Turn));
+                            tv_turn.setText(String.format("%s %s%s", getString(R.string.Its), turn.toString(), getString(R.string.Turn)));
                         }
                         if (timer != 0 && notCPUturn())
                             counter.start();
@@ -510,7 +510,7 @@ public class Game extends AppCompatActivity {
         return new AlertDialog.Builder(this)
                 .setCancelable(false)
                 .setTitle(R.string.Winner)
-                .setMessage(player ? String.format("%s %s %s", R.string.Player, player_won, R.string.Won_The_Game) : String.format("%s %s", player_won, R.string.Won_The_Game))
+                .setMessage(player ? String.format("%s %s %s", getString(R.string.Player), player_won, getString(R.string.Won_The_Game)) : String.format("%s %s", player_won, getString(R.string.Won_The_Game)))
                 .setPositiveButton(R.string.Continue, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -695,9 +695,9 @@ public class Game extends AppCompatActivity {
         }
         turn = turn.flip();
         if (vs_multiplayer) {
-            tv_turn.setText(String.format("%s %s%s (%s)", R.string.Its, thisType == turn ? thisName : otherName, R.string.Turn, turn.toString()));
+            tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), thisType == turn ? thisName : otherName, getString(R.string.Turn), turn.toString()));
         } else {
-            tv_turn.setText(String.format("%s %s%s", R.string.Its, turn.toString(), R.string.Turn));
+            tv_turn.setText(String.format("%s %s%s", getString(R.string.Its), turn.toString(), getString(R.string.Turn)));
         }
         if (allVisible()) {     //No winner and the board is full (tie)
             if (timer != 0) {
@@ -740,16 +740,16 @@ public class Game extends AppCompatActivity {
     @SuppressLint("DefaultLocale")
     private void initialize() {
 
-        tv_maxgames.setText(String.format("%s %s %s", R.string.First_To, String.valueOf(maxGames), R.string.Wins_wins));
+        tv_maxgames.setText(String.format("%s %s %s", getString(R.string.First_To), String.valueOf(maxGames), getString(R.string.Wins_wins)));
 
         if (timer > 0) {
             tv_time_text.setVisibility(View.VISIBLE);
             tv_timer.setVisibility(View.VISIBLE);
-            tv_timer.setText(String.format("%s %s", String.valueOf(timer), R.string.Seconds));
+            tv_timer.setText(String.format("%s %s", String.valueOf(timer), getString(R.string.Seconds)));
             counter = new CountDownTimer(timer * 1000, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
-                    tv_timer.setText(String.format("%s %s", String.valueOf((int) millisUntilFinished / 1000 + 1), R.string.Seconds));
+                    tv_timer.setText(String.format("%s %s", String.valueOf((int) millisUntilFinished / 1000 + 1), getString(R.string.Seconds)));
                 }
 
                 @Override
@@ -767,7 +767,10 @@ public class Game extends AppCompatActivity {
                         this.start();
                     }
                 }
-            }.start();
+            };
+            if (vs_on_this_device) {
+                counter.start();
+            }
         }
     }
 
