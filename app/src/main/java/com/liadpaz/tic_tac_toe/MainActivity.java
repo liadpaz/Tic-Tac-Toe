@@ -1,6 +1,5 @@
 package com.liadpaz.tic_tac_toe;
 
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -26,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.util.Objects;
 
@@ -87,45 +87,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         btn_mutltiplayer.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("StaticFieldLeak")
             @Override
             public void onClick(View v) {
-                new AsyncTask<Void, Void, Boolean>() {
-                    @Override
-                    protected Boolean doInBackground(Void... voids) {
-                        try {
-                            return InetAddress.getByName("www.google.com").isReachable(2000);
-                        } catch (Exception ignored) {
-                            return false;
-                        }
-                    }
-
-                    @Override
-                    protected void onPostExecute(Boolean aBoolean) {
-                        if (aBoolean) {
-                            AlertDialog.Builder multiplayer = new AlertDialog.Builder(MainActivity.this)
-                                    .setNegativeButton(R.string.HostGame, new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            startActivity(new Intent(MainActivity.this, SettingsActivity.class)
-                                                    .putExtra("Mode", Utils.Mode.Multiplayer));
-                                        }
-                                    })
-                                    .setPositiveButton(R.string.JoinGame, new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            startActivity(new Intent(MainActivity.this, JoinMultiplayer.class));
-                                        }
-                                    })
-                                    .setTitle(R.string.MultiplayerOptions)
-                                    .setMessage(R.string.MultiplayerDialog);
-                            multiplayer.show();
-                        } else {
-                            Toast.makeText(MainActivity.this, R.string.NotAvailableOffline, Toast.LENGTH_LONG).show();
-                        }
-                        super.onPostExecute(aBoolean);
-                    }
-                }.execute();
+                new Task(MainActivity.this).execute();
             }
         });
 
@@ -179,5 +143,49 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         super.onPause();
+    }
+
+    private static class Task extends AsyncTask<Void, Void, Boolean> {
+
+        private WeakReference<MainActivity> activityReference;
+
+        Task(MainActivity activityReference) {
+            this.activityReference = new WeakReference<>(activityReference);
+        }
+
+            @Override
+            protected Boolean doInBackground(Void... voids) {
+                try {
+                    return InetAddress.getByName("www.google.com").isReachable(2000);
+                } catch (Exception ignored) {
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                if (aBoolean) {
+                    AlertDialog.Builder multiplayer = new AlertDialog.Builder(activityReference.get())
+                            .setNegativeButton(R.string.HostGame, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    activityReference.get().startActivity(new Intent(activityReference.get(), SettingsActivity.class)
+                                            .putExtra("Mode", Utils.Mode.Multiplayer));
+                                }
+                            })
+                            .setPositiveButton(R.string.JoinGame, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    activityReference.get().startActivity(new Intent(activityReference.get(), JoinMultiplayer.class));
+                                }
+                            })
+                            .setTitle(R.string.MultiplayerOptions)
+                            .setMessage(R.string.MultiplayerDialog);
+                    multiplayer.show();
+                } else {
+                    Toast.makeText(activityReference.get(), R.string.NotAvailableOffline, Toast.LENGTH_LONG).show();
+                }
+                super.onPostExecute(aBoolean);
+            }
     }
 }

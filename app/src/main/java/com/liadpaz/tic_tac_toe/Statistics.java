@@ -21,6 +21,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.util.Objects;
 
@@ -37,7 +38,6 @@ public class Statistics extends AppCompatActivity {
     TextView tv_localTime;
     TextView tv_globalTime;
 
-    @SuppressLint("StaticFieldLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,28 +58,8 @@ public class Statistics extends AppCompatActivity {
         tv_localX.setText(String.valueOf(Stats.readFile(Stats.Readables.Xwins)));
         tv_localTime.setText(String.format("%s %s", String.valueOf(Stats.readFile(Stats.Readables.Time)), getString(R.string.Seconds)));
 
-        new AsyncTask<Void, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(Void... voids) {
-                try {
-                    return InetAddress.getByName("www.google.com").isReachable(2000);
-                } catch (Exception ignored) {
-                    return false;
-                }
-            }
+        new Task(this).execute();
 
-            @Override
-            protected void onPostExecute(Boolean aBoolean) {
-                if (aBoolean) {
-                    getGlobals();
-                } else {
-                    tv_globalO.setText(getString(R.string.NotAvailableOffline));
-                    tv_globalX.setText(getString(R.string.NotAvailableOffline));
-                    tv_globalTime.setText(getString(R.string.NotAvailableOffline));
-                }
-                super.onPostExecute(aBoolean);
-            }
-        }.execute();
         btn_return.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,7 +77,7 @@ public class Statistics extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        AlertDialog.Builder alert = new AlertDialog.Builder(Statistics.this)
+        new AlertDialog.Builder(Statistics.this)
                 .setTitle(R.string.ResetData)
                 .setMessage(R.string.ResetDataDialog)
                 .setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener() {
@@ -111,8 +91,8 @@ public class Statistics extends AppCompatActivity {
                     }
                 })
                 .setNegativeButton(R.string.No, null)
-                .setCancelable(true);
-        alert.show();
+                .setCancelable(true)
+                .show();
         return super.onOptionsItemSelected(item);
     }
 
@@ -120,7 +100,6 @@ public class Statistics extends AppCompatActivity {
      * This function gets the global stats and writes them
      */
     void getGlobals() {
-
         tv_globalO.setText(R.string.Loading);
         tv_globalX.setText(R.string.Loading);
         tv_globalTime.setText(R.string.Loading);
@@ -133,12 +112,42 @@ public class Statistics extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 tv_globalO.setText(String.valueOf(dataSnapshot.child("Owins").getValue(Integer.class)));
                 tv_globalX.setText(String.valueOf(dataSnapshot.child("Xwins").getValue(Integer.class)));
-                tv_globalTime.setText(String.format("%d %s", dataSnapshot.child("Time").getValue(Integer.class), R.string.Seconds));
+                tv_globalTime.setText(String.format("%d %s", dataSnapshot.child("Time").getValue(Integer.class), getString(R.string.Seconds)));
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
+    }
+
+    private static class Task extends AsyncTask<Void, Void, Boolean> {
+
+        private WeakReference<Statistics> activityReference;
+
+        Task(Statistics activityReference) {
+            this.activityReference = new WeakReference<>(activityReference);
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            try {
+                return InetAddress.getByName("www.google.com").isReachable(2000);
+            } catch (Exception ignored) {
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            if (aBoolean) {
+                activityReference.get().getGlobals();
+            } else {
+                activityReference.get().tv_globalO.setText(activityReference.get().getString(R.string.NotAvailableOffline));
+                activityReference.get().tv_globalX.setText(activityReference.get().getString(R.string.NotAvailableOffline));
+                activityReference.get().tv_globalTime.setText(activityReference.get().getString(R.string.NotAvailableOffline));
+            }
+            super.onPostExecute(aBoolean);
+        }
     }
 }
