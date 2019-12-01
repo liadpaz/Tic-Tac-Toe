@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     TextView tv_title;
 
     Button btn_singleplayer;
-    Button btn_mutltiplayer;
+    Button btn_multiplayer;
     CountDownTimer count;
 
     int devCounter;
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
         tv_title = findViewById(R.id.tv_title);
         btn_singleplayer = findViewById(R.id.btn_singleplayer);
-        btn_mutltiplayer = findViewById(R.id.btn_multiplayer);
+        btn_multiplayer = findViewById(R.id.btn_multiplayer);
 
         count = new CountDownTimer(1500, 1500) {
             @Override
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, SettingsActivity.class));
             }
         });
-        btn_mutltiplayer.setOnClickListener(new View.OnClickListener() {
+        btn_multiplayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new Task(MainActivity.this).execute();
