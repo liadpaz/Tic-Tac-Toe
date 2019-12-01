@@ -6,10 +6,14 @@ import android.view.View;
 import android.widget.ImageView;
 
 import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -20,6 +24,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -360,6 +365,16 @@ class Stats {
      */
     static void addXwins() {
         writeFile(Readables.Xwins, readFile(Readables.Xwins) + 1);
+        Firebase.dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Firebase.dataRef.child("Xwins").setValue(Objects.requireNonNull(dataSnapshot.child("Xwins").getValue(Integer.class)) + 1);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
     }
 
     /**
@@ -367,6 +382,16 @@ class Stats {
      */
     static void addOwins() {
         writeFile(Readables.Owins, readFile(Readables.Owins) + 1);
+        Firebase.dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Firebase.dataRef.child("Owins").setValue(Objects.requireNonNull(dataSnapshot.child("Owins").getValue(Integer.class)) + 1);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
     }
 
     /**
@@ -393,15 +418,16 @@ class Stats {
 /**
  * This class represents the lobby
  */
+@SuppressWarnings("unused")
 @Keep
 class Lobby {
-    public int max;
-    public int timer;
-    public boolean privacy;
-    public String hostName;
-    public String number;
-    public String hostType;
-    public String startingType;
+    private int max;
+    private int timer;
+    private boolean privacy;
+    private String hostName;
+    private String number;
+    private String hostType;
+    private String startingType;
 
     Lobby(String hostName, String number, String startingType, int timer, int max, boolean privacy) {
         this.hostName = hostName;
@@ -411,5 +437,61 @@ class Lobby {
         this.max = max;
         this.privacy = privacy;
         this.hostType = "O";
+    }
+
+    public int getMax() {
+        return max;
+    }
+
+    public void setMax(int max) {
+        this.max = max;
+    }
+
+    public int getTimer() {
+        return timer;
+    }
+
+    public void setTimer(int timer) {
+        this.timer = timer;
+    }
+
+    public boolean isPrivacy() {
+        return privacy;
+    }
+
+    public void setPrivacy(boolean privacy) {
+        this.privacy = privacy;
+    }
+
+    public String getHostName() {
+        return hostName;
+    }
+
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public String getHostType() {
+        return hostType;
+    }
+
+    public void setHostType(String hostType) {
+        this.hostType = hostType;
+    }
+
+    public String getStartingType() {
+        return startingType;
+    }
+
+    public void setStartingType(String startingType) {
+        this.startingType = startingType;
     }
 }

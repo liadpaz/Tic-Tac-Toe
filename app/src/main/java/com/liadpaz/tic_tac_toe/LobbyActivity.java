@@ -95,7 +95,7 @@ public class LobbyActivity extends AppCompatActivity {
                     if (ready_host && ready_client) {
                         writeDatabaseMessage("play");
                         startActivity(new Intent(LobbyActivity.this, Game.class)
-                                .putExtra("lobbyNumber", lobbyNumber)
+                                .putExtra("LobbyNumber", lobbyNumber)
                                 .putExtra("Multiplayer", "Host"));
 
                     }
