@@ -32,7 +32,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Objects;
@@ -63,8 +62,8 @@ public class Game extends AppCompatActivity {
     String lastHostMessage;
     String lastClientMessage;
     String lastSentMessage;
-    boolean canPlay;
-    boolean thisCanPlay = false;
+    boolean canPlay = true;
+    boolean thisCanPlay = true;
     Boolean privacy;
 
     ImageView iv_board;
@@ -146,8 +145,6 @@ public class Game extends AppCompatActivity {
             vs_on_this_device = mode == Utils.Mode.TwoPlayer;
             initialize();
         } else {
-            canPlay = true;
-
             btn_reset.setVisibility(View.INVISIBLE);
 
             gameRef = Firebase.dataRef.child("Lobbies").child(lobbyNumber);
@@ -232,7 +229,6 @@ public class Game extends AppCompatActivity {
                                         counter.start();
                                     }
                                     tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), thisType == startingType ? thisName : otherName, getString(R.string.Turn), startingType.toString()));
-                                    thisCanPlay = false;
                                     canPlay = true;
                                     break;
                             }
@@ -266,7 +262,6 @@ public class Game extends AppCompatActivity {
                                         counter.start();
                                     }
                                     tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.Its), thisType == turn ? thisName : otherName, getString(R.string.Turn), turn.toString()));
-                                    thisCanPlay = false;
                                     canPlay = true;
                                     break;
                             }
@@ -295,10 +290,8 @@ public class Game extends AppCompatActivity {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 if (vs_multiplayer) {
                                     writeDatabaseMessage("left");
-                                    finish();
-                                } else {
-                                    finishAffinity();
                                 }
+                                finishAffinity();
                                 startActivity(new Intent(Game.this, MainActivity.class));
                             }
                         })
@@ -344,7 +337,7 @@ public class Game extends AppCompatActivity {
         }
 
         if (vs_computer) {
-            counter.cancel();
+            cancelCounter();
             tv_turn.setVisibility(View.INVISIBLE);
             new AlertDialog.Builder(this)
                     .setCancelable(false)
@@ -420,7 +413,7 @@ public class Game extends AppCompatActivity {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
-                    if (over_cells[i][j].contains(touchX, touchY) && !cells[i][j].isVisible() && (!vs_multiplayer || (turn == thisType && canPlay))) {
+                    if (over_cells[i][j].contains(touchX, touchY) && !cells[i][j].isVisible() && (!vs_multiplayer || (turn == thisType && canPlay && thisCanPlay))) {
                         play(i, j);
                         if (vs_multiplayer) {
                             writeDatabaseMessage(String.format("turn %d %d", i, j));
@@ -435,41 +428,12 @@ public class Game extends AppCompatActivity {
     }
 
     /**
-     * This function builds and returns a winner AlertDialog with the winner name in it
-     *
-     * @param player_won    player_won: a String contains the player name
-     *
-     * @return              winner AlertDialog
-     */
-    private AlertDialog.Builder winnerAlert(boolean player, String player_won) {
-        return new AlertDialog.Builder(this)
-                .setCancelable(false)
-                .setTitle(R.string.Congratulations)
-                .setMessage(player ? String.format("%s %s %s", getString(R.string.Player), player_won, getString(R.string.Won)) : String.format("%s %s", player_won, getString(R.string.Won)))
-                .setPositiveButton(R.string.Continue, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        resetGame(false);
-                        thisCanPlay = true;
-                        if (vs_multiplayer) {
-                            writeDatabaseMessage("go");
-                        }
-                        if (timer != 0 && (notCPUturn() || (vs_multiplayer && canPlay))) {
-                            if (!vs_multiplayer || canPlay) {
-                                counter.start();
-                            }
-                        }
-                        //canPlay = !canPlay;
-                    }
-                });
-    }
-
-    /**
      * This function builds and returns a tie AlertDialog
      *
      * @return tie AlertDialog
      */
     private AlertDialog.Builder tieAlert() {
+        thisCanPlay = false;
         return new AlertDialog.Builder(this)
                 .setCancelable(false)
                 .setTitle(R.string.Tie)
@@ -490,7 +454,36 @@ public class Game extends AppCompatActivity {
                                 counter.start();
                             }
                         }
-                        //canPlay = !canPlay;
+                    }
+                });
+    }
+
+    /**
+     * This function builds and returns a winner AlertDialog with the winner name in it
+     *
+     * @param player_won    player_won: a String contains the player name
+     *
+     * @return              winner AlertDialog
+     */
+    private AlertDialog.Builder winnerAlert(boolean player, String player_won) {
+        thisCanPlay = false;
+        return new AlertDialog.Builder(this)
+                .setCancelable(false)
+                .setTitle(R.string.Congratulations)
+                .setMessage(player ? String.format("%s %s %s", getString(R.string.Player), player_won, getString(R.string.Won)) : String.format("%s %s", player_won, getString(R.string.Won)))
+                .setPositiveButton(R.string.Continue, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        resetGame(false);
+                        thisCanPlay = true;
+                        if (vs_multiplayer) {
+                            writeDatabaseMessage("go");
+                        }
+                        if (timer != 0 && (notCPUturn() || (vs_multiplayer && canPlay))) {
+                            if (!vs_multiplayer || canPlay) {
+                                counter.start();
+                            }
+                        }
                     }
                 });
     }
@@ -513,7 +506,7 @@ public class Game extends AppCompatActivity {
                 .setPositiveButton(R.string.Continue, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        finish();
+                        finishAffinity();
                         startActivity(new Intent(Game.this, MainActivity.class));
                     }
                 });
@@ -527,39 +520,23 @@ public class Game extends AppCompatActivity {
      *
      * @return type of the winner if there is one, otherwise null
      */
-    @Nullable
-    private Cell.Type winner() {
+    private boolean winner() {
         if (checkWinner()) {
-            if (timer != 0) {
-                counter.cancel();
-            }
             Cell.Type winner = turn;
-            if (winner == Cell.Type.O) {
-                players[0].won();
-                tv_playerOwins.setText(String.valueOf(players[0].getWins()));
-            } else {
-                players[1].won();
-                tv_playerXwins.setText(String.valueOf(players[1].getWins()));
-            }
+            players[winner == Cell.Type.O ? 0 : 1].won();
+            tv_playerOwins.setText(String.valueOf(players[0].getWins()));
+            tv_playerXwins.setText(String.valueOf(players[1].getWins()));
             if (!(players[0].getWins() == maxGames || players[1].getWins() == maxGames)) {
                 winnerAlert(!vs_multiplayer, winner.toString()).show();
             } else {
                 if (vs_on_this_device || notCPUturn() || (vs_multiplayer && (winner == thisType))) {
-                    if (winner == Cell.Type.X) {
-                        addXwins();
-                    } else {
-                        addOwins();
-                    }
+                    addWins(winner);
                 }
-                if (vs_multiplayer) {
-                    absoluteWinnerAlert(false, thisType == winner ? thisName : otherName).show();
-                } else {
-                    absoluteWinnerAlert(true, winner.toString()).show();
-                }
+                absoluteWinnerAlert(!vs_multiplayer, vs_multiplayer ? (thisType == winner ? thisName : otherName) : winner.toString()).show();
             }
-            return winner;
+            return true;
         }
-        return null;
+        return false;
     }
 
     /**
@@ -682,22 +659,18 @@ public class Game extends AppCompatActivity {
      * @param j the x index of the cell
      */
     private void play(int i, int j) {
-        if (timer != 0) {
-            counter.cancel();
-        }
+        cancelCounter();
         cells[i][j].setType(turn);
-        if (winner() != null) { //Winner is found
-            if (timer != 0) {
-                if (vs_multiplayer) {
-                    canPlay = false;
-                }
-                counter.cancel();
+        if (winner()) { //Winner is found
+            if (vs_multiplayer) {
+                canPlay = false;
             }
             return;
         }
         if (allVisible()) {     //No winner and the board is full (tie)
-            if (timer != 0) {
-                counter.cancel();
+            cancelCounter();
+            if (vs_multiplayer) {
+                canPlay = false;
             }
             tieAlert().show();
             return;
@@ -710,8 +683,11 @@ public class Game extends AppCompatActivity {
         }
         if (vs_computer) {      //One of the players is CPU
             putCPU();
-            if (winner() == null && allVisible()) { //If no winner and no vacant place
-                if (timer != 0) counter.cancel();
+            cancelCounter();
+            if (winner()) {
+                return;
+            }
+            if (allVisible()) {
                 tieAlert().show();
                 return;
             }
@@ -741,7 +717,7 @@ public class Game extends AppCompatActivity {
     private void initialize() {
         tv_maxgames.setText(String.format("%s %s %s", getString(R.string.First_To), String.valueOf(maxGames), getString(R.string.Wins_wins)));
 
-        if (timer > 0) {
+        if (timer != 0) {
             tv_time_text.setVisibility(View.VISIBLE);
             tv_timer.setVisibility(View.VISIBLE);
             tv_timer.setText(String.format("%s %s", String.valueOf(timer), getString(R.string.Seconds)));
@@ -769,17 +745,25 @@ public class Game extends AppCompatActivity {
     }
 
     /**
-     * This function adds X wins to the local and global X wins
+     * This function cancels the counter if should
      */
-    private void addXwins() {
-        Stats.addXwins();
+    private void cancelCounter() {
+        if (timer != 0) {
+            counter.cancel();
+        }
     }
 
     /**
-     * This function adds O wins to the local and global O wins
+     * This function adds wins to the local and global wins
+     *
+     * @param type the type of winner
      */
-    private void addOwins() {
-        Stats.addOwins();
+    private void addWins(Cell.Type type) {
+        if (type == Cell.Type.X) {
+            Stats.addXwins();
+        } else {
+            Stats.addOwins();
+        }
     }
 
     /**
