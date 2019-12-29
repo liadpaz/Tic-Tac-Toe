@@ -83,7 +83,7 @@ public class Statistics extends AppCompatActivity {
                 .setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Stats.resetFile();
+                        Stats.resetStats();
                         tv_localO.setText("0");
                         tv_localX.setText("0");
                         tv_localTime.setText("0");

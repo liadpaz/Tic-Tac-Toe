@@ -14,10 +14,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,9 +29,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
 import java.net.InetAddress;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final int FIREBASE_AUTH = 1;
 
     DatabaseReference mainRef;
 
@@ -48,7 +54,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar_main));
 
         Utils.setTime();
-        Stats.setFile(getFilesDir());
+
+        new Stats(getSharedPreferences("com.liadpaz.tic_tac_toe.stats", 0));
 
         tv_title = findViewById(R.id.tv_title);
         btn_singleplayer = findViewById(R.id.btn_singleplayer);
@@ -75,7 +82,11 @@ public class MainActivity extends AppCompatActivity {
                     count.start();
                 } else {
                     devCounter = 0;
-                    startActivity(new Intent(MainActivity.this, DeveloperActivity.class));
+                    List<AuthUI.IdpConfig> providers = Collections.singletonList(new AuthUI.IdpConfig.EmailBuilder().setAllowNewAccounts(false).build());
+                    startActivityForResult(AuthUI.getInstance()
+                            .createSignInIntentBuilder()
+                            .setAvailableProviders(providers)
+                            .build(), FIREBASE_AUTH);
                 }
             }
         });
@@ -143,6 +154,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         super.onPause();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == FIREBASE_AUTH) {
+            if (resultCode == RESULT_OK) {
+                startActivity(new Intent(MainActivity.this, DeveloperActivity.class));
+            } else {
+                Toast.makeText(this, R.string.NotAuth, Toast.LENGTH_LONG).show();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private static class Task extends AsyncTask<Void, Void, Boolean> {

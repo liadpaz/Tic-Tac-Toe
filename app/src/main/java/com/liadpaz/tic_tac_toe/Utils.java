@@ -1,6 +1,7 @@
 package com.liadpaz.tic_tac_toe;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.view.View;
 import android.widget.ImageView;
@@ -17,12 +18,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Objects;
 import java.util.Random;
@@ -266,22 +261,10 @@ class Stats {
         Time
     }
 
-    private static File file;
+    private static SharedPreferences sharedPreferences;
 
-    /**
-     * This function sets the local file if it's already exists or not
-     *
-     * @param parent the directory
-     */
-    static void setFile(File parent) {
-        file = new File(parent, "tic-tac-toe");
-        try {
-            if (readFile(Readables.Xwins) == -1) {
-                resetFile();
-            }
-        } catch (Exception ignored) {
-            resetFile();
-        }
+    Stats(SharedPreferences sharedPreferences) {
+        Stats.sharedPreferences = sharedPreferences;
     }
 
     static boolean flipPrivacy() {
@@ -291,25 +274,14 @@ class Stats {
     }
 
     static boolean readPrivacy() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            return Boolean.parseBoolean(reader.readLine().split(" ")[3]);
-        } catch (Exception ignored) {
-            return false;
-        }
+        return sharedPreferences.getBoolean("privacy", false);
     }
 
     @SuppressLint("DefaultLocale")
     private static void writePrivacy(boolean privacy) {
-        try {
-            int Xwins = readFile(Readables.Xwins);
-            int Owins = readFile(Readables.Owins);
-            int Time = readFile(Readables.Time);
-
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(String.format("%d %d %d %s", Xwins, Owins, Time, String.valueOf(privacy)));
-            writer.close();
-        } catch (Exception ignored) {
-        }
+        sharedPreferences.edit()
+                .putBoolean("privacy", privacy)
+                .apply();
     }
 
     /**
@@ -320,24 +292,7 @@ class Stats {
      * @return the stat from the file
      */
     static int readFile(Readables param) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String[] contents = reader.readLine().split(" ");
-            switch (param) {
-                case Xwins:
-                    return Integer.parseInt(contents[0]);
-
-                case Owins:
-                    return Integer.parseInt(contents[1]);
-
-                case Time:
-                    return Integer.parseInt(contents[2]);
-
-                default:
-                    return 0;
-            }
-        } catch (IOException error) {
-            return -1;
-        }
+        return sharedPreferences.getInt(param.toString(), 0);
     }
 
     /**
@@ -347,21 +302,13 @@ class Stats {
      */
     @SuppressLint("DefaultLocale")
     static private void writeFile(Readables type, int message) {
-        try {
-            int Xwins = type == Readables.Xwins ? message : readFile(Readables.Xwins);
-            int Owins = type == Readables.Owins ? message : readFile(Readables.Owins);
-            int Time  = type == Readables.Time ? message : readFile(Readables.Time);
-            boolean privacy = readPrivacy();
-
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(String.format("%d %d %d %s", Xwins, Owins, Time, String.valueOf(privacy)));
-            writer.close();
-        } catch (Exception ignored) {
-        }
+        sharedPreferences.edit()
+                .putInt(type.toString(), message)
+                .apply();
     }
 
     /**
-     * This function adds 1 X win to the local file
+     * This function adds 1 X win to the shared preferences
      */
     static void addXwins() {
         writeFile(Readables.Xwins, readFile(Readables.Xwins) + 1);
@@ -378,7 +325,7 @@ class Stats {
     }
 
     /**
-     * This function adds 1 O win to the local file
+     * This function adds 1 O win to the shared preferences
      */
     static void addOwins() {
         writeFile(Readables.Owins, readFile(Readables.Owins) + 1);
@@ -395,23 +342,23 @@ class Stats {
     }
 
     /**
-     * This function adds {@param time} seconds to the local file
+     * This function adds {@param time} seconds to the shared preferences
      */
     static void addTime(long time) {
         writeFile(Readables.Time, readFile(Readables.Time) + (int) time);
     }
 
     /**
-     * This function resets the local file
+     * This function resets the shared preferences
      */
     @SuppressLint("DefaultLocale")
-    static void resetFile() {
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(String.format("%d %d %d %s", 0, 0, 0, String.valueOf(false)));
-            writer.close();
-        } catch (Exception ignored) {
-        }
+    static void resetStats() {
+        sharedPreferences.edit()
+                .putInt("Xwins", 0)
+                .putInt("Owins", 0)
+                .putInt("Time", 0)
+                .putBoolean("privacy", false)
+                .apply();
     }
 }
 

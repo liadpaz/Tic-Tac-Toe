@@ -42,11 +42,32 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="20dp"
         android:text="@string/AboutApp"
         android:textColor="@android:color/black"
-        app:layout_constraintBottom_toTopOf="@+id/tv_about_version"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar_about" />
+
+    <TextView
+        android:id="@+id/tv_whats_new"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/WhatsNew"
+        app:layout_constraintBottom_toTopOf="@+id/tv_new"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_new"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="24dp"
+        android:text="@string/New"
+        app:layout_constraintBottom_toTopOf="@+id/tv_about_version"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
