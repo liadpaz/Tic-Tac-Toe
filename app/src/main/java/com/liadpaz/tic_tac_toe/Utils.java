@@ -27,7 +27,7 @@ import java.util.Random;
  */
 class Utils {
     /**
-     * This enum is to differ a 'TwoPlayer', 'Computer' or Multiplayer gamemode
+     * This enum is to differ a 'TwoPlayer', 'Computer' or Multiplayer game mode
      */
     public enum Mode {TwoPlayer, Computer, Multiplayer}
 
@@ -261,22 +261,46 @@ class Stats {
         Time
     }
 
+    /**
+     * The app's shared preferences
+     */
     private static SharedPreferences sharedPreferences;
 
+    /**
+     * Constructor for an instance of the Stats class, sets the static shared preferences to the
+     * paramater
+     *
+     * @param sharedPreferences the shared preferences to set
+     */
     Stats(SharedPreferences sharedPreferences) {
         Stats.sharedPreferences = sharedPreferences;
     }
 
+    /**
+     * This function flip the privacy state and returns the result
+     *
+     * @return privacy state after flipped
+     */
     static boolean flipPrivacy() {
         boolean privacy = readPrivacy();
         writePrivacy(!privacy);
         return !privacy;
     }
 
+    /**
+     * This function returns the privacy state from the shared preferences
+     *
+     * @return privacy state from the shared preferences
+     */
     static boolean readPrivacy() {
         return sharedPreferences.getBoolean("privacy", false);
     }
 
+    /**
+     * This function writes the given privacy state to the shared preferences
+     *
+     * @param privacy the privacy state to write, true if privacy enabled otherwise false
+     */
     @SuppressLint("DefaultLocale")
     private static void writePrivacy(boolean privacy) {
         sharedPreferences.edit()
@@ -297,6 +321,7 @@ class Stats {
 
     /**
      * This function writes to the local file based on the {@param type} and the {@param message}
+     *
      * @param type      the type to write to
      * @param message   the message to write to the type
      */
@@ -325,6 +350,15 @@ class Stats {
     }
 
     /**
+     * This function sets the local x wins to the {@param x}
+     *
+     * @param x the number of x wins to set
+     */
+    static void setXwins(int x) {
+        writeFile(Readables.Xwins, x);
+    }
+
+    /**
      * This function adds 1 O win to the shared preferences
      */
     static void addOwins() {
@@ -342,6 +376,15 @@ class Stats {
     }
 
     /**
+     * This function sets the local x wins to the {@param o}
+     *
+     * @param o the number of x wins to set
+     */
+    static void setOwins(int o) {
+        writeFile(Readables.Xwins, o);
+    }
+
+    /**
      * This function adds {@param time} seconds to the shared preferences
      */
     static void addTime(long time) {
@@ -349,15 +392,13 @@ class Stats {
     }
 
     /**
-     * This function resets the shared preferences
+     * This function sets the local time in the shared preferences to the {@param time} parameter
+     *
+     * @param time the time to write to the shared preferences
      */
-    @SuppressLint("DefaultLocale")
-    static void resetStats() {
+    static void setTime(int time) {
         sharedPreferences.edit()
-                .putInt("Xwins", 0)
-                .putInt("Owins", 0)
-                .putInt("Time", 0)
-                .putBoolean("privacy", false)
+                .putInt("Time", time)
                 .apply();
     }
 }

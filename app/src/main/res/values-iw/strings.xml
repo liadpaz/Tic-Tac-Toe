@@ -62,8 +62,6 @@
     <string name="JoinLobby">חיבור ללובי קיים</string>
     <string name="Join">הצטרף/הצטרפי</string>
     <string name="EnterRoomNumber">הכנס/הכניסי את מספר הלובי (שאל/י את חברך):</string>
-    <string name="ResetData">איפוס נתונים מקומיים</string>
-    <string name="ResetDataDialog">את/ה עומד/ת לאפס את הנתונים המקומיים. את/ה בטוח/ה?</string>
     <string name="Its">זה תור</string>
     <string name="Turn">.</string>
     <string name="LobbyFull">הלובי כבר מלא</string>
@@ -80,7 +78,21 @@
     <string name="Game">משחק</string>
     <string name="WentWrong">משהו השתבש</string>
     <string name="WentWrongMessage">משהו התשבש ואת/ה תוחזר/י לתפריט הראשי</string>
-    <string name="NotAuth">את\\ה לא מוסמך…</string>
+    <string name="NotAuthorized">אין לך הרשאה…</string>
     <string name="WhatsNew">מה חדש:</string>
     <string name="New">-נוסף שימוש ב shared preferences במקום בקובץ מקומי\n-שינוי ה listview של מצב מפתח\n-תיקון באגים קטנים</string>
+    <string name="Logout">התנתק/י</string>
+    <string name="Login">התבחר/י</string>
+    <string name="UnauthedUser">כדי לשחק ברשת את/ה צריך/צריכה להיות מחובר/ת</string>
+    <string name="LogoutMessage">התנתקת בהצלחה</string>
+    <string name="DeleteUser">מחק/י משתמש</string>
+    <string name="DeleteUserSuccess">המשתמש שלך נמחק בהצלחה</string>
+    <string name="DeleteUserFail">משהו השתבש במהלך מחיקת המשתמש שלך</string>
+    <string name="HelloButton">שלום!</string>
+    <string name="GoodMorning">בוקר טוב</string>
+    <string name="GoodNight">לילה טוב</string>
+    <string name="GoodAfternoon">אחר הצהריים טובים</string>
+    <string name="GoodNoon">צהריים טובים</string>
+    <string name="GoodEvening">ערב טוב</string>
+    <string name="AuthenticatedUsers">רק משתמשים מחוברים יכולים לראות לראות סטטיסטיקות כלליות</string>
 </resources>

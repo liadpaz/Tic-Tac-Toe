@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Tic-Tac-Toe</string>
 
     <!-- Preference Titles -->
@@ -76,8 +76,6 @@
     <string name="JoinLobby">Join Lobby</string>
     <string name="Join">Join</string>
     <string name="EnterRoomNumber">Enter the room number (ask your friend):</string>
-    <string name="ResetData">Reset Local Data</string>
-    <string name="ResetDataDialog">You are about to delete local stats. Are you sure?</string>
     <string name="Its">It\'s</string>
     <string name="Turn">\'s turn</string>
     <string name="LobbyFull">Lobby is already full</string>
@@ -101,7 +99,21 @@
     <string name="Game">Game</string>
     <string name="WentWrong">Something Went Wrong…</string>
     <string name="WentWrongMessage">Something went wrong and you\'ll be redirected to the main menu</string>
-    <string name="NotAuth">You are not authenticated…</string>
+    <string name="NotAuthorized">You are not authorized…</string>
     <string name="WhatsNew">What\'s New:</string>
     <string name="New">-Added shared preferences instead of local file\n-Changed developer mode listview\n-Minor bug fixes</string>
+    <string name="Logout">Logout</string>
+    <string name="Login">Login</string>
+    <string name="UnauthedUser" tools:ignore="Typos">You need to be signed in in order to play online</string>
+    <string name="LogoutMessage">You have successfully logged out</string>
+    <string name="DeleteUser">Delete User</string>
+    <string name="DeleteUserSuccess">Successfully deleted your user</string>
+    <string name="DeleteUserFail">Something went wrong while trying to delete your user</string>
+    <string name="HelloButton">Hello!</string>
+    <string name="GoodMorning">Good Morning</string>
+    <string name="GoodNight">Good Night</string>
+    <string name="GoodNoon">Good Noon</string>
+    <string name="GoodAfternoon">Good Afternoon</string>
+    <string name="GoodEvening">Good Evening</string>
+    <string name="AuthenticatedUsers">Only authenticated users can see global stats</string>
 </resources>

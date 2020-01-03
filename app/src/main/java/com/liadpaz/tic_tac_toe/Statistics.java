@@ -1,21 +1,17 @@
 package com.liadpaz.tic_tac_toe;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -68,34 +64,6 @@ public class Statistics extends AppCompatActivity {
         });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_statistics, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        new AlertDialog.Builder(Statistics.this)
-                .setTitle(R.string.ResetData)
-                .setMessage(R.string.ResetDataDialog)
-                .setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Stats.resetStats();
-                        tv_localO.setText("0");
-                        tv_localX.setText("0");
-                        tv_localTime.setText("0");
-                        Utils.setTime();
-                    }
-                })
-                .setNegativeButton(R.string.No, null)
-                .setCancelable(true)
-                .show();
-        return super.onOptionsItemSelected(item);
-    }
-
     /**
      * This function gets the global stats and writes them
      */
@@ -104,15 +72,29 @@ public class Statistics extends AppCompatActivity {
         tv_globalX.setText(R.string.Loading);
         tv_globalTime.setText(R.string.Loading);
 
-        statsRef = Firebase.dataRef;
+        statsRef = Firebase.dataRef.child("Users").child(Objects.requireNonNull(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName()));
 
         statsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("DefaultLocale")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                tv_globalO.setText(String.valueOf(dataSnapshot.child("Owins").getValue(Integer.class)));
-                tv_globalX.setText(String.valueOf(dataSnapshot.child("Xwins").getValue(Integer.class)));
-                tv_globalTime.setText(String.format("%d %s", dataSnapshot.child("Time").getValue(Integer.class), getString(R.string.Seconds)));
+                long time = 0;
+                int xWins = 0;
+                int oWins = 0;
+                for (DataSnapshot user : dataSnapshot.getChildren()) {
+                    for (DataSnapshot info : user.getChildren()) {
+                        if (Objects.equals(info.getKey(), "Time")) {
+                            time += Objects.requireNonNull(info.getValue(Integer.class));
+                        } else if (Objects.equals(info.getKey(), "Xwins")) {
+                            xWins += Objects.requireNonNull(info.getValue(Integer.class));
+                        } else {
+                            oWins += Objects.requireNonNull(info.getValue(Integer.class));
+                        }
+                    }
+                }
+                tv_globalO.setText(String.valueOf(oWins));
+                tv_globalX.setText(String.valueOf(xWins));
+                tv_globalTime.setText(String.format("%d %s", time, getString(R.string.Seconds)));
             }
 
             @Override
@@ -141,7 +123,13 @@ public class Statistics extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             if (aBoolean) {
-                activityReference.get().getGlobals();
+                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                    activityReference.get().getGlobals();
+                } else {
+                    activityReference.get().tv_globalO.setText(activityReference.get().getString(R.string.AuthenticatedUsers));
+                    activityReference.get().tv_globalX.setText(activityReference.get().getString(R.string.AuthenticatedUsers));
+                    activityReference.get().tv_globalTime.setText(activityReference.get().getString(R.string.AuthenticatedUsers));
+                }
             } else {
                 activityReference.get().tv_globalO.setText(activityReference.get().getString(R.string.NotAvailableOffline));
                 activityReference.get().tv_globalX.setText(activityReference.get().getString(R.string.NotAvailableOffline));
