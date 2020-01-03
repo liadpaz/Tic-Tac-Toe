@@ -81,7 +81,6 @@
     <string name="LobbyFull">Lobby is already full</string>
     <string name="DevFirst" translatable="false">You are</string>
     <string name="DevSecond" translatable="false">steps away from entering developer mode</string>
-    <string name="DevButton" translatable="false">Check credentials</string>
     <string name="Delete" translatable="false">Delete</string>
     <string name="Easy">Easy</string>
     <string name="ComputerDifficulty">Choose the computer difficulty:</string>
