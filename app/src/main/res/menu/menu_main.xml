@@ -8,12 +8,6 @@
         android:title="@string/Privacy"
         android:checkable="true" />
     <item
-        android:id="@+id/menu_logout"
-        android:title="@string/Logout" />
-    <item
-        android:id="@+id/menu_login"
-        android:title="@string/Login" />
-    <item
         android:id="@+id/menu_delete"
         android:title="@string/DeleteUser" />
     <item

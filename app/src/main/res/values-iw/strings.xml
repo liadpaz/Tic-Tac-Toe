@@ -80,7 +80,7 @@
     <string name="WentWrongMessage">משהו התשבש ואת/ה תוחזר/י לתפריט הראשי</string>
     <string name="NotAuthorized">אין לך הרשאה…</string>
     <string name="WhatsNew">מה חדש:</string>
-    <string name="New">-נוסף שימוש ב shared preferences במקום בקובץ מקומי\n-שינוי ה listview של מצב מפתח\n-תיקון באגים קטנים</string>
+    <string name="New">-הוספת תמיכה במשתמשים\n-רק משתמשים מחוברים יכולים לשחק במשחק מרובה שחקנים ולראות סטיטסטיקות כלליות\n-תיקון באגים קטנים</string>
     <string name="Logout">התנתק/י</string>
     <string name="Login">התבחר/י</string>
     <string name="UnauthedUser">כדי לשחק ברשת את/ה צריך/צריכה להיות מחובר/ת</string>
@@ -92,7 +92,10 @@
     <string name="GoodMorning">בוקר טוב</string>
     <string name="GoodNight">לילה טוב</string>
     <string name="GoodAfternoon">אחר הצהריים טובים</string>
-    <string name="GoodNoon">צהריים טובים</string>
     <string name="GoodEvening">ערב טוב</string>
     <string name="AuthenticatedUsers">רק משתמשים מחוברים יכולים לראות לראות סטטיסטיקות כלליות</string>
+    <string name="Connected">מחובר/ת</string>
+    <string name="NotConnected">לא מחובר/ת</string>
+    <string name="UseGoogleName">השתמש/י בשם בגוגל</string>
+    <string name="Connecting">מתחבר…</string>
 </resources>

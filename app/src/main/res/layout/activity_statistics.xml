@@ -13,7 +13,6 @@
         android:layout_marginTop="60dp"
         android:text="@string/Local_O_wins"
         android:textAlignment="center"
-        android:textColor="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar_statistics" />
@@ -25,7 +24,6 @@
         android:layout_marginTop="20dp"
         android:text="@string/Global_O_wins"
         android:textAlignment="center"
-        android:textColor="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_local_wins_O" />
@@ -37,7 +35,6 @@
         android:layout_marginTop="20dp"
         android:text="@string/Local_X_wins"
         android:textAlignment="center"
-        android:textColor="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_global_wins_O" />
@@ -76,7 +73,6 @@
         android:layout_marginTop="20dp"
         android:text="@string/Global_X_wins"
         android:textAlignment="center"
-        android:textColor="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_local_wins_X" />
@@ -97,7 +93,6 @@
         android:layout_marginTop="20dp"
         android:text="@string/Local_Time"
         android:textAlignment="center"
-        android:textColor="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_global_wins_X" />
@@ -109,7 +104,6 @@
         android:layout_marginTop="20dp"
         android:text="@string/Global_Time"
         android:textAlignment="center"
-        android:textColor="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
@@ -132,17 +126,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_global_time_text" />
-
-    <Button
-        android:id="@+id/btn_return_stats"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginBottom="20dp"
-        android:text="@string/Main_Menu"
-        android:textAllCaps="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_statistics"

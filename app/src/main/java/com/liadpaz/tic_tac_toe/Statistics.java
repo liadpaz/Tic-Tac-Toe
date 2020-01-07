@@ -3,13 +3,10 @@ package com.liadpaz.tic_tac_toe;
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -25,8 +22,6 @@ public class Statistics extends AppCompatActivity {
 
     DatabaseReference statsRef;
 
-    Button btn_return;
-
     TextView tv_localO;
     TextView tv_localX;
     TextView tv_globalO;
@@ -38,11 +33,9 @@ public class Statistics extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar_statistics));
+        setSupportActionBar(findViewById(R.id.toolbar_statistics));
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-
-        btn_return = findViewById(R.id.btn_return_stats);
         tv_localO = findViewById(R.id.tv_local_wins_O);
         tv_localX = findViewById(R.id.tv_local_wins_X);
         tv_globalO = findViewById(R.id.tv_global_wins_O);
@@ -50,18 +43,11 @@ public class Statistics extends AppCompatActivity {
         tv_localTime = findViewById(R.id.tv_local_time);
         tv_globalTime = findViewById(R.id.tv_global_time);
 
-        tv_localO.setText(String.valueOf(Stats.readFile(Stats.Readables.Owins)));
-        tv_localX.setText(String.valueOf(Stats.readFile(Stats.Readables.Xwins)));
-        tv_localTime.setText(String.format("%s %s", String.valueOf(Stats.readFile(Stats.Readables.Time)), getString(R.string.Seconds)));
+        tv_localO.setText(String.valueOf(Stats.readStat(Stats.Readables.Owins)));
+        tv_localX.setText(String.valueOf(Stats.readStat(Stats.Readables.Xwins)));
+        tv_localTime.setText(String.format("%s %s", String.valueOf(Stats.readStat(Stats.Readables.Time)), getString(R.string.Seconds)));
 
         new Task(this).execute();
-
-        btn_return.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
     }
 
     /**
@@ -72,7 +58,7 @@ public class Statistics extends AppCompatActivity {
         tv_globalX.setText(R.string.Loading);
         tv_globalTime.setText(R.string.Loading);
 
-        statsRef = Firebase.dataRef.child("Users").child(Objects.requireNonNull(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName()));
+        statsRef = Firebase.dataRef.child("Users");
 
         statsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("DefaultLocale")

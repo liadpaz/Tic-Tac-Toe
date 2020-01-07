@@ -1,12 +1,9 @@
 package com.liadpaz.tic_tac_toe;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -61,7 +58,7 @@ public class LobbyActivity extends AppCompatActivity {
         Button btn_exit_lobby = findViewById(R.id.btn_exit_lobby);
         tv_host_name = findViewById(R.id.tv_host_name);
         tv_client_name = findViewById(R.id.tv_client_name);
-        TextView tv_room_number = findViewById(R.id.tv_room_ip);
+        TextView tv_room_number = findViewById(R.id.tv_room_number);
         sw_host = findViewById(R.id.sw_host_side);
         sw_client = findViewById(R.id.sw_client_side);
         ckbx_ready = findViewById(R.id.ckbx_ready);
@@ -75,47 +72,38 @@ public class LobbyActivity extends AppCompatActivity {
         sw_client.setChecked(true);
 
         if (isHost) {
-            sw_host.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    sw_client.setChecked(!isChecked);
-                    setHostType(isChecked);
-                }
+            sw_host.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                sw_client.setChecked(!isChecked);
+                LobbyActivity.this.setHostType(isChecked);
             });
         } else {
             sw_host.setEnabled(false);
         }
 
-        ckbx_ready.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isHost) {
-                    ready_host = isChecked;
-                    sw_host.setEnabled(!isChecked);
-                    if (ready_host && ready_client) {
-                        writeDatabaseMessage("play");
-                        startActivity(new Intent(LobbyActivity.this, Game.class)
-                                .putExtra("LobbyNumber", lobbyNumber)
-                                .putExtra("Multiplayer", "Host"));
+        ckbx_ready.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isHost) {
+                ready_host = isChecked;
+                sw_host.setEnabled(!isChecked);
+                if (ready_host && ready_client) {
+                    LobbyActivity.this.writeDatabaseMessage("play");
+                    LobbyActivity.this.startActivity(new Intent(LobbyActivity.this, Game.class)
+                            .putExtra("LobbyNumber", lobbyNumber)
+                            .putExtra("Multiplayer", "Host"));
 
-                    }
-                } else {
-                    writeDatabaseMessage(isChecked ? "ready" : "not_ready");
                 }
+            } else {
+                LobbyActivity.this.writeDatabaseMessage(isChecked ? "ready" : "not_ready");
             }
         });
-        btn_exit_lobby.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isHost) {
-                    if (clientName != null) {
-                        writeDatabaseMessage("left");
-                    }
-                } else {
+        btn_exit_lobby.setOnClickListener(v -> {
+            if (isHost) {
+                if (clientName != null) {
                     writeDatabaseMessage("left");
                 }
-                finish();
+            } else {
+                writeDatabaseMessage("left");
             }
+            finish();
         });
 
         ckbx_ready.setEnabled(!isHost);
@@ -140,7 +128,7 @@ public class LobbyActivity extends AppCompatActivity {
                         String clientMessage = dataSnapshot.child("clientMessage").getValue(String.class);
                         if (clientMessage != null) {
                             switch (clientMessage) {
-                                case "ready":
+                                case "ready": {
                                     ready_client = true;
                                     if (ready_host) {
                                         writeDatabaseMessage("play");
@@ -150,25 +138,25 @@ public class LobbyActivity extends AppCompatActivity {
                                         finish();
                                     }
                                     break;
+                                }
 
-                                case "not_ready":
+                                case "not_ready": {
                                     ready_client = false;
                                     break;
+                                }
 
-                                case "left":
-                                    AlertDialog.Builder alert = new AlertDialog.Builder(LobbyActivity.this)
+                                case "left": {
+                                    new AlertDialog.Builder(LobbyActivity.this)
                                             .setMessage(R.string.LobbyLeftMessage)
-                                            .setPositiveButton(R.string.BackMainMenu, new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    lobbyRef.removeValue();
-                                                    finishAffinity();
-                                                    startActivity(new Intent(LobbyActivity.this, MainActivity.class));
-                                                }
+                                            .setPositiveButton(R.string.BackMainMenu, (dialog, which) -> {
+                                                lobbyRef.removeValue();
+                                                finishAffinity();
+                                                startActivity(new Intent(LobbyActivity.this, MainActivity.class));
                                             })
-                                            .setCancelable(false);
-                                    alert.show();
+                                            .setCancelable(false)
+                                            .show();
                                     break;
+                                }
                             }
                         }
                     }
@@ -188,27 +176,26 @@ public class LobbyActivity extends AppCompatActivity {
                     String hostMessage = dataSnapshot.child("hostMessage").getValue(String.class);
                     if (hostMessage != null) {
                         switch (hostMessage) {
-                            case "play":
+                            case "play": {
                                 startActivity(new Intent(LobbyActivity.this, Game.class)
                                         .putExtra("LobbyNumber", lobbyNumber)
                                         .putExtra("Multiplayer", "Client"));
                                 finish();
                                 break;
+                            }
 
-                            case "left":
-                                AlertDialog.Builder alert = new AlertDialog.Builder(LobbyActivity.this)
+                            case "left": {
+                                new AlertDialog.Builder(LobbyActivity.this)
                                         .setMessage(R.string.LobbyLeftMessage)
-                                        .setPositiveButton(R.string.BackMainMenu, new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                lobbyRef.removeValue();
-                                                finishAffinity();
-                                                startActivity(new Intent(LobbyActivity.this, MainActivity.class));
-                                            }
+                                        .setPositiveButton(R.string.BackMainMenu, (dialog, which) -> {
+                                            lobbyRef.removeValue();
+                                            finishAffinity();
+                                            startActivity(new Intent(LobbyActivity.this, MainActivity.class));
                                         })
-                                        .setCancelable(false);
-                                alert.show();
+                                        .setCancelable(false)
+                                        .show();
                                 break;
+                            }
                         }
                     }
                 }

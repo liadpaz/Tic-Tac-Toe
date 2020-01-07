@@ -13,10 +13,11 @@
         android:layout_marginTop="20dp"
         android:ems="10"
         android:inputType="textPersonName"
-        android:maxLength="7"
+        android:maxLength="15"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_name_join" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_name_join"
+        tools:ignore="Autofill,LabelFor" />
 
     <EditText
         android:id="@+id/et_lobby_number"
@@ -28,20 +29,20 @@
         android:maxLength="4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_lobby_number" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_lobby_number"
+        tools:ignore="Autofill,LabelFor" />
 
     <TextView
         android:id="@+id/tv_name_join"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="16dp"
         android:text="@string/Enter_Name"
         android:textAlignment="center"
-        android:textColor="@android:color/black"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar_join" />
+        app:layout_constraintTop_toBottomOf="@+id/ckbx_google_name_join" />
 
     <TextView
         android:id="@+id/tv_lobby_number"
@@ -50,7 +51,6 @@
         android:layout_marginTop="80dp"
         android:text="@string/EnterRoomNumber"
         android:textAlignment="center"
-        android:textColor="@android:color/black"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -90,5 +90,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <CheckBox
+        android:id="@+id/ckbx_google_name_join"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/UseGoogleName"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_join" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

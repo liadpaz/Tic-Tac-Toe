@@ -91,11 +91,15 @@ class Firebase {
     /**
      * The main reference to the Firebase Database
      */
-    static DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference();
+    static final DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference();
     /**
      * The main reference to the Firebase Storage
      */
-    static StorageReference storeRef = FirebaseStorage.getInstance().getReference();
+    static final StorageReference storeRef = FirebaseStorage.getInstance().getReference();
+    /**
+     * The reference to the user in the database if a user is connected, otherwise null
+     */
+    static DatabaseReference userRef;
 }
 
 /**
@@ -251,7 +255,8 @@ class Player {
 /**
  * This class is for the statistics
  */
-class Stats {
+class Stats{
+
     /**
      * This is the possible readings from the local file
      */
@@ -309,13 +314,33 @@ class Stats {
     }
 
     /**
+     * This function return whether the user prefer to use his google name in multiplayer or not
+     *
+     * @return true if the user prefer to his google name in multiplayer or not
+     */
+    static boolean getGoogleName() {
+        return sharedPreferences.getBoolean("name", false);
+    }
+
+    /**
+     * This function sets the user preference of his name in multiplayer game (google name or custom)
+     *
+     * @param googleName true if the user prefer to use his google name
+     */
+    static void setGoogleName(boolean googleName) {
+        sharedPreferences.edit()
+                .putBoolean("name", googleName)
+                .apply();
+    }
+
+    /**
      * This function reads from the local file info depending on the {@param param}
      *
      * @param param the stat to read from the file
      *
      * @return the stat from the file
      */
-    static int readFile(Readables param) {
+    static int readStat(Readables param) {
         return sharedPreferences.getInt(param.toString(), 0);
     }
 
@@ -336,17 +361,19 @@ class Stats {
      * This function adds 1 X win to the shared preferences
      */
     static void addXwins() {
-        writeFile(Readables.Xwins, readFile(Readables.Xwins) + 1);
-        Firebase.dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Firebase.dataRef.child("Xwins").setValue(Objects.requireNonNull(dataSnapshot.child("Xwins").getValue(Integer.class)) + 1);
-            }
+        writeFile(Readables.Xwins, readStat(Readables.Xwins) + 1);
+        if (Firebase.userRef != null) {
+            Firebase.userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Firebase.userRef.child("Xwins").setValue(Objects.requireNonNull(dataSnapshot.child("Xwins").getValue(Integer.class)) + 1);
+                }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                }
+            });
+        }
     }
 
     /**
@@ -362,17 +389,19 @@ class Stats {
      * This function adds 1 O win to the shared preferences
      */
     static void addOwins() {
-        writeFile(Readables.Owins, readFile(Readables.Owins) + 1);
-        Firebase.dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Firebase.dataRef.child("Owins").setValue(Objects.requireNonNull(dataSnapshot.child("Owins").getValue(Integer.class)) + 1);
-            }
+        writeFile(Readables.Owins, readStat(Readables.Owins) + 1);
+        if (Firebase.userRef != null) {
+            Firebase.userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Firebase.userRef.child("Owins").setValue(Objects.requireNonNull(dataSnapshot.child("Owins").getValue(Integer.class)) + 1);
+                }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                }
+            });
+        }
     }
 
     /**
@@ -388,7 +417,7 @@ class Stats {
      * This function adds {@param time} seconds to the shared preferences
      */
     static void addTime(long time) {
-        writeFile(Readables.Time, readFile(Readables.Time) + (int) time);
+        writeFile(Readables.Time, readStat(Readables.Time) + (int) time);
     }
 
     /**

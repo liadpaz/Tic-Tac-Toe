@@ -5,19 +5,15 @@ import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class DeveloperActivity extends AppCompatActivity {
-
-    DatabaseReference devRef;
 
     ArrayList<String> lobbiesNumber;
 
@@ -27,7 +23,7 @@ public class DeveloperActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_developer);
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar_developer));
+        setSupportActionBar(findViewById(R.id.toolbar_developer));
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
@@ -42,7 +38,6 @@ public class DeveloperActivity extends AppCompatActivity {
         Firebase.dataRef.child("Lobbies").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
                 lobbiesNumber.clear();
 
                 for (DataSnapshot lobby : dataSnapshot.getChildren()) {
@@ -50,7 +45,6 @@ public class DeveloperActivity extends AppCompatActivity {
                 }
 
                 final LobbiesAdapter adapter = new LobbiesAdapter(DeveloperActivity.this, lobbiesNumber);
-
                 lv_lobbies.setAdapter(adapter);
             }
 

@@ -2,7 +2,6 @@ package com.liadpaz.tic_tac_toe;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -22,25 +21,17 @@ class HelloDialog extends Dialog {
         TextView tv_hello_name = findViewById(R.id.tv_hello_name);
         Button btn_hello = findViewById(R.id.btn_hello);
 
-        int time = Integer.parseInt(new SimpleDateFormat("HH", Locale.getDefault()).format(new Date()));
+        int time = Integer.parseInt(new SimpleDateFormat("HH", Locale.ENGLISH).format(new Date()));
         if (time <= 5) {
-            tv_hello_name.setText(String.format("%s %s", context.getString(R.string.GoodNight), name));
+            tv_hello_name.setText(String.format("%s %s!", context.getString(R.string.GoodNight), name));
         } else if (time <= 11) {
-            tv_hello_name.setText(String.format("%s %s", context.getString(R.string.GoodMorning), name));
-        } else if (time <= 15) {
-            tv_hello_name.setText(String.format("%s %s", context.getString(R.string.GoodNoon), name));
-        } else if (time <= 20) {
-            tv_hello_name.setText(String.format("%s %s", context.getString(R.string.GoodAfternoon), name));
+            tv_hello_name.setText(String.format("%s %s!", context.getString(R.string.GoodMorning), name));
+        } else if (time <= 17) {
+            tv_hello_name.setText(String.format("%s %s!", context.getString(R.string.GoodAfternoon), name));
         } else {
-            tv_hello_name.setText(String.format("%s %s", context.getString(R.string.GoodEvening), name));
+            tv_hello_name.setText(String.format("%s %s!", context.getString(R.string.GoodEvening), name));
         }
 
-        btn_hello.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
-
+        btn_hello.setOnClickListener(v -> HelloDialog.this.dismiss());
     }
 }

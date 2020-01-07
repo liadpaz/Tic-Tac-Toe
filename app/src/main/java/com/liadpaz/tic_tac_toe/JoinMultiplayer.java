@@ -7,14 +7,16 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,6 +26,8 @@ import java.io.File;
 import java.util.Objects;
 
 public class JoinMultiplayer extends AppCompatActivity {
+
+    private static final int PHOTO_ACTIVITY = 1;
 
     DatabaseReference joinRef;
 
@@ -38,6 +42,8 @@ public class JoinMultiplayer extends AppCompatActivity {
     String clientName;
     String lobbyNumber;
 
+    CheckBox ckbx_google_name_join;
+
     boolean photoOk = false;
     boolean nameOk = false;
     boolean numberOk = false;
@@ -46,7 +52,7 @@ public class JoinMultiplayer extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join_multiplayer);
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar_join));
+        setSupportActionBar(findViewById(R.id.toolbar_join));
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.JoinLobby);
@@ -57,60 +63,62 @@ public class JoinMultiplayer extends AppCompatActivity {
         btn_camera = findViewById(R.id.btn_join_camera);
         et_name_join = findViewById(R.id.et_name_join);
         et_lobby_number = findViewById(R.id.et_lobby_number);
+        ckbx_google_name_join = findViewById(R.id.ckbx_google_name_join);
 
-        btn_join.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        ckbx_google_name_join.setChecked(Stats.getGoogleName());
 
-                clientName = et_name_join.getText().toString();
-                lobbyNumber = et_lobby_number.getText().toString();
+        btn_join.setOnClickListener(v -> {
+            clientName = et_name_join.getText().toString();
+            lobbyNumber = et_lobby_number.getText().toString();
 
-                if (lobbyNumber.length() != 4) {
-                    Toast.makeText(JoinMultiplayer.this, R.string.LobbyLength, Toast.LENGTH_LONG).show();
-                } else {
-                    joinRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for (DataSnapshot data : dataSnapshot.getChildren()) {
-                                if (Objects.equals(data.getKey(), lobbyNumber)) {
-                                    if (data.child("clientName").getValue(String.class) == null) {
+            if (lobbyNumber.length() != 4) {
+                Toast.makeText(JoinMultiplayer.this, R.string.LobbyLength, Toast.LENGTH_LONG).show();
+            } else {
+                joinRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot data : dataSnapshot.getChildren()) {
+                            if (Objects.equals(data.getKey(), lobbyNumber)) {
+                                if (data.child("clientName").getValue(String.class) == null) {
 
-                                        startActivity(new Intent(JoinMultiplayer.this, LobbyActivity.class)
-                                                .putExtra("ClientName", clientName)
-                                                .putExtra("Multiplayer", "Client")
-                                                .putExtra("LobbyNumber", lobbyNumber));
-                                        joinRef.child(lobbyNumber).child("clientName").setValue(clientName);
-                                        if (!Objects.requireNonNull(data.child("privacy").getValue(Boolean.class))) {
-                                            joinRef.child(lobbyNumber).child("privacy").setValue(Stats.readPrivacy());
-                                        }
-                                    } else {
-                                        Toast.makeText(JoinMultiplayer.this, R.string.LobbyFull, Toast.LENGTH_LONG).show();
+                                    startActivity(new Intent(JoinMultiplayer.this, LobbyActivity.class)
+                                            .putExtra("ClientName", clientName)
+                                            .putExtra("Multiplayer", "Client")
+                                            .putExtra("LobbyNumber", lobbyNumber));
+                                    joinRef.child(lobbyNumber).child("clientName").setValue(clientName);
+                                    if (!Objects.requireNonNull(data.child("privacy").getValue(Boolean.class))) {
+                                        joinRef.child(lobbyNumber).child("privacy").setValue(Stats.readPrivacy());
                                     }
-                                    return;
+                                } else {
+                                    Toast.makeText(JoinMultiplayer.this, R.string.LobbyFull, Toast.LENGTH_LONG).show();
                                 }
+                                return;
                             }
-                            Toast.makeText(JoinMultiplayer.this, R.string.LobbyNotFound, Toast.LENGTH_LONG).show();
                         }
+                        Toast.makeText(JoinMultiplayer.this, R.string.LobbyNotFound, Toast.LENGTH_LONG).show();
+                    }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                        }
-                    });
-                }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {}
+                });
             }
         });
         if (!Stats.readPrivacy()) {
             btn_camera.setVisibility(View.VISIBLE);
         }
-        btn_camera.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                photo = new File(getFilesDir(), "Photo.jpg");
+        btn_camera.setOnClickListener(v -> {
+            photo = new File(JoinMultiplayer.this.getFilesDir(), "Photo.jpg");
 
-                Utils.localPhotoUri = FileProvider.getUriForFile(JoinMultiplayer.this, "com.liadpaz.tic_tac_toe.fileprovider", photo);
+            Utils.localPhotoUri = FileProvider.getUriForFile(JoinMultiplayer.this, "com.liadpaz.tic_tac_toe.fileprovider", photo);
 
-                startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(MediaStore.EXTRA_OUTPUT, Utils.localPhotoUri), 0);
-            }
+            startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(MediaStore.EXTRA_OUTPUT, Utils.localPhotoUri), PHOTO_ACTIVITY);
+        });
+
+        ckbx_google_name_join.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            nameOk = isChecked;
+            Stats.setGoogleName(isChecked);
+            et_name_join.setText(isChecked ? Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName() : "");
+            et_name_join.setEnabled(!isChecked);
         });
 
         et_name_join.addTextChangedListener(new TextWatcher() {
@@ -126,12 +134,12 @@ public class JoinMultiplayer extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+                nameOk = s.length() > 0;
             }
         });
         et_lobby_number.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -140,11 +148,27 @@ public class JoinMultiplayer extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-            }
+            public void afterTextChanged(Editable s) {}
         });
 
+        if (Stats.getGoogleName()) {
+            nameOk = true;
+            et_name_join.setText(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName());
+            et_name_join.setEnabled(false);
+        }
+
         btn_join.setEnabled(false);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PHOTO_ACTIVITY && resultCode == RESULT_OK) {
+            photoOk = true;
+            if (nameOk && et_lobby_number.getText().length() > 0) {
+                btn_join.setEnabled(true);
+            }
+        }
     }
 }
 
