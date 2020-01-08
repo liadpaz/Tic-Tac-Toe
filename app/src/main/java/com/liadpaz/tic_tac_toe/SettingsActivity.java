@@ -71,7 +71,7 @@ public class SettingsActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.toolbar_setting));
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.Settings);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.settings);
 
         mode = (Utils.Mode) getIntent().getSerializableExtra("Mode");
 

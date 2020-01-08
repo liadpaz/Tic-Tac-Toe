@@ -2,15 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_statistics"
-        android:title="@string/Statistics" />
+        android:title="@string/statistics" />
     <item
-        android:id="@+id/menu_privacy"
-        android:title="@string/Privacy"
-        android:checkable="true" />
-    <item
-        android:id="@+id/menu_delete"
-        android:title="@string/DeleteUser" />
+        android:id="@+id/menu_options"
+        android:title="@string/options" />
     <item
         android:id="@+id/menu_about"
-        android:title="@string/About" />
+        android:title="@string/about" />
 </menu>

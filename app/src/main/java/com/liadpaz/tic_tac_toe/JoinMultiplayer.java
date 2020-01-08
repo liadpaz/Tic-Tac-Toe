@@ -55,7 +55,7 @@ public class JoinMultiplayer extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.toolbar_join));
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.JoinLobby);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.join_lobby);
 
         joinRef = Firebase.dataRef.child("Lobbies");
 
@@ -72,7 +72,7 @@ public class JoinMultiplayer extends AppCompatActivity {
             lobbyNumber = et_lobby_number.getText().toString();
 
             if (lobbyNumber.length() != 4) {
-                Toast.makeText(JoinMultiplayer.this, R.string.LobbyLength, Toast.LENGTH_LONG).show();
+                Toast.makeText(JoinMultiplayer.this, R.string.lobby_length, Toast.LENGTH_LONG).show();
             } else {
                 joinRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -90,12 +90,12 @@ public class JoinMultiplayer extends AppCompatActivity {
                                         joinRef.child(lobbyNumber).child("privacy").setValue(Stats.readPrivacy());
                                     }
                                 } else {
-                                    Toast.makeText(JoinMultiplayer.this, R.string.LobbyFull, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(JoinMultiplayer.this, R.string.lobby_full, Toast.LENGTH_LONG).show();
                                 }
                                 return;
                             }
                         }
-                        Toast.makeText(JoinMultiplayer.this, R.string.LobbyNotFound, Toast.LENGTH_LONG).show();
+                        Toast.makeText(JoinMultiplayer.this, R.string.lobby_not_found, Toast.LENGTH_LONG).show();
                     }
 
                     @Override

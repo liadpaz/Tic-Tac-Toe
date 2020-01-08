@@ -2,6 +2,7 @@ package com.liadpaz.tic_tac_toe;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -16,6 +17,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.preference.PreferenceManager;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -55,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
 
     int devCounter;
 
+    static boolean firstopen = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
             count.cancel();
             devCounter++;
             if (devCounter != 5) {
-                Toast.makeText(MainActivity.this, String.format("%s %s %s", MainActivity.this.getString(R.string.DevFirst), String.valueOf(5 - devCounter), MainActivity.this.getString(R.string.DevSecond)), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, String.format("%s %s %s", MainActivity.this.getString(R.string.dev_first), String.valueOf(5 - devCounter), MainActivity.this.getString(R.string.dev_second)), Toast.LENGTH_SHORT).show();
                 count.start();
             } else {
                 devCounter = 0;
@@ -94,10 +99,10 @@ public class MainActivity extends AppCompatActivity {
                     if (Objects.equals(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail(), "liadpazhamud@gmail.com")) {
                         MainActivity.this.startActivity(new Intent(MainActivity.this, DeveloperActivity.class));
                     } else {
-                        Toast.makeText(MainActivity.this, R.string.NotAuthorized, Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, R.string.not_authorized, Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    Toast.makeText(MainActivity.this, R.string.NotAuthorized, Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, R.string.not_authorized, Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -110,9 +115,9 @@ public class MainActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         setUsername(null);
                         Firebase.userRef = null;
-                        btn_user_action.setText(R.string.Login);
-                        tv_user_state.setText(String.format("%s", getString(R.string.NotConnected)));
-                        Toast.makeText(MainActivity.this, R.string.LogoutMessage, Toast.LENGTH_LONG).show();
+                        btn_user_action.setText(R.string.login);
+                        tv_user_state.setText(String.format("%s", getString(R.string.not_connected)));
+                        Toast.makeText(MainActivity.this, R.string.logout_message, Toast.LENGTH_LONG).show();
                     }
                 });
             } else {    //No user connected (login active)
@@ -126,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
         // If the user is authenticated
         if (auth.getCurrentUser() != null) {
-            btn_user_action.setText(R.string.Logout);
+            btn_user_action.setText(R.string.logout);
             btn_singleplayer.setEnabled(false);
             btn_multiplayer.setEnabled(false);
             auth.getCurrentUser().reload().addOnCompleteListener(task -> {
@@ -134,8 +139,11 @@ public class MainActivity extends AppCompatActivity {
                 btn_multiplayer.setEnabled(true);
                 if (auth.getCurrentUser() != null) {
                     mainRef = (Firebase.userRef = Firebase.dataRef.child("Users").child(getUsername()));
-                    new HelloDialog(MainActivity.this, getUsername()).show();
-                    tv_user_state.setText(String.format("%s: %s", getString(R.string.Connected), getUsername()));
+                    if (firstopen) {
+                        new HelloDialog(MainActivity.this, getUsername()).show();
+                        firstopen = false;
+                    }
+                    tv_user_state.setText(String.format("%s: %s", getString(R.string.connected), getUsername()));
                     mainRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -175,13 +183,13 @@ public class MainActivity extends AppCompatActivity {
                         public void onCancelled(@NonNull DatabaseError databaseError) {}
                     });
                 } else {
-                    btn_user_action.setText(R.string.Login);
-                    tv_user_state.setText(R.string.NotConnected);
+                    btn_user_action.setText(R.string.login);
+                    tv_user_state.setText(R.string.not_connected);
                 }
             });
         } else {
-            btn_user_action.setText(R.string.Login);
-            tv_user_state.setText(R.string.NotConnected);
+            btn_user_action.setText(R.string.login);
+            tv_user_state.setText(R.string.not_connected);
         }
 
         Utils.setTime();
@@ -194,24 +202,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        menu.findItem(R.id.menu_privacy).setChecked(Stats.readPrivacy());
-        if (auth.getCurrentUser() == null) {
-            menu.findItem(R.id.menu_delete).setVisible(false);
+    protected void onPause() {
+        if (!stats) {
+            final long time = Utils.getTime();
+            Stats.addTime(time);
+            if (auth.getCurrentUser() != null && getUsername() != null) {
+                mainRef.child("Time").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        mainRef.child("Time").setValue(Objects.requireNonNull(dataSnapshot.getValue(Integer.class)) + time);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
+            }
         }
-        return super.onCreateOptionsMenu(menu);
+        super.onPause();
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        if (auth.getCurrentUser() != null) {
-            menu.findItem(R.id.menu_delete).setVisible(true);
-        } else {
-            menu.findItem(R.id.menu_delete).setVisible(false);
-        }
-        return super.onPrepareOptionsMenu(menu);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -238,24 +253,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
 
-            case R.id.menu_privacy: {
-                boolean privacy = Stats.flipPrivacy();
-                item.setChecked(privacy);
-                Toast.makeText(MainActivity.this, privacy ? R.string.PrivacyActivated : R.string.PrivacyDeactivated, Toast.LENGTH_LONG).show();
-                break;
-            }
-
-            case R.id.menu_delete: {
-                AuthUI.getInstance().delete(MainActivity.this).addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        setUsername(null);
-                        Firebase.userRef = null;
-                        tv_user_state.setText(String.format("%s", getString(R.string.NotConnected)));
-                        Toast.makeText(MainActivity.this, R.string.DeleteUserSuccess, Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(MainActivity.this, R.string.DeleteUserFail, Toast.LENGTH_LONG).show();
-                    }
-                });
+            case R.id.menu_options: {
+                startActivity(new Intent(MainActivity.this, OptionsActivity.class));
                 break;
             }
 
@@ -272,24 +271,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        if (!stats) {
-            final long time = Utils.getTime();
-            Stats.addTime(time);
-            if (auth.getCurrentUser() != null && getUsername() != null) {
-                mainRef.child("Time").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        mainRef.child("Time").setValue(Objects.requireNonNull(dataSnapshot.getValue(Integer.class)) + time);
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
-                });
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        if (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getString("dark_mode", "").equals("default")) {
+            if ((newConfig.uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
             }
+            recreate();
         }
-        super.onPause();
+        super.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -300,8 +291,8 @@ public class MainActivity extends AppCompatActivity {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 setUsername(Objects.requireNonNull(user).getDisplayName());
                 new HelloDialog(MainActivity.this, getUsername()).show();
-                btn_user_action.setText(R.string.Logout);
-                tv_user_state.setText(String.format("%s: %s", getString(R.string.Connected), getUsername()));
+                btn_user_action.setText(R.string.logout);
+                tv_user_state.setText(String.format("%s: %s", getString(R.string.connected), getUsername()));
                 (mainRef = Firebase.userRef = Firebase.dataRef.child("Users").child(getUsername())).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -373,19 +364,19 @@ public class MainActivity extends AppCompatActivity {
                 if (aBoolean) {
                     if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                         AlertDialog.Builder multiplayer = new AlertDialog.Builder(activityReference.get())
-                                .setNegativeButton(R.string.HostGame, (dialogInterface, i) -> activityReference.get()
+                                .setNegativeButton(R.string.host_game, (dialogInterface, i) -> activityReference.get()
                                         .startActivity(new Intent(activityReference.get(), SettingsActivity.class)
                                                 .putExtra("Mode", Utils.Mode.Multiplayer)))
-                                .setPositiveButton(R.string.JoinGame, (dialogInterface, i) -> activityReference.get()
+                                .setPositiveButton(R.string.join_game, (dialogInterface, i) -> activityReference.get()
                                         .startActivity(new Intent(activityReference.get(), JoinMultiplayer.class)))
-                                .setTitle(R.string.MultiplayerOptions)
-                                .setMessage(R.string.MultiplayerDialog);
+                                .setTitle(R.string.multiplayer_options)
+                                .setMessage(R.string.multiplayer_dialog);
                         multiplayer.show();
                     } else {
-                        Toast.makeText(activityReference.get(), R.string.UnauthedUser, Toast.LENGTH_LONG).show();
+                        Toast.makeText(activityReference.get(), R.string.unauthed_user, Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    Toast.makeText(activityReference.get(), R.string.NotAvailableOffline, Toast.LENGTH_LONG).show();
+                    Toast.makeText(activityReference.get(), R.string.not_available_offline, Toast.LENGTH_LONG).show();
                 }
                 super.onPostExecute(aBoolean);
             }

@@ -1,120 +1,109 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Tic-Tac-Toe</string>
-
-    <!-- Preference Titles -->
-    <string name="messages_header" translatable="false">Messages</string>
-    <string name="sync_header" translatable="false">Sync</string>
-
-    <!-- Messages Preferences -->
-    <string name="signature_title" translatable="false">Your signature</string>
-    <string name="reply_title" translatable="false">Default reply action</string>
-
-    <!-- Sync Preferences -->
-    <string name="sync_title" translatable="false">Sync email periodically</string>
-    <string name="attachment_title" translatable="false">Download incoming attachments</string>
-    <string name="attachment_summary_on" translatable="false">Automatically download attachments for incoming emails</string>
-    <string name="attachment_summary_off" translatable="false">Only download attachments when manually requested</string>
-    <string name="Winner">Winner</string>
-    <string name="Resign">Resign</string>
-    <string name="Resign_Message">Are you sure you want to resign the current game?</string>
-    <string name="Reset_BTN">Reset</string>
-    <string name="Time_Left">Time Left:</string>
-    <string name="You">You</string>
-    <string name="Computer">Computer</string>
-    <string name="Seconds">seconds</string>
-    <string name="About">About</string>
-    <string name="Statistics">Statistics</string>
-    <string name="Play_Multi">Play VS Another Player</string>
-    <string name="Play_Local">Play On This Device</string>
-    <string name="Main_Menu">Return to main menu</string>
-    <string name="Local_O_wins">Your wins with O:</string>
-    <string name="Global_O_wins">Total wins with O:</string>
-    <string name="Local_X_wins">Your wins with X:</string>
-    <string name="Global_X_wins">Total wins with X:</string>
-    <string name="Local_Time">Your time on this app:</string>
-    <string name="Global_Time">Total time on this app:</string>
-    <string name="Settings">Settings</string>
-    <string name="Player">Player</string>
-    <string name="Won_The_Game">Won The Game</string>
-    <string name="Continue">Continue</string>
-    <string name="Won">Won</string>
-    <string name="Its_a_tie">"It\'s a tie!"</string>
-    <string name="Congratulations">Congratulations!</string>
-    <string name="Tie">Tie</string>
-    <string name="Choose_Player">"Choose player"</string>
-    <string name="Player_Chooser">"Which player you wish to be?"</string>
-    <string name="NotAvailableOffline">"Not available while offline…"</string>
-    <string name="Restart">Restart</string>
-    <string name="Restart_question">"Are you sure you want to restart the current game?"</string>
-    <string name="Yes">Yes</string>
-    <string name="No">No</string>
-    <string name="First_To">First to</string>
-    <string name="Wins_wins">wins, wins!</string>
-    <string name="Play_Local_Message">VS Computer / 2 Players</string>
-    <string name="Two_Players">2 Players</string>
-    <string name="Number_Wins">Number of wins, to win:</string>
-    <string name="Start_Player">Choose starting player:</string>
-    <string name="Toggle_Time">Toggle time</string>
-    <string name="Max_Time">Choose max time per turn:</string>
-    <string name="Enter_Name">Enter your name:</string>
-    <string name="Play">Play</string>
-    <string name="Loading">Loading</string>
-    <string name="Waiting">Waiting…</string>
-    <string name="LobbyLength">Lobby number should be exactly 4 number</string>
-    <string name="LobbyNotFound">No lobby with this number was found</string>
-    <string name="LobbyLeftMessage">The other player has left the lobby</string>
-    <string name="BackMainMenu">Back to main menu</string>
-    <string name="HostGame">Host a game</string>
-    <string name="JoinGame">Join a lobby</string>
-    <string name="MultiplayerOptions">Multiplayer Options</string>
-    <string name="MultiplayerDialog">Choose if you\'d like to join a game / host a game</string>
-    <string name="Lobby">Multiplayer Lobby</string>
-    <string name="LobbyNumber">Lobby number:</string>
-    <string name="Ready">Ready</string>
-    <string name="ReturnSettings">Return to settings</string>
-    <string name="JoinLobby">Join Lobby</string>
-    <string name="Join">Join</string>
-    <string name="EnterRoomNumber">Enter the room number (ask your friend):</string>
-    <string name="Its">It\'s</string>
-    <string name="Turn">\'s turn</string>
-    <string name="LobbyFull">Lobby is already full</string>
-    <string name="DevFirst" translatable="false">You are</string>
-    <string name="DevSecond" translatable="false">steps away from entering developer mode</string>
-    <string name="Delete" translatable="false">Delete</string>
-    <string name="Easy">Easy</string>
-    <string name="ComputerDifficulty">Choose the computer difficulty:</string>
-    <string name="Hard">Hard</string>
-    <string name="Camera">Take Photo</string>
-    <string name="Privacy">Privacy</string>
-    <string name="PrivacyActivated">You won\'t be able to see other player\'s photos</string>
-    <string name="PrivacyDeactivated">You will see other player\'s photos</string>
-    <string name="Developer" translatable="false">Developer</string>
-    <string name="AppVersion">Version:</string>
-    <string name="DevelopedBy">Developed by Liad Paz</string>
-    <string name="AboutApp">I made this app as a school project in app development in Android. I made this in about two months, if you find any bugs or glitches please send me an email. Thanks for playing!</string>
-    <string name="O" translatable="false">O</string>
-    <string name="X" translatable="false">X</string>
-    <string name="Game">Game</string>
-    <string name="WentWrong">Something Went Wrong…</string>
-    <string name="WentWrongMessage">Something went wrong and you\'ll be redirected to the main menu</string>
-    <string name="NotAuthorized">You are not authorized…</string>
-    <string name="WhatsNew">What\'s New:</string>
-    <string name="New">-Added users support\n-Only connected users can play multiplayer and see global statistics\n-Minor bug fixes</string>
-    <string name="Logout">Logout</string>
-    <string name="Login">Login</string>
-    <string name="UnauthedUser" tools:ignore="Typos">You need to be signed in in order to play online</string>
-    <string name="LogoutMessage">You have successfully logged out</string>
-    <string name="DeleteUser">Delete User</string>
-    <string name="DeleteUserSuccess">Successfully deleted your user</string>
-    <string name="DeleteUserFail">Something went wrong while trying to delete your user</string>
-    <string name="HelloButton">Hello!</string>
-    <string name="GoodMorning">Good Morning</string>
-    <string name="GoodNight">Good Night</string>
-    <string name="GoodAfternoon">Good Afternoon</string>
-    <string name="GoodEvening">Good Evening</string>
-    <string name="AuthenticatedUsers">Only authenticated users can see global stats</string>
-    <string name="Connected">Connected</string>
-    <string name="NotConnected">Not Connected</string>
-    <string name="UseGoogleName">Use Google name</string>
-    <string name="Connecting">Connecting…</string>
+    <string name="winner">Winner</string>
+    <string name="resign">Resign</string>
+    <string name="resign_message">Are you sure you want to resign the current game?</string>
+    <string name="time_left">Time Left:</string>
+    <string name="you">You</string>
+    <string name="computer">Computer</string>
+    <string name="seconds">seconds</string>
+    <string name="about">About</string>
+    <string name="statistics">Statistics</string>
+    <string name="play_multi">Play VS Another Player</string>
+    <string name="play_local">Play On This Device</string>
+    <string name="local_o_wins">Your wins with O:</string>
+    <string name="global_o_wins">Total wins with O:</string>
+    <string name="local_x_wins">Your wins with X:</string>
+    <string name="global_x_wins">Total wins with X:</string>
+    <string name="local_time">Your time on this app:</string>
+    <string name="global_time">Total time on this app:</string>
+    <string name="settings">Settings</string>
+    <string name="player">Player</string>
+    <string name="won_the_game">Won The Game</string>
+    <string name="continue_dialog">Continue</string>
+    <string name="won">Won</string>
+    <string name="its_a_tie">"It\'s a tie!"</string>
+    <string name="congratulations">Congratulations!</string>
+    <string name="tie">Tie</string>
+    <string name="choose_player">"Choose player"</string>
+    <string name="player_chooser">"Which player you wish to be?"</string>
+    <string name="not_available_offline">"Not available while offline…"</string>
+    <string name="restart">Restart</string>
+    <string name="restart_question">"Are you sure you want to restart the current game?"</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="first_to">First to</string>
+    <string name="wins_wins">wins, wins!</string>
+    <string name="play_local_message">VS Computer / 2 Players</string>
+    <string name="two_players">2 Players</string>
+    <string name="number_wins">Number of wins, to win:</string>
+    <string name="start_player">Choose starting player:</string>
+    <string name="toggle_time">Toggle time</string>
+    <string name="max_time">Choose max time per turn:</string>
+    <string name="enter_name">Enter your name:</string>
+    <string name="play">Play</string>
+    <string name="loading">Loading</string>
+    <string name="waiting">Waiting…</string>
+    <string name="lobby_length">Lobby number should be exactly 4 number</string>
+    <string name="lobby_not_found">No lobby with this number was found</string>
+    <string name="lobby_left_message">The other player has left the lobby</string>
+    <string name="back_main_menu">Back to main menu</string>
+    <string name="host_game">Host a game</string>
+    <string name="join_game">Join a lobby</string>
+    <string name="multiplayer_options">Multiplayer Options</string>
+    <string name="multiplayer_dialog">Choose if you\'d like to join a game / host a game</string>
+    <string name="lobby">Multiplayer Lobby</string>
+    <string name="lobby_number">Lobby number:</string>
+    <string name="ready">Ready</string>
+    <string name="return_settings">Return to settings</string>
+    <string name="join_lobby">Join Lobby</string>
+    <string name="join">Join</string>
+    <string name="enter_room_number">Enter the room number (ask your friend):</string>
+    <string name="its">It\'s</string>
+    <string name="turn">\'s turn</string>
+    <string name="lobby_full">Lobby is already full</string>
+    <string name="dev_first" translatable="false">You are</string>
+    <string name="dev_second" translatable="false">steps away from entering developer mode</string>
+    <string name="easy">Easy</string>
+    <string name="computer_difficulty">Choose the computer difficulty:</string>
+    <string name="hard">Hard</string>
+    <string name="camera">Take Photo</string>
+    <string name="privacy">Privacy</string>
+    <string name="privacy_activated">You won\'t be able to see other player\'s photos</string>
+    <string name="privacy_deactivated">You will see other player\'s photos</string>
+    <string name="developer" translatable="false">Developer</string>
+    <string name="app_version">Version:</string>
+    <string name="developed_by">Developed by Liad Paz</string>
+    <string name="about_app">I made this app as a school project in app development in Android. I made this in about two months, if you find any bugs or glitches please send me an email. Thanks for playing!</string>
+    <string name="o" translatable="false">O</string>
+    <string name="x" translatable="false">X</string>
+    <string name="game">Game</string>
+    <string name="not_authorized">You are not authorized…</string>
+    <string name="whats_new">What\'s New:</string>
+    <string name="new_things">-Added users support\n-Only connected users can play multiplayer and see global statistics\n-Minor bug fixes</string>
+    <string name="logout">Logout</string>
+    <string name="login">Login</string>
+    <string name="unauthed_user" tools:ignore="Typos">You need to be signed in in order to play online</string>
+    <string name="logout_message">You have successfully logged out</string>
+    <string name="delete_user">Delete User</string>
+    <string name="hello_button">Hello!</string>
+    <string name="good_morning">Good Morning</string>
+    <string name="good_night">Good Night</string>
+    <string name="good_afternoon">Good Afternoon</string>
+    <string name="good_evening">Good Evening</string>
+    <string name="authenticated_users">Only authenticated users can see global stats</string>
+    <string name="connected">Connected</string>
+    <string name="not_connected">Not Connected</string>
+    <string name="use_google_name">Use Google name</string>
+    <string name="connecting">Connecting…</string>
+    <string name="options">Options</string>
+    <string name="title_activity_options">Settings</string>
+    <string name="general">General</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
+    <string name="system_default">System Default</string>
+    <string name="delete_user_warning">You may be required to reauthenticate</string>
+    <string name="delete_user_fail">Something went wrong while trying to delete your user</string>
+    <string name="delete_user_success">Successfully deleted your user</string>
 </resources>

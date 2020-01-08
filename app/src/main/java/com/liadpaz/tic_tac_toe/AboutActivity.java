@@ -20,6 +20,6 @@ public class AboutActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         tv_about_version = findViewById(R.id.tv_about_version);
-        tv_about_version.setText(String.format("%s %s", getString(R.string.AppVersion), BuildConfig.VERSION_NAME));
+        tv_about_version.setText(String.format("%s %s", getString(R.string.app_version), BuildConfig.VERSION_NAME));
     }
 }

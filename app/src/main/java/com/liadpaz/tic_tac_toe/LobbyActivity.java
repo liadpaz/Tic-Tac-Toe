@@ -66,7 +66,7 @@ public class LobbyActivity extends AppCompatActivity {
         tv_room_number.setText(lobbyNumber);
 
         tv_host_name.setText(hostName);
-        tv_client_name.setText(R.string.Waiting);
+        tv_client_name.setText(R.string.waiting);
 
         sw_client.setEnabled(false);
         sw_client.setChecked(true);
@@ -147,8 +147,8 @@ public class LobbyActivity extends AppCompatActivity {
 
                                 case "left": {
                                     new AlertDialog.Builder(LobbyActivity.this)
-                                            .setMessage(R.string.LobbyLeftMessage)
-                                            .setPositiveButton(R.string.BackMainMenu, (dialog, which) -> {
+                                            .setMessage(R.string.lobby_left_message)
+                                            .setPositiveButton(R.string.back_main_menu, (dialog, which) -> {
                                                 lobbyRef.removeValue();
                                                 finishAffinity();
                                                 startActivity(new Intent(LobbyActivity.this, MainActivity.class));
@@ -186,8 +186,8 @@ public class LobbyActivity extends AppCompatActivity {
 
                             case "left": {
                                 new AlertDialog.Builder(LobbyActivity.this)
-                                        .setMessage(R.string.LobbyLeftMessage)
-                                        .setPositiveButton(R.string.BackMainMenu, (dialog, which) -> {
+                                        .setMessage(R.string.lobby_left_message)
+                                        .setPositiveButton(R.string.back_main_menu, (dialog, which) -> {
                                             lobbyRef.removeValue();
                                             finishAffinity();
                                             startActivity(new Intent(LobbyActivity.this, MainActivity.class));

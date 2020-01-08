@@ -23,13 +23,13 @@ class HelloDialog extends Dialog {
 
         int time = Integer.parseInt(new SimpleDateFormat("HH", Locale.ENGLISH).format(new Date()));
         if (time <= 5) {
-            tv_hello_name.setText(String.format("%s %s!", context.getString(R.string.GoodNight), name));
+            tv_hello_name.setText(String.format("%s %s!", context.getString(R.string.good_night), name));
         } else if (time <= 11) {
-            tv_hello_name.setText(String.format("%s %s!", context.getString(R.string.GoodMorning), name));
+            tv_hello_name.setText(String.format("%s %s!", context.getString(R.string.good_morning), name));
         } else if (time <= 17) {
-            tv_hello_name.setText(String.format("%s %s!", context.getString(R.string.GoodAfternoon), name));
+            tv_hello_name.setText(String.format("%s %s!", context.getString(R.string.good_afternoon), name));
         } else {
-            tv_hello_name.setText(String.format("%s %s!", context.getString(R.string.GoodEvening), name));
+            tv_hello_name.setText(String.format("%s %s!", context.getString(R.string.good_evening), name));
         }
 
         btn_hello.setOnClickListener(v -> HelloDialog.this.dismiss());

@@ -45,7 +45,7 @@ public class Statistics extends AppCompatActivity {
 
         tv_localO.setText(String.valueOf(Stats.readStat(Stats.Readables.Owins)));
         tv_localX.setText(String.valueOf(Stats.readStat(Stats.Readables.Xwins)));
-        tv_localTime.setText(String.format("%s %s", String.valueOf(Stats.readStat(Stats.Readables.Time)), getString(R.string.Seconds)));
+        tv_localTime.setText(String.format("%s %s", String.valueOf(Stats.readStat(Stats.Readables.Time)), getString(R.string.seconds)));
 
         new Task(this).execute();
     }
@@ -54,9 +54,9 @@ public class Statistics extends AppCompatActivity {
      * This function gets the global stats and writes them
      */
     void getGlobals() {
-        tv_globalO.setText(R.string.Loading);
-        tv_globalX.setText(R.string.Loading);
-        tv_globalTime.setText(R.string.Loading);
+        tv_globalO.setText(R.string.loading);
+        tv_globalX.setText(R.string.loading);
+        tv_globalTime.setText(R.string.loading);
 
         statsRef = Firebase.dataRef.child("Users");
 
@@ -80,7 +80,7 @@ public class Statistics extends AppCompatActivity {
                 }
                 tv_globalO.setText(String.valueOf(oWins));
                 tv_globalX.setText(String.valueOf(xWins));
-                tv_globalTime.setText(String.format("%d %s", time, getString(R.string.Seconds)));
+                tv_globalTime.setText(String.format("%d %s", time, getString(R.string.seconds)));
             }
 
             @Override
@@ -112,14 +112,14 @@ public class Statistics extends AppCompatActivity {
                 if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                     activityReference.get().getGlobals();
                 } else {
-                    activityReference.get().tv_globalO.setText(activityReference.get().getString(R.string.AuthenticatedUsers));
-                    activityReference.get().tv_globalX.setText(activityReference.get().getString(R.string.AuthenticatedUsers));
-                    activityReference.get().tv_globalTime.setText(activityReference.get().getString(R.string.AuthenticatedUsers));
+                    activityReference.get().tv_globalO.setText(activityReference.get().getString(R.string.authenticated_users));
+                    activityReference.get().tv_globalX.setText(activityReference.get().getString(R.string.authenticated_users));
+                    activityReference.get().tv_globalTime.setText(activityReference.get().getString(R.string.authenticated_users));
                 }
             } else {
-                activityReference.get().tv_globalO.setText(activityReference.get().getString(R.string.NotAvailableOffline));
-                activityReference.get().tv_globalX.setText(activityReference.get().getString(R.string.NotAvailableOffline));
-                activityReference.get().tv_globalTime.setText(activityReference.get().getString(R.string.NotAvailableOffline));
+                activityReference.get().tv_globalO.setText(activityReference.get().getString(R.string.not_available_offline));
+                activityReference.get().tv_globalX.setText(activityReference.get().getString(R.string.not_available_offline));
+                activityReference.get().tv_globalTime.setText(activityReference.get().getString(R.string.not_available_offline));
             }
             super.onPostExecute(aBoolean);
         }
