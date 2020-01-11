@@ -103,15 +103,15 @@ public class Game extends AppCompatActivity {
         turn = startingType;
 
         iv_board = findViewById(R.id.iv_board);
-        cells[0][0] = new Cell(new ImageView[]{findViewById(R.id.iv_Xtl), findViewById(R.id.iv_Otl)});
-        cells[0][1] = new Cell(new ImageView[]{findViewById(R.id.iv_Xtm), findViewById(R.id.iv_Otm)});
-        cells[0][2] = new Cell(new ImageView[]{findViewById(R.id.iv_Xtr), findViewById(R.id.iv_Otr)});
-        cells[1][0] = new Cell(new ImageView[]{findViewById(R.id.iv_Xml), findViewById(R.id.iv_Oml)});
-        cells[1][1] = new Cell(new ImageView[]{findViewById(R.id.iv_Xmm), findViewById(R.id.iv_Omm)});
-        cells[1][2] = new Cell(new ImageView[]{findViewById(R.id.iv_Xmr), findViewById(R.id.iv_Omr)});
-        cells[2][0] = new Cell(new ImageView[]{findViewById(R.id.iv_Xbl), findViewById(R.id.iv_Obl)});
-        cells[2][1] = new Cell(new ImageView[]{findViewById(R.id.iv_Xbm), findViewById(R.id.iv_Obm)});
-        cells[2][2] = new Cell(new ImageView[]{findViewById(R.id.iv_Xbr), findViewById(R.id.iv_Obr)});
+        cells[0][0] = new Cell(findViewById(R.id.iv_tl));
+        cells[0][1] = new Cell(findViewById(R.id.iv_tm));
+        cells[0][2] = new Cell(findViewById(R.id.iv_tr));
+        cells[1][0] = new Cell(findViewById(R.id.iv_ml));
+        cells[1][1] = new Cell(findViewById(R.id.iv_mm));
+        cells[1][2] = new Cell(findViewById(R.id.iv_mr));
+        cells[2][0] = new Cell(findViewById(R.id.iv_bl));
+        cells[2][1] = new Cell(findViewById(R.id.iv_bm));
+        cells[2][2] = new Cell(findViewById(R.id.iv_br));
         btn_resign = findViewById(R.id.btn_resign);
         btn_reset = findViewById(R.id.btn_reset);
         iv_playerX = findViewById(R.id.iv_playerX);

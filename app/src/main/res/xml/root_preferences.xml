@@ -14,31 +14,44 @@
   ~ limitations under the License.
   -->
 
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory app:title="@string/multiplayer_options" >
+    <PreferenceCategory app:title="@string/multiplayer_settings" >
 
         <CheckBoxPreference app:title="@string/privacy"
             app:key="privacy"
+            app:icon="@android:drawable/ic_lock_lock"
+            app:defaultValue="true"
             app:summaryOn="@string/privacy_activated"
             app:summaryOff="@string/privacy_deactivated" />
 
         <CheckBoxPreference app:title="@string/use_google_name"
-            app:key="google_name" />
+            app:key="google_name"
+            app:defaultValue="true"
+            app:icon="@drawable/googleg_standard_color_18"/>
 
         <Preference app:title="@string/delete_user"
             app:key="delete"
+            app:icon="@android:drawable/ic_menu_delete"
             app:summary="@string/delete_user_warning" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/display" >
+
+        <SwitchPreferenceCompat app:title="@string/dark_mode"
+            app:key="dark_mode"
+            app:icon="@drawable/daynight"
+            app:defaultValue="true" />
 
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/general" >
 
-        <ListPreference app:title="@string/dark_mode"
-            app:key="dark_mode"
-            app:defaultValue="@string/system_default"
-            app:entries="@array/DarkModeOptionsView"
-            app:entryValues="@array/DarkModeOptions" />
+        <Preference app:title="@string/about"
+            app:key="about"
+            app:icon="@android:drawable/ic_menu_info_details" />
 
     </PreferenceCategory>
 

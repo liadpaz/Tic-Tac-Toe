@@ -51,7 +51,7 @@
     <string name="back_main_menu">חזרה לתפריט ראשי</string>
     <string name="host_game">פתח/י לובי</string>
     <string name="join_game">הצטרף/הצטרפי ללובי קיים</string>
-    <string name="multiplayer_options">אפשרויות משחק מרובה שחקנים</string>
+    <string name="multiplayer_settings">הגדרות משחק מרובה שחקנים</string>
     <string name="multiplayer_dialog">תבחר/י אם את/ה רוצה לפתוח לובי או להצטרף ללובי קיים</string>
     <string name="lobby">לובי משחק מרובה שחקנים</string>
     <string name="lobby_number">מספר לובי:</string>
@@ -76,7 +76,7 @@
     <string name="game">משחק</string>
     <string name="not_authorized">אין לך הרשאה…</string>
     <string name="whats_new">מה חדש:</string>
-    <string name="new_things">-הוספת תמיכה במשתמשים\n-רק משתמשים מחוברים יכולים לשחק במשחק מרובה שחקנים ולראות סטיטסטיקות כלליות\n-תיקון באגים קטנים</string>
+    <string name="new_things">-הוספת תמיכה במשתמשים\n-רק משתמשים מחוברים יכולים לשחק במשחק מרובה שחקנים ולראות סטיטסטיקות כלליות\n-הוספת מצב חשוך\n-הוספת דף הגדרות\n-תיקון באגים קטנים</string>
     <string name="logout">התנתק/י</string>
     <string name="login">התבחר/י</string>
     <string name="unauthed_user">כדי לשחק ברשת את/ה צריך/צריכה להיות מחובר/ת</string>
@@ -97,9 +97,10 @@
     <string name="dark_mode">מצב חשוך</string>
     <string name="on">פועל</string>
     <string name="off">כבוי</string>
-    <string name="system_default">ברירת מחדל של המערכת</string>
     <string name="delete_user_warning">את/ה עלול/ה להתבקש להתחבר מחדש</string>
     <string name="title_activity_options">הגדרות</string>
     <string name="delete_user_fail">משהו השתבש במהלך מחיקת המשתמש שלך</string>
     <string name="delete_user_success">המשתמש שלך נמחק בהצלחה</string>
+    <string name="display">תצוגה</string>
+    <string name="delete_user_message">האם את/ה בטוח/ה שאת/ה רוצה למחוק את המשתמש שלך?</string>
 </resources>

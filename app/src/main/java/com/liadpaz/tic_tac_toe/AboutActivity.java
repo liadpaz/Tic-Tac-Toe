@@ -18,6 +18,7 @@ public class AboutActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.toolbar_about));
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setIcon(R.drawable.info);
 
         tv_about_version = findViewById(R.id.tv_about_version);
         tv_about_version.setText(String.format("%s %s", getString(R.string.app_version), BuildConfig.VERSION_NAME));

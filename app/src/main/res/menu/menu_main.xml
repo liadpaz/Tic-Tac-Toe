@@ -4,9 +4,6 @@
         android:id="@+id/menu_statistics"
         android:title="@string/statistics" />
     <item
-        android:id="@+id/menu_options"
-        android:title="@string/options" />
-    <item
-        android:id="@+id/menu_about"
-        android:title="@string/about" />
+        android:id="@+id/menu_settings"
+        android:title="@string/settings" />
 </menu>

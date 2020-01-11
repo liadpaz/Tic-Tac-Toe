@@ -13,10 +13,14 @@
         android:roundIcon="@mipmap/tic_tac_toe_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
-            android:name=".OptionsActivity"
+            android:name=".SettingsActivity"
+            android:configChanges="uiMode"
             android:label="@string/title_activity_options"
-            android:parentActivityName=".MainActivity">
+            android:launchMode="singleTask"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.liadpaz.tic_tac_toe.MainActivity" />
@@ -24,16 +28,18 @@
         <activity
             android:name=".AboutActivity"
             android:configChanges="uiMode"
+            android:label="@string/about"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".SettingsActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".SettingsActivity" />
         </activity>
         <activity
             android:name=".DeveloperActivity"
             android:configChanges="uiMode"
+            android:label="@string/developer"
             android:launchMode="singleTask"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
@@ -44,6 +50,7 @@
         <activity
             android:name=".Statistics"
             android:configChanges="uiMode"
+            android:label="@string/statistics"
             android:launchMode="singleTask"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
@@ -54,11 +61,13 @@
         <activity
             android:name=".LobbyActivity"
             android:configChanges="uiMode"
+            android:label="@string/lobby"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
             android:name=".JoinMultiplayer"
             android:configChanges="uiMode"
+            android:label="@string/join_lobby"
             android:launchMode="singleTask"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
@@ -69,16 +78,18 @@
         <activity
             android:name=".Game"
             android:configChanges="uiMode"
+            android:label="@string/game"
             android:launchMode="singleTask"
-            android:parentActivityName=".SettingsActivity"
+            android:parentActivityName=".OptionsActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".SettingsActivity" />
+                android:value=".OptionsActivity" />
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".OptionsActivity"
             android:configChanges="uiMode"
+            android:label="@string/options"
             android:launchMode="singleTask"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">

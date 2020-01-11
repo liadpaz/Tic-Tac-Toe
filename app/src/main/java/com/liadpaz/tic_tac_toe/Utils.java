@@ -110,6 +110,7 @@ class Cell {
      * This is the type of the cell. eg. X, O
      */
     public enum Type {
+        None,
         X,
         O;
 
@@ -125,7 +126,7 @@ class Cell {
         }
     }
 
-    private ImageView[] XO;
+    private ImageView XO;
     private Type type;
     private boolean visible = false;
 
@@ -134,7 +135,7 @@ class Cell {
      *
      * @param XO an array of 2 ImageVies (X, O)
      */
-    Cell(ImageView[] XO) {
+    Cell(ImageView XO) {
         this.XO = XO;
     }
 
@@ -157,10 +158,13 @@ class Cell {
     boolean setType(Type type) {
         if (!visible) {
             this.type = type;
-            if (type == Type.X)
-                XO[0].setVisibility(View.VISIBLE);
-            else /*if (type == Type.O)*/
-                XO[1].setVisibility(View.VISIBLE);
+            if (type == Type.X) {
+                XO.setImageResource(R.drawable.x);
+                XO.setVisibility(View.VISIBLE);
+            } else {/*if (type == Type.O)*/
+                XO.setImageResource(R.drawable.o);
+                XO.setVisibility(View.VISIBLE);
+            }
             visible = true;
             return true;
         }
@@ -183,10 +187,8 @@ class Cell {
      * @param y the y coordinates
      */
     void setLocation(int x, int y) {
-        for (ImageView iv : XO) {
-            iv.setX(x);
-            iv.setY(y);
-        }
+        XO.setX(x);
+        XO.setY(y);
     }
 
     /**
@@ -195,9 +197,7 @@ class Cell {
      * @param x the height and width of the cell
      */
     void setSize(int x) {
-        for (ImageView iv : XO) {
-            iv.setLayoutParams(new ConstraintLayout.LayoutParams(x, x));
-        }
+        XO.setLayoutParams(new ConstraintLayout.LayoutParams(x, x));
     }
 
     /**
@@ -206,8 +206,7 @@ class Cell {
     void hide() {
         visible = false;
         type = null;
-        XO[0].setVisibility(View.GONE);
-        XO[1].setVisibility(View.GONE);
+        XO.setVisibility(View.GONE);
     }
 }
 
@@ -282,17 +281,6 @@ class Stats{
     }
 
     /**
-     * This function flip the privacy state and returns the result
-     *
-     * @return privacy state after flipped
-     */
-    static boolean flipPrivacy() {
-        boolean privacy = readPrivacy();
-        writePrivacy(!privacy);
-        return !privacy;
-    }
-
-    /**
      * This function returns the privacy state from the shared preferences
      *
      * @return privacy state from the shared preferences
@@ -302,24 +290,12 @@ class Stats{
     }
 
     /**
-     * This function writes the given privacy state to the shared preferences
-     *
-     * @param privacy the privacy state to write, true if privacy enabled otherwise false
-     */
-    @SuppressLint("DefaultLocale")
-    private static void writePrivacy(boolean privacy) {
-        sharedPreferences.edit()
-                .putBoolean("privacy", privacy)
-                .apply();
-    }
-
-    /**
      * This function return whether the user prefer to use his google name in multiplayer or not
      *
      * @return true if the user prefer to his google name in multiplayer or not
      */
     static boolean getGoogleName() {
-        return sharedPreferences.getBoolean("name", false);
+        return sharedPreferences.getBoolean("google_name", false);
     }
 
     /**
@@ -329,7 +305,7 @@ class Stats{
      */
     static void setGoogleName(boolean googleName) {
         sharedPreferences.edit()
-                .putBoolean("name", googleName)
+                .putBoolean("google_name", googleName)
                 .apply();
     }
 
@@ -410,7 +386,7 @@ class Stats{
      * @param o the number of x wins to set
      */
     static void setOwins(int o) {
-        writeFile(Readables.Xwins, o);
+        writeFile(Readables.Owins, o);
     }
 
     /**
@@ -421,7 +397,7 @@ class Stats{
     }
 
     /**
-     * This function sets the local time in the shared preferences to the {@param time} parameter
+     * This function sets the local time in the shared preferences to {@param time}
      *
      * @param time the time to write to the shared preferences
      */

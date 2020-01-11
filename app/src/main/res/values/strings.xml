@@ -50,7 +50,7 @@
     <string name="back_main_menu">Back to main menu</string>
     <string name="host_game">Host a game</string>
     <string name="join_game">Join a lobby</string>
-    <string name="multiplayer_options">Multiplayer Options</string>
+    <string name="multiplayer_settings">Multiplayer Settings</string>
     <string name="multiplayer_dialog">Choose if you\'d like to join a game / host a game</string>
     <string name="lobby">Multiplayer Lobby</string>
     <string name="lobby_number">Lobby number:</string>
@@ -80,7 +80,7 @@
     <string name="game">Game</string>
     <string name="not_authorized">You are not authorized…</string>
     <string name="whats_new">What\'s New:</string>
-    <string name="new_things">-Added users support\n-Only connected users can play multiplayer and see global statistics\n-Minor bug fixes</string>
+    <string name="new_things">-Added users support\n-Only connected users can play multiplayer and see global statistics\n-Added dark mode support\n-Added settings tab\n-Minor bug fixes</string>
     <string name="logout">Logout</string>
     <string name="login">Login</string>
     <string name="unauthed_user" tools:ignore="Typos">You need to be signed in in order to play online</string>
@@ -102,8 +102,11 @@
     <string name="dark_mode">Dark Mode</string>
     <string name="on">On</string>
     <string name="off">Off</string>
-    <string name="system_default">System Default</string>
     <string name="delete_user_warning">You may be required to reauthenticate</string>
     <string name="delete_user_fail">Something went wrong while trying to delete your user</string>
     <string name="delete_user_success">Successfully deleted your user</string>
+    <string name="delete_all" translatable="false">Delete All</string>
+    <string name="delete_all_message" translatable="false">Are you sure you want to delete all lobbies?</string>
+    <string name="display">Display</string>
+    <string name="delete_user_message">Are you sure you want to delete your user?</string>
 </resources>

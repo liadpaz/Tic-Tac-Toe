@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SettingsActivity">
+    tools:context=".OptionsActivity">
 
     <Switch
         android:id="@+id/sw_singleplayer_mode"
@@ -53,7 +53,7 @@
         android:textSize="15sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar_setting" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_options" />
 
     <NumberPicker
         android:id="@+id/numpic_maxgames"
@@ -83,7 +83,7 @@
         android:textAlignment="center"
         android:textSize="15sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar_setting" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_options" />
 
     <TextView
         android:id="@+id/tv_timer"
@@ -253,7 +253,7 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar_setting"
+        android:id="@+id/toolbar_options"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"

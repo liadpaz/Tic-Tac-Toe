@@ -38,7 +38,8 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int USER_AUTH = 1;
+    private static final int USER_AUTH = 578;
+    public static final int SETTINGS_ACTIVITY = 275;
 
     FirebaseAuth auth;
     DatabaseReference mainRef;
@@ -58,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
 
     int devCounter;
 
-    static boolean firstopen = true;
+    static boolean first_open = true;
+    boolean can_open_menu = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +69,16 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.toolbar_main));
         Objects.requireNonNull(getSupportActionBar()).setTitle(null);
 
-        new Stats(getSharedPreferences("tic-tac-toe-stats", 0));
+        boolean mode = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean(SettingsActivity.DARK_MODE_PREFERENCES, true);
+        if (mode && (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) != Configuration.UI_MODE_NIGHT_YES) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            recreate();
+        } else if (!mode && (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) != Configuration.UI_MODE_NIGHT_NO) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            recreate();
+        }
+
+        new Stats(PreferenceManager.getDefaultSharedPreferences(MainActivity.this));
         sharedPreferences = getSharedPreferences("name", 0);
         auth = FirebaseAuth.getInstance();
 
@@ -107,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btn_singleplayer.setOnClickListener(v -> MainActivity.this.startActivity(new Intent(MainActivity.this, SettingsActivity.class)));
+        btn_singleplayer.setOnClickListener(v -> MainActivity.this.startActivity(new Intent(MainActivity.this, OptionsActivity.class)));
         btn_multiplayer.setOnClickListener(v -> new InternetTask(MainActivity.this).execute());
         btn_user_action.setOnClickListener(v -> {
             if (auth.getCurrentUser() != null) {    //User connected (logout active)
@@ -129,53 +140,63 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Utils.setTime();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         // If the user is authenticated
         if (auth.getCurrentUser() != null) {
             btn_user_action.setText(R.string.logout);
             btn_singleplayer.setEnabled(false);
             btn_multiplayer.setEnabled(false);
+            can_open_menu = false;
             auth.getCurrentUser().reload().addOnCompleteListener(task -> {
+                can_open_menu = true;
                 btn_singleplayer.setEnabled(true);
                 btn_multiplayer.setEnabled(true);
                 if (auth.getCurrentUser() != null) {
                     mainRef = (Firebase.userRef = Firebase.dataRef.child("Users").child(getUsername()));
-                    if (firstopen) {
+                    if (first_open) {
                         new HelloDialog(MainActivity.this, getUsername()).show();
-                        firstopen = false;
+                        first_open = false;
                     }
                     tv_user_state.setText(String.format("%s: %s", getString(R.string.connected), getUsername()));
                     mainRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            int localTime = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Time) : 0, serverTime;
-                            if (dataSnapshot.hasChild("Time")) {
-                                if (localTime > (serverTime = Objects.requireNonNull(dataSnapshot.child("Time").getValue(Integer.class)))) {
+                            if (getUsername().equals(auth.getCurrentUser().getDisplayName())) {
+                                int localTime = Stats.readStat(Stats.Readables.Time), serverTime;
+                                if (dataSnapshot.hasChild("Time")) {
+                                    if (localTime > (serverTime = Objects.requireNonNull(dataSnapshot.child("Time").getValue(Integer.class)))) {
+                                        mainRef.child("Time").setValue(localTime);
+                                    } else {
+                                        Stats.setTime(serverTime);
+                                    }
+                                } else {
                                     mainRef.child("Time").setValue(localTime);
-                                } else {
-                                    Stats.setTime(serverTime);
                                 }
-                            } else {
-                                mainRef.child("Time").setValue(localTime);
-                            }
-                            int localX = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Xwins) : 0, serverX;
-                            if (dataSnapshot.hasChild("Xwins")) {
-                                if (localX > (serverX = Objects.requireNonNull(dataSnapshot.child("Xwins").getValue(Integer.class)))) {
+                                int localX = Stats.readStat(Stats.Readables.Xwins), serverX;
+                                if (dataSnapshot.hasChild("Xwins")) {
+                                    if (localX > (serverX = Objects.requireNonNull(dataSnapshot.child("Xwins").getValue(Integer.class)))) {
+                                        mainRef.child("Xwins").setValue(localX);
+                                    } else {
+                                        Stats.setXwins(serverX);
+                                    }
+                                } else {
                                     mainRef.child("Xwins").setValue(localX);
-                                } else {
-                                    Stats.setXwins(serverX);
                                 }
-                            } else {
-                                mainRef.child("Xwins").setValue(localX);
-                            }
-                            int localO = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Owins) : 0, serverO;
-                            if (dataSnapshot.hasChild("Owins")) {
-                                if (localO > (serverO = Objects.requireNonNull(dataSnapshot.child("Owins").getValue(Integer.class)))) {
+                                int localO = Stats.readStat(Stats.Readables.Owins), serverO;
+                                if (dataSnapshot.hasChild("Owins")) {
+                                    if (localO > (serverO = Objects.requireNonNull(dataSnapshot.child("Owins").getValue(Integer.class)))) {
+                                        mainRef.child("Owins").setValue(localO);
+                                    } else {
+                                        Stats.setOwins(serverO);
+                                    }
+                                } else {
                                     mainRef.child("Owins").setValue(localO);
-                                } else {
-                                    Stats.setOwins(serverO);
                                 }
-                            } else {
-                                mainRef.child("Owins").setValue(localO);
                             }
                         }
 
@@ -191,13 +212,6 @@ public class MainActivity extends AppCompatActivity {
             btn_user_action.setText(R.string.login);
             tv_user_state.setText(R.string.not_connected);
         }
-
-        Utils.setTime();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         stats = false;
     }
 
@@ -207,16 +221,17 @@ public class MainActivity extends AppCompatActivity {
             final long time = Utils.getTime();
             Stats.addTime(time);
             if (auth.getCurrentUser() != null && getUsername() != null) {
-                mainRef.child("Time").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        mainRef.child("Time").setValue(Objects.requireNonNull(dataSnapshot.getValue(Integer.class)) + time);
-                    }
+                try {
+                    mainRef.child("Time").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            mainRef.child("Time").setValue(Objects.requireNonNull(dataSnapshot.getValue(Integer.class)) + time);
+                        }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
-                });
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {}
+                    });
+                } catch (Exception ignored) {}
             }
         }
         super.onPause();
@@ -231,56 +246,49 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NotNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_statistics: {
-                final long time = Utils.getTime();
-                Stats.addTime(time);
-                stats = true;
-                if (auth.getCurrentUser() != null) {
-                    mainRef.child("Time").addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            mainRef.child("Time").setValue(Objects.requireNonNull(dataSnapshot.getValue(Integer.class)) + time)
-                                    .addOnCompleteListener(task -> startActivity(new Intent(MainActivity.this, Statistics.class)));
-                        }
+        if (can_open_menu) {
+            switch (item.getItemId()) {
+                case R.id.menu_statistics: {
+                    final long time = Utils.getTime();
+                    Stats.addTime(time);
+                    stats = true;
+                    if (auth.getCurrentUser() != null) {
+                        mainRef.child("Time").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                mainRef.child("Time").setValue(Objects.requireNonNull(dataSnapshot.getValue(Integer.class)) + time)
+                                        .addOnCompleteListener(task -> startActivity(new Intent(MainActivity.this, Statistics.class)));
+                            }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {}
-                    });
-                } else {
-                    startActivity(new Intent(MainActivity.this, Statistics.class));
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                            }
+                        });
+                    } else {
+                        startActivity(new Intent(MainActivity.this, Statistics.class));
+                    }
+                    break;
                 }
-                break;
-            }
 
-            case R.id.menu_options: {
-                startActivity(new Intent(MainActivity.this, OptionsActivity.class));
-                break;
-            }
+                case R.id.menu_settings: {
+                    startActivityForResult(new Intent(MainActivity.this, SettingsActivity.class), SETTINGS_ACTIVITY);
+                    break;
+                }
 
-            case R.id.menu_about: {
-                startActivity(new Intent(MainActivity.this, AboutActivity.class));
-                break;
-            }
-
-            default: {
-                return super.onOptionsItemSelected(item);
+                default: {
+                    return super.onOptionsItemSelected(item);
+                }
             }
         }
         return true;
     }
 
     @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        if (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getString("dark_mode", "").equals("default")) {
-            if ((newConfig.uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-            }
-            recreate();
-        }
-        super.onConfigurationChanged(newConfig);
+    public void recreate() {
+        finish();
+        overridePendingTransition(0, 0);
+        startActivity(new Intent(MainActivity.this, MainActivity.class));
+        overridePendingTransition(0, 0);
     }
 
     @Override
@@ -332,6 +340,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onCancelled(@NonNull DatabaseError databaseError) {}
                 });
             }
+        } else if (requestCode == SETTINGS_ACTIVITY) {
+            recreate();
         }
     }
 
@@ -365,11 +375,11 @@ public class MainActivity extends AppCompatActivity {
                     if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                         AlertDialog.Builder multiplayer = new AlertDialog.Builder(activityReference.get())
                                 .setNegativeButton(R.string.host_game, (dialogInterface, i) -> activityReference.get()
-                                        .startActivity(new Intent(activityReference.get(), SettingsActivity.class)
+                                        .startActivity(new Intent(activityReference.get(), OptionsActivity.class)
                                                 .putExtra("Mode", Utils.Mode.Multiplayer)))
                                 .setPositiveButton(R.string.join_game, (dialogInterface, i) -> activityReference.get()
                                         .startActivity(new Intent(activityReference.get(), JoinMultiplayer.class)))
-                                .setTitle(R.string.multiplayer_options)
+                                .setTitle(R.string.multiplayer_settings)
                                 .setMessage(R.string.multiplayer_dialog);
                         multiplayer.show();
                     } else {

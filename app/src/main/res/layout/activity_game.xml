@@ -43,18 +43,7 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/iv_Otl"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/iv_board"
-        app:srcCompat="@drawable/o"
-        tools:visibility="gone"
-        tools:ignore="ContentDescription" />
-
-    <ImageView
-        android:id="@+id/iv_Xtl"
+        android:id="@+id/iv_tl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="132dp"
@@ -66,19 +55,7 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/iv_Otm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/iv_board"
-        app:srcCompat="@drawable/o"
-        tools:visibility="gone"
-        tools:ignore="ContentDescription" />
-
-    <ImageView
-        android:id="@+id/iv_Xtm"
+        android:id="@+id/iv_tm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="172dp"
@@ -90,19 +67,7 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/iv_Otr"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/iv_board"
-        app:srcCompat="@drawable/o"
-        tools:visibility="gone"
-        tools:ignore="ContentDescription" />
-
-    <ImageView
-        android:id="@+id/iv_Xtr"
+        android:id="@+id/iv_tr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="220dp"
@@ -114,19 +79,7 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/iv_Oml"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/iv_board"
-        app:srcCompat="@drawable/o"
-        tools:visibility="gone"
-        tools:ignore="ContentDescription" />
-
-    <ImageView
-        android:id="@+id/iv_Xml"
+        android:id="@+id/iv_ml"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="184dp"
@@ -139,20 +92,7 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/iv_Omm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="32dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/iv_board"
-        app:srcCompat="@drawable/o"
-        tools:visibility="gone"
-        tools:ignore="ContentDescription" />
-
-    <ImageView
-        android:id="@+id/iv_Xmm"
+        android:id="@+id/iv_mm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="200dp"
@@ -165,20 +105,7 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/iv_Omr"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="32dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/iv_board"
-        app:srcCompat="@drawable/o"
-        tools:visibility="gone"
-        tools:ignore="ContentDescription" />
-
-    <ImageView
-        android:id="@+id/iv_Xmr"
+        android:id="@+id/iv_mr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="224dp"
@@ -191,19 +118,7 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/iv_Obl"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="156dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/iv_board"
-        app:srcCompat="@drawable/o"
-        tools:visibility="gone"
-        tools:ignore="ContentDescription" />
-
-    <ImageView
-        android:id="@+id/iv_Xbl"
+        android:id="@+id/iv_bl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="188dp"
@@ -216,20 +131,7 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/iv_Obm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="156dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/iv_board"
-        app:srcCompat="@drawable/o"
-        tools:visibility="gone"
-        tools:ignore="ContentDescription" />
-
-    <ImageView
-        android:id="@+id/iv_Xbm"
+        android:id="@+id/iv_bm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="200dp"
@@ -242,20 +144,7 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/iv_Obr"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="156dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/iv_board"
-        app:srcCompat="@drawable/o"
-        tools:visibility="gone"
-        tools:ignore="ContentDescription" />
-
-    <ImageView
-        android:id="@+id/iv_Xbr"
+        android:id="@+id/iv_br"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="220dp"

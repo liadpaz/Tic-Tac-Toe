@@ -2,11 +2,9 @@
     <string-array name="DarkModeOptionsView" >
         <item>@string/on</item>
         <item>@string/off</item>
-        <item>@string/system_default</item>
     </string-array>
     <string-array name="DarkModeOptions" >
         <item>on</item>
         <item>off</item>
-        <item>default</item>
     </string-array>
 </resources>

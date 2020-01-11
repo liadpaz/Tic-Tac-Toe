@@ -15,6 +15,7 @@ class HelloDialog extends Dialog {
 
     HelloDialog(Context context, @NotNull String name) {
         super(context);
+
         setContentView(R.layout.layout_hello);
         setCancelable(true);
 
