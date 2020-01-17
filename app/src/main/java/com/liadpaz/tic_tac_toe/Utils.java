@@ -319,17 +319,6 @@ class Stats{
     }
 
     /**
-     * This function sets the user preference of his photo in multiplayer game (google photo or custom)
-     *
-     * @param googlePhoto true if the user prefer to use his google photo
-     */
-    static void setGooglePhoto(boolean googlePhoto) {
-        sharedPreferences.edit()
-                .putBoolean("google_photo", googlePhoto)
-                .apply();
-    }
-
-    /**
      * This function reads from the local file info depending on the {@param param}
      *
      * @param param the stat to read from the file
