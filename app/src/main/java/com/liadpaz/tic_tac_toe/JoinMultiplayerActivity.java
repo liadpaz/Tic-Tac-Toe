@@ -1,6 +1,9 @@
 package com.liadpaz.tic_tac_toe;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
@@ -23,9 +26,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.ref.WeakReference;
+import java.net.URL;
 import java.util.Objects;
 
-public class JoinMultiplayer extends AppCompatActivity {
+public class JoinMultiplayerActivity extends AppCompatActivity {
 
     private static final int PHOTO_ACTIVITY = 1;
 
@@ -72,30 +80,27 @@ public class JoinMultiplayer extends AppCompatActivity {
             lobbyNumber = et_lobby_number.getText().toString();
 
             if (lobbyNumber.length() != 4) {
-                Toast.makeText(JoinMultiplayer.this, R.string.lobby_length, Toast.LENGTH_LONG).show();
+                Toast.makeText(JoinMultiplayerActivity.this, R.string.lobby_length, Toast.LENGTH_LONG).show();
             } else {
                 joinRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot data : dataSnapshot.getChildren()) {
-                            if (Objects.equals(data.getKey(), lobbyNumber)) {
-                                if (data.child("clientName").getValue(String.class) == null) {
-
-                                    startActivity(new Intent(JoinMultiplayer.this, LobbyActivity.class)
-                                            .putExtra("ClientName", clientName)
-                                            .putExtra("Multiplayer", "Client")
-                                            .putExtra("LobbyNumber", lobbyNumber));
-                                    joinRef.child(lobbyNumber).child("clientName").setValue(clientName);
-                                    if (!Objects.requireNonNull(data.child("privacy").getValue(Boolean.class))) {
-                                        joinRef.child(lobbyNumber).child("privacy").setValue(Stats.readPrivacy());
-                                    }
-                                } else {
-                                    Toast.makeText(JoinMultiplayer.this, R.string.lobby_full, Toast.LENGTH_LONG).show();
+                        if (dataSnapshot.hasChild(lobbyNumber)) {
+                            if (dataSnapshot.child(lobbyNumber).child("clientName").getValue(String.class) == null) {
+                                startActivity(new Intent(JoinMultiplayerActivity.this, LobbyActivity.class)
+                                        .putExtra("ClientName", clientName)
+                                        .putExtra("Multiplayer", "Client")
+                                        .putExtra("LobbyNumber", lobbyNumber));
+                                joinRef.child(lobbyNumber).child("clientName").setValue(clientName);
+                                if (!Objects.requireNonNull(dataSnapshot.child(lobbyNumber).child("privacy").getValue(Boolean.class))) {
+                                    joinRef.child(lobbyNumber).child("privacy").setValue(Stats.readPrivacy());
                                 }
-                                return;
+                            } else {
+                                Toast.makeText(JoinMultiplayerActivity.this, R.string.lobby_full, Toast.LENGTH_LONG).show();
                             }
+                        } else {
+                            Toast.makeText(JoinMultiplayerActivity.this, R.string.lobby_not_found, Toast.LENGTH_LONG).show();
                         }
-                        Toast.makeText(JoinMultiplayer.this, R.string.lobby_not_found, Toast.LENGTH_LONG).show();
                     }
 
                     @Override
@@ -105,14 +110,17 @@ public class JoinMultiplayer extends AppCompatActivity {
         });
         if (!Stats.readPrivacy()) {
             btn_camera.setVisibility(View.VISIBLE);
+            photo = new File(JoinMultiplayerActivity.this.getFilesDir(), "Photo.jpg");
+            if (!Stats.getGooglePhoto()) {
+                btn_camera.setOnClickListener(v -> {
+                    Utils.localPhotoUri = FileProvider.getUriForFile(JoinMultiplayerActivity.this, "com.liadpaz.tic_tac_toe.fileprovider", photo);
+                    startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(MediaStore.EXTRA_OUTPUT, Utils.localPhotoUri), PHOTO_ACTIVITY);
+                });
+            } else {
+                new PhotoTask(JoinMultiplayerActivity.this, photo).execute(Objects.requireNonNull(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhotoUrl()).toString());
+                btn_camera.setVisibility(View.INVISIBLE);
+            }
         }
-        btn_camera.setOnClickListener(v -> {
-            photo = new File(JoinMultiplayer.this.getFilesDir(), "Photo.jpg");
-
-            Utils.localPhotoUri = FileProvider.getUriForFile(JoinMultiplayer.this, "com.liadpaz.tic_tac_toe.fileprovider", photo);
-
-            startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(MediaStore.EXTRA_OUTPUT, Utils.localPhotoUri), PHOTO_ACTIVITY);
-        });
 
         ckbx_google_name_join.setOnCheckedChangeListener((buttonView, isChecked) -> {
             nameOk = isChecked;
@@ -123,8 +131,7 @@ public class JoinMultiplayer extends AppCompatActivity {
 
         et_name_join.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -168,6 +175,49 @@ public class JoinMultiplayer extends AppCompatActivity {
             if (nameOk && et_lobby_number.getText().length() > 0) {
                 btn_join.setEnabled(true);
             }
+        }
+    }
+
+    private static class PhotoTask extends AsyncTask<String, Void, Void> {
+
+        private WeakReference<JoinMultiplayerActivity> joinMultiplayer;
+        private File photo;
+
+        PhotoTask(JoinMultiplayerActivity joinMultiplayerActivity, File photo) {
+            this.joinMultiplayer = new WeakReference<>(joinMultiplayerActivity);
+            this.photo = photo;
+        }
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            try {
+                URL url = new URL(Objects.requireNonNull(strings[0]));
+                InputStream is = url.openStream();
+                OutputStream os = new FileOutputStream(photo);
+
+                byte[] b = new byte[2048];
+                int length;
+
+                while ((length = is.read(b)) != -1) {
+                    os.write(b, 0, length);
+                }
+
+                is.close();
+                os.close();
+
+                Utils.localPhotoUri = FileProvider.getUriForFile(joinMultiplayer.get(), "com.liadpaz.tic_tac_toe.fileprovider", photo);
+            } catch (Exception ignored) {
+                Toast.makeText(joinMultiplayer.get(), R.string.photo_not_found, Toast.LENGTH_LONG).show();
+                try {
+                    OutputStream os = new FileOutputStream(photo);
+                    Bitmap bitmap = BitmapFactory.decodeResource(joinMultiplayer.get().getResources(), R.drawable.placeholder);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, Bitmap.DENSITY_NONE, os);
+                    os.close();
+                } catch (Exception ignored1) {}
+            } finally {
+                joinMultiplayer.get().photoOk = true;
+            }
+            return null;
         }
     }
 }

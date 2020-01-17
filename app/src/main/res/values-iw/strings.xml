@@ -103,4 +103,8 @@
     <string name="delete_user_success">המשתמש שלך נמחק בהצלחה</string>
     <string name="display">תצוגה</string>
     <string name="delete_user_message">האם את/ה בטוח/ה שאת/ה רוצה למחוק את המשתמש שלך?</string>
+    <string name="dev_first">את/ה</string>
+    <string name="dev_second">צעדים מלהכנס למצב מפתח</string>
+    <string name="use_google_photo">השתמש/י בתמונה של גוגל</string>
+    <string name="photo_not_found">תמונת גוגל שלך לא נמצאה, משתמש בממלא מקום במקום…</string>
 </resources>

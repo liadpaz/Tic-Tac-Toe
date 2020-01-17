@@ -1,6 +1,9 @@
 package com.liadpaz.tic_tac_toe;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
@@ -12,6 +15,7 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,6 +28,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.ref.WeakReference;
+import java.net.URL;
 import java.util.Objects;
 
 public class OptionsActivity extends AppCompatActivity {
@@ -122,18 +131,13 @@ public class OptionsActivity extends AppCompatActivity {
             if (mode == Utils.Mode.Multiplayer) {
                 OptionsActivity.this.initializeLobby();
             } else {
-                OptionsActivity.this.startActivity(new Intent(OptionsActivity.this.getApplicationContext(), Game.class)
+                OptionsActivity.this.startActivity(new Intent(OptionsActivity.this.getApplicationContext(), GameActivity.class)
                         .putExtra("Mode", mode)
                         .putExtra("Max", max_games)
                         .putExtra("Timer", timer)
                         .putExtra("Starting", starting_player)
                         .putExtra("Difficulty", difficulty));
             }
-        });
-        btn_camera.setOnClickListener(v -> {
-            photo = new File(OptionsActivity.this.getFilesDir(), "Photo.jpg");
-            Utils.localPhotoUri = FileProvider.getUriForFile(OptionsActivity.this, "com.liadpaz.tic_tac_toe.fileprovider", photo);
-            OptionsActivity.this.startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(MediaStore.EXTRA_OUTPUT, Utils.localPhotoUri), CAMERA_ACTIVITY);
         });
 
         numpic_maxgames.setValue(max_games);
@@ -146,6 +150,17 @@ public class OptionsActivity extends AppCompatActivity {
             tv_name_host.setVisibility(View.VISIBLE);
             if (!Stats.readPrivacy()) {
                 btn_camera.setVisibility(View.VISIBLE);
+            }
+            photo = new File(OptionsActivity.this.getFilesDir(), "Photo.jpg");
+            if (!Stats.getGooglePhoto()) {
+                btn_camera.setOnClickListener(v -> {
+                    Utils.localPhotoUri = FileProvider.getUriForFile(OptionsActivity.this, "com.liadpaz.tic_tac_toe.fileprovider", photo);
+                    OptionsActivity.this.startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(MediaStore.EXTRA_OUTPUT, Utils.localPhotoUri), CAMERA_ACTIVITY);
+                });
+            } else {
+                photoOk = true;
+                new PhotoTask(OptionsActivity.this, photo).execute(Objects.requireNonNull(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhotoUrl()).toString());
+                btn_camera.setVisibility(View.INVISIBLE);
             }
             et_name_host.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -230,6 +245,48 @@ public class OptionsActivity extends AppCompatActivity {
         if (requestCode == CAMERA_ACTIVITY && resultCode == RESULT_OK) {
             photoOk = true;
             btn_play.setEnabled(nameOk);
+        }
+    }
+
+    private static class PhotoTask extends AsyncTask<String, Void, Void> {
+
+        private WeakReference<OptionsActivity> optionsActivity;
+        private File photo;
+
+        PhotoTask(OptionsActivity optionsActivity, File photo) {
+            this.optionsActivity = new WeakReference<>(optionsActivity);
+            this.photo = photo;
+        }
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            try {
+                URL url = new URL(Objects.requireNonNull(strings[0]));
+                InputStream is = url.openStream();
+                OutputStream os = new FileOutputStream(photo);
+
+                byte[] b = new byte[2048];
+                int length;
+
+                while ((length = is.read(b)) != -1) {
+                    os.write(b, 0, length);
+                }
+
+                is.close();
+                os.close();
+
+                Utils.localPhotoUri = FileProvider.getUriForFile(optionsActivity.get(), "com.liadpaz.tic_tac_toe.fileprovider", photo);
+            } catch (Exception ignored) {
+                optionsActivity.get().runOnUiThread(() -> Toast.makeText(optionsActivity.get(), R.string.photo_not_found, Toast.LENGTH_LONG).show());
+
+                try {
+                    OutputStream os = new FileOutputStream(photo);
+                    Bitmap bitmap = BitmapFactory.decodeResource(optionsActivity.get().getResources(), R.drawable.placeholder);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, Bitmap.DENSITY_NONE, os);
+                    os.close();
+                } catch (Exception ignored1) {}
+            }
+            return null;
         }
     }
 }

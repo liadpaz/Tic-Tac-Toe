@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.Objects;
 
-public class Game extends AppCompatActivity {
+public class GameActivity extends AppCompatActivity {
 
     DatabaseReference gameRef;
     StorageReference storageRef;
@@ -190,8 +190,7 @@ public class Game extends AppCompatActivity {
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                }
+                public void onCancelled(@NonNull DatabaseError databaseError) {}
             });
             gameRef.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -274,24 +273,24 @@ public class Game extends AppCompatActivity {
         tv_playerXwins.setText("0");
         tv_playerOwins.setText("0");
 
-        btn_resign.setOnClickListener(v -> new AlertDialog.Builder(Game.this)
+        btn_resign.setOnClickListener(v -> new AlertDialog.Builder(GameActivity.this)
                 .setTitle(R.string.resign)
                 .setMessage(R.string.resign_message)
                 .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
                     if (vs_multiplayer) {
-                        Game.this.writeDatabaseMessage("left");
+                        GameActivity.this.writeDatabaseMessage("left");
                     }
-                    Game.this.finishAffinity();
-                    Game.this.startActivity(new Intent(Game.this, MainActivity.class));
+                    GameActivity.this.finishAffinity();
+                    GameActivity.this.startActivity(new Intent(GameActivity.this, MainActivity.class));
                 })
                 .setNegativeButton(R.string.no, null)
                 .setCancelable(true)
                 .show());
-        btn_reset.setOnClickListener(v -> new AlertDialog.Builder(Game.this)
+        btn_reset.setOnClickListener(v -> new AlertDialog.Builder(GameActivity.this)
                 .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
                     tv_playerOwins.setText("0");
                     tv_playerXwins.setText("0");
-                    Game.this.resetGame(true);
+                    GameActivity.this.resetGame(true);
                 })
                 .setNegativeButton(R.string.no, null)
                 .setCancelable(true)
@@ -332,7 +331,7 @@ public class Game extends AppCompatActivity {
                         tv_playerXwins.setVisibility(View.VISIBLE);
                         tv_playerOwins.setVisibility(View.VISIBLE);
                         if (startingType == Cell.Type.O) {
-                            Game.this.putCPU();
+                            GameActivity.this.putCPU();
                             turn = Cell.Type.X;
                         }
                         if (timer != 0) {
@@ -349,7 +348,7 @@ public class Game extends AppCompatActivity {
                         tv_playerXwins.setVisibility(View.VISIBLE);
                         tv_playerOwins.setVisibility(View.VISIBLE);
                         if (startingType == Cell.Type.X) {
-                            Game.this.putCPU();
+                            GameActivity.this.putCPU();
                             turn = Cell.Type.O;
                         }
                         if (timer != 0) {
@@ -413,14 +412,14 @@ public class Game extends AppCompatActivity {
                 .setMessage(R.string.its_a_tie)
                 .setPositiveButton(R.string.continue_dialog, (dialog, which) -> {
                     thisCanPlay = true;
-                    Game.this.resetGame(false);
+                    GameActivity.this.resetGame(false);
                     if (vs_multiplayer) {
-                        Game.this.writeDatabaseMessage("go");
-                        tv_turn.setText(String.format("%s %s%s (%s)", Game.this.getString(R.string.its), thisType == turn ? thisName : otherName, Game.this.getString(R.string.turn), turn.toString()));
+                        GameActivity.this.writeDatabaseMessage("go");
+                        tv_turn.setText(String.format("%s %s%s (%s)", GameActivity.this.getString(R.string.its), thisType == turn ? thisName : otherName, GameActivity.this.getString(R.string.turn), turn.toString()));
                     } else {
-                        tv_turn.setText(String.format("%s %s%s", Game.this.getString(R.string.its), turn.toString(), Game.this.getString(R.string.turn)));
+                        tv_turn.setText(String.format("%s %s%s", GameActivity.this.getString(R.string.its), turn.toString(), GameActivity.this.getString(R.string.turn)));
                     }
-                    if (timer != 0 && (Game.this.notCPUturn() || (vs_multiplayer && canPlay))) {
+                    if (timer != 0 && (GameActivity.this.notCPUturn() || (vs_multiplayer && canPlay))) {
                         if (!vs_multiplayer || canPlay) {
                             counter.start();
                         }
@@ -442,12 +441,12 @@ public class Game extends AppCompatActivity {
                 .setTitle(R.string.congratulations)
                 .setMessage(player ? String.format("%s %s %s", getString(R.string.player), player_won, getString(R.string.won)) : String.format("%s %s", player_won, getString(R.string.won)))
                 .setPositiveButton(R.string.continue_dialog, (dialog, which) -> {
-                    Game.this.resetGame(false);
+                    GameActivity.this.resetGame(false);
                     thisCanPlay = true;
                     if (vs_multiplayer) {
-                        Game.this.writeDatabaseMessage("go");
+                        GameActivity.this.writeDatabaseMessage("go");
                     }
-                    if (timer != 0 && (Game.this.notCPUturn() || (vs_multiplayer && canPlay))) {
+                    if (timer != 0 && (GameActivity.this.notCPUturn() || (vs_multiplayer && canPlay))) {
                         if (!vs_multiplayer || canPlay) {
                             counter.start();
                         }
@@ -471,8 +470,8 @@ public class Game extends AppCompatActivity {
                 .setTitle(R.string.winner)
                 .setMessage(player ? String.format("%s %s %s", getString(R.string.player), player_won, getString(R.string.won_the_game)) : String.format("%s %s", player_won, getString(R.string.won_the_game)))
                 .setPositiveButton(R.string.continue_dialog, (dialog, which) -> {
-                    Game.this.finishAffinity();
-                    Game.this.startActivity(new Intent(Game.this, MainActivity.class));
+                    GameActivity.this.finishAffinity();
+                    GameActivity.this.startActivity(new Intent(GameActivity.this, MainActivity.class));
                 });
     }
 
@@ -736,7 +735,7 @@ public class Game extends AppCompatActivity {
     private void putPhotos() {
         final File remotePhoto = new File(getFilesDir(), "Photo1.jpg");
         storageRef.child(multiType.equals("Host") ? "Client" : "Host").getFile(remotePhoto).addOnCompleteListener(task -> {
-            Utils.remotePhotoUri = FileProvider.getUriForFile(Game.this, "com.liadpaz.tic_tac_toe.fileprovider", remotePhoto);
+            Utils.remotePhotoUri = FileProvider.getUriForFile(GameActivity.this, "com.liadpaz.tic_tac_toe.fileprovider", remotePhoto);
             if (thisType == Cell.Type.X) {
                 iv_playerX.setImageURI(Utils.localPhotoUri);
                 iv_playerX.setVisibility(View.VISIBLE);

@@ -48,7 +48,7 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
-            android:name=".Statistics"
+            android:name=".StatisticsActivity"
             android:configChanges="uiMode"
             android:label="@string/statistics"
             android:launchMode="singleTask"
@@ -65,7 +65,7 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".JoinMultiplayer"
+            android:name=".JoinMultiplayerActivity"
             android:configChanges="uiMode"
             android:label="@string/join_lobby"
             android:launchMode="singleTask"
@@ -76,7 +76,7 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
-            android:name=".Game"
+            android:name=".GameActivity"
             android:configChanges="uiMode"
             android:label="@string/game"
             android:launchMode="singleTask"

@@ -86,7 +86,7 @@ public class LobbyActivity extends AppCompatActivity {
                 sw_host.setEnabled(!isChecked);
                 if (ready_host && ready_client) {
                     LobbyActivity.this.writeDatabaseMessage("play");
-                    LobbyActivity.this.startActivity(new Intent(LobbyActivity.this, Game.class)
+                    LobbyActivity.this.startActivity(new Intent(LobbyActivity.this, GameActivity.class)
                             .putExtra("LobbyNumber", lobbyNumber)
                             .putExtra("Multiplayer", "Host"));
 
@@ -132,7 +132,7 @@ public class LobbyActivity extends AppCompatActivity {
                                     ready_client = true;
                                     if (ready_host) {
                                         writeDatabaseMessage("play");
-                                        startActivity(new Intent(LobbyActivity.this, Game.class)
+                                        startActivity(new Intent(LobbyActivity.this, GameActivity.class)
                                                 .putExtra("LobbyNumber", lobbyNumber)
                                                 .putExtra("Multiplayer", "Host"));
                                         finish();
@@ -177,7 +177,7 @@ public class LobbyActivity extends AppCompatActivity {
                     if (hostMessage != null) {
                         switch (hostMessage) {
                             case "play": {
-                                startActivity(new Intent(LobbyActivity.this, Game.class)
+                                startActivity(new Intent(LobbyActivity.this, GameActivity.class)
                                         .putExtra("LobbyNumber", lobbyNumber)
                                         .putExtra("Multiplayer", "Client"));
                                 finish();

@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
     CountDownTimer count;
 
-    static SharedPreferences sharedPreferences;
+    SharedPreferences sharedPreferences;
 
     int devCounter;
 
@@ -166,38 +166,36 @@ public class MainActivity extends AppCompatActivity {
                     mainRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            if (getUsername().equals(auth.getCurrentUser().getDisplayName())) {
-                                int localTime = Stats.readStat(Stats.Readables.Time), serverTime;
-                                if (dataSnapshot.hasChild("Time")) {
-                                    if (localTime > (serverTime = Objects.requireNonNull(dataSnapshot.child("Time").getValue(Integer.class)))) {
-                                        mainRef.child("Time").setValue(localTime);
-                                    } else {
-                                        Stats.setTime(serverTime);
-                                    }
-                                } else {
+                            int localTime = getUsername().equals(auth.getCurrentUser().getDisplayName())? Stats.readStat(Stats.Readables.Time) : 0, serverTime;
+                            if (dataSnapshot.hasChild("Time")) {
+                                if (localTime > (serverTime = Objects.requireNonNull(dataSnapshot.child("Time").getValue(Integer.class)))) {
                                     mainRef.child("Time").setValue(localTime);
-                                }
-                                int localX = Stats.readStat(Stats.Readables.Xwins), serverX;
-                                if (dataSnapshot.hasChild("Xwins")) {
-                                    if (localX > (serverX = Objects.requireNonNull(dataSnapshot.child("Xwins").getValue(Integer.class)))) {
-                                        mainRef.child("Xwins").setValue(localX);
-                                    } else {
-                                        Stats.setXwins(serverX);
-                                    }
                                 } else {
+                                    Stats.setTime(serverTime);
+                                }
+                            } else {
+                                mainRef.child("Time").setValue(localTime);
+                            }
+                            int localX = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Xwins) : 0, serverX;
+                            if (dataSnapshot.hasChild("Xwins")) {
+                                if (localX > (serverX = Objects.requireNonNull(dataSnapshot.child("Xwins").getValue(Integer.class)))) {
                                     mainRef.child("Xwins").setValue(localX);
-                                }
-                                int localO = Stats.readStat(Stats.Readables.Owins), serverO;
-                                if (dataSnapshot.hasChild("Owins")) {
-                                    if (localO > (serverO = Objects.requireNonNull(dataSnapshot.child("Owins").getValue(Integer.class)))) {
-                                        mainRef.child("Owins").setValue(localO);
-                                    } else {
-                                        Stats.setOwins(serverO);
-                                    }
                                 } else {
+                                    Stats.setXwins(serverX);
+                                }
+                            } else {
+                                mainRef.child("Xwins").setValue(localX);
+                            }
+                            int localO = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Owins) : 0, serverO;
+                            if (dataSnapshot.hasChild("Owins")) {
+                                if (localO > (serverO = Objects.requireNonNull(dataSnapshot.child("Owins").getValue(Integer.class)))) {
+                                    mainRef.child("Owins").setValue(localO);
+                                } else {
+                                    Stats.setOwins(serverO);
+                                }
+                            } else {
                                     mainRef.child("Owins").setValue(localO);
                                 }
-                            }
                         }
 
                         @Override
@@ -252,21 +250,7 @@ public class MainActivity extends AppCompatActivity {
                     final long time = Utils.getTime();
                     Stats.addTime(time);
                     stats = true;
-                    if (auth.getCurrentUser() != null) {
-                        mainRef.child("Time").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                mainRef.child("Time").setValue(Objects.requireNonNull(dataSnapshot.getValue(Integer.class)) + time)
-                                        .addOnCompleteListener(task -> startActivity(new Intent(MainActivity.this, Statistics.class)));
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                            }
-                        });
-                    } else {
-                        startActivity(new Intent(MainActivity.this, Statistics.class));
-                    }
+                    new InternetTask(MainActivity.this, time).execute();
                     break;
                 }
 
@@ -345,16 +329,38 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    static String getUsername() {
+    /**
+     * This function returns the connected user's name
+     *
+     * @return the connected user's name
+     */
+    String getUsername() {
         return sharedPreferences.getString("name", null);
     }
 
-    static void setUsername(String name) {
+    /**
+     * This function sets the connected user's name
+     *
+     * @param name the connected user's name
+     */
+    void setUsername(String name) {
         sharedPreferences.edit().putString("name", name).apply();
     }
 
+    /**
+     * The AsyncTask to check if the user is connected to the internet
+     */
     private static class InternetTask extends AsyncTask<Void, Void, Boolean> {
+        /**
+         * The weak reference to main activity object
+         */
         private WeakReference<MainActivity> activityReference;
+        private long time = 0;
+
+        InternetTask(MainActivity activityReference, long time) {
+            this.activityReference = new WeakReference<>(activityReference);
+            this.time = time;
+        }
 
         InternetTask(MainActivity activityReference) {
             this.activityReference = new WeakReference<>(activityReference);
@@ -372,21 +378,42 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Boolean aBoolean) {
                 if (aBoolean) {
-                    if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                        AlertDialog.Builder multiplayer = new AlertDialog.Builder(activityReference.get())
-                                .setNegativeButton(R.string.host_game, (dialogInterface, i) -> activityReference.get()
-                                        .startActivity(new Intent(activityReference.get(), OptionsActivity.class)
-                                                .putExtra("Mode", Utils.Mode.Multiplayer)))
-                                .setPositiveButton(R.string.join_game, (dialogInterface, i) -> activityReference.get()
-                                        .startActivity(new Intent(activityReference.get(), JoinMultiplayer.class)))
-                                .setTitle(R.string.multiplayer_settings)
-                                .setMessage(R.string.multiplayer_dialog);
-                        multiplayer.show();
+                    if (time != 0) {
+                        if (activityReference.get().auth.getCurrentUser() != null) {
+                            activityReference.get().mainRef.child("Time").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    activityReference.get().mainRef.child("Time").setValue(Objects.requireNonNull(dataSnapshot.getValue(Integer.class)) + time)
+                                            .addOnCompleteListener(task -> activityReference.get().startActivity(new Intent(activityReference.get(), StatisticsActivity.class)));
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {}
+                            });
+                        } else {
+                            activityReference.get().startActivity(new Intent(activityReference.get(), StatisticsActivity.class));
+                        }
                     } else {
-                        Toast.makeText(activityReference.get(), R.string.unauthed_user, Toast.LENGTH_LONG).show();
+                        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                            new AlertDialog.Builder(activityReference.get())
+                                    .setNegativeButton(R.string.host_game, (dialogInterface, i) -> activityReference.get()
+                                            .startActivity(new Intent(activityReference.get(), OptionsActivity.class)
+                                                    .putExtra("Mode", Utils.Mode.Multiplayer)))
+                                    .setPositiveButton(R.string.join_game, (dialogInterface, i) -> activityReference.get()
+                                            .startActivity(new Intent(activityReference.get(), JoinMultiplayerActivity.class)))
+                                    .setTitle(R.string.multiplayer_settings)
+                                    .setMessage(R.string.multiplayer_dialog)
+                                    .show();
+                        } else {
+                            Toast.makeText(activityReference.get(), R.string.unauthed_user, Toast.LENGTH_LONG).show();
+                        }
                     }
                 } else {
-                    Toast.makeText(activityReference.get(), R.string.not_available_offline, Toast.LENGTH_LONG).show();
+                    if (time != 0) {
+                        activityReference.get().startActivity(new Intent(activityReference.get(), StatisticsActivity.class));
+                    } else {
+                        Toast.makeText(activityReference.get(), R.string.not_available_offline, Toast.LENGTH_LONG).show();
+                    }
                 }
                 super.onPostExecute(aBoolean);
             }

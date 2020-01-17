@@ -18,7 +18,7 @@ import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.util.Objects;
 
-public class Statistics extends AppCompatActivity {
+public class StatisticsActivity extends AppCompatActivity {
 
     DatabaseReference statsRef;
 
@@ -90,9 +90,9 @@ public class Statistics extends AppCompatActivity {
 
     private static class Task extends AsyncTask<Void, Void, Boolean> {
 
-        private WeakReference<Statistics> activityReference;
+        private WeakReference<StatisticsActivity> activityReference;
 
-        Task(Statistics activityReference) {
+        Task(StatisticsActivity activityReference) {
             this.activityReference = new WeakReference<>(activityReference);
         }
 

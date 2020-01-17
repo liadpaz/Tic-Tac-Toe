@@ -62,8 +62,8 @@
     <string name="its">It\'s</string>
     <string name="turn">\'s turn</string>
     <string name="lobby_full">Lobby is already full</string>
-    <string name="dev_first" translatable="false">You are</string>
-    <string name="dev_second" translatable="false">steps away from entering developer mode</string>
+    <string name="dev_first">You are</string>
+    <string name="dev_second">steps away from entering developer mode</string>
     <string name="easy">Easy</string>
     <string name="computer_difficulty">Choose the computer difficulty:</string>
     <string name="hard">Hard</string>
@@ -109,4 +109,6 @@
     <string name="delete_all_message" translatable="false">Are you sure you want to delete all lobbies?</string>
     <string name="display">Display</string>
     <string name="delete_user_message">Are you sure you want to delete your user?</string>
+    <string name="use_google_photo">Use Google photo</string>
+    <string name="photo_not_found">Your Google photo was not found, using a placeholder instead…</string>
 </resources>
