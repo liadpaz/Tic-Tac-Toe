@@ -80,7 +80,7 @@
     <string name="game">Game</string>
     <string name="not_authorized">You are not authorized…</string>
     <string name="whats_new">What\'s New:</string>
-    <string name="new_things">-Added users support\n-Only connected users can play multiplayer and see global statistics\n-Added dark mode support\n-Added settings tab\n-Minor bug fixes</string>
+    <string name="new_things">-Added users support\n-Only connected users can play multiplayer and see global statistics\n-You can now use your google name and picture in multiplayer\n-Added dark mode support\n-Added settings tab\n-Minor bug fixes</string>
     <string name="logout">Logout</string>
     <string name="login">Login</string>
     <string name="unauthed_user" tools:ignore="Typos">You need to be signed in in order to play online</string>
