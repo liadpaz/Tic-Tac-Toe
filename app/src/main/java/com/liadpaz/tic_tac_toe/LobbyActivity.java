@@ -110,6 +110,8 @@ public class LobbyActivity extends AppCompatActivity {
 
         lobbyRef = Firebase.dataRef.child("Lobbies").child(lobbyNumber);
 
+        lobbyRef.child(isHost ? "hostMessage" : "clientMessage").onDisconnect().setValue("left");
+
         listener = lobbyRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

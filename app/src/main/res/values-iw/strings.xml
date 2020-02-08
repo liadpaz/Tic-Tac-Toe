@@ -76,7 +76,7 @@
     <string name="game">משחק</string>
     <string name="not_authorized">אין לך הרשאה…</string>
     <string name="whats_new">מה חדש:</string>
-    <string name="new_things">-הוספת תמיכה במשתמשים\n-רק משתמשים מחוברים יכולים לשחק במשחק מרובה שחקנים ולראות סטיטסטיקות כלליות\n-אפשר להשתמש בשם ובתמונת גוגל במשחק מרובה שחקנים\n-הוספת מצב חשוך\n-הוספת דף הגדרות\n-תיקון באגים קטנים</string>
+    <string name="new_things">-הוספת פונקציות לשרת, כאשר שחקן בלובי מתנתק באופן לא צפוי, השחקן האחר מקבל התראה</string>
     <string name="logout">התנתק/י</string>
     <string name="login">התבחר/י</string>
     <string name="unauthed_user">כדי לשחק ברשת את/ה צריך/צריכה להיות מחובר/ת</string>

@@ -69,7 +69,9 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.toolbar_main));
         Objects.requireNonNull(getSupportActionBar()).setTitle(null);
 
-        boolean mode = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean(SettingsActivity.DARK_MODE_PREFERENCES, true);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        boolean mode = sharedPreferences.getBoolean(SettingsActivity.DARK_MODE_PREFERENCES, true);
         if (mode && (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) != Configuration.UI_MODE_NIGHT_YES) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
             recreate();
@@ -79,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         new Stats(PreferenceManager.getDefaultSharedPreferences(MainActivity.this));
-        sharedPreferences = getSharedPreferences("name", 0);
         auth = FirebaseAuth.getInstance();
 
         tv_title = findViewById(R.id.tv_title);
@@ -153,11 +154,12 @@ public class MainActivity extends AppCompatActivity {
             btn_multiplayer.setEnabled(false);
             can_open_menu = false;
             auth.getCurrentUser().reload().addOnCompleteListener(task -> {
+                setUsername(auth.getCurrentUser().getDisplayName());
                 can_open_menu = true;
                 btn_singleplayer.setEnabled(true);
                 btn_multiplayer.setEnabled(true);
                 if (auth.getCurrentUser() != null) {
-                    mainRef = (Firebase.userRef = Firebase.dataRef.child("Users").child(getUsername()));
+                    mainRef = (Firebase.userRef = Firebase.dataRef.child("Users").child(auth.getCurrentUser().getUid()));
                     if (first_open) {
                         new HelloDialog(MainActivity.this, getUsername()).show();
                         first_open = false;
@@ -285,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
                 new HelloDialog(MainActivity.this, getUsername()).show();
                 btn_user_action.setText(R.string.logout);
                 tv_user_state.setText(String.format("%s: %s", getString(R.string.connected), getUsername()));
-                (mainRef = Firebase.userRef = Firebase.dataRef.child("Users").child(getUsername())).addListenerForSingleValueEvent(new ValueEventListener() {
+                (mainRef = Firebase.userRef = Firebase.dataRef.child("Users").child(user.getUid())).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         int localTime = getUsername().equals(Objects.requireNonNull(auth.getCurrentUser()).getDisplayName()) ? Stats.readStat(Stats.Readables.Time) : 0, serverTime;
@@ -334,7 +336,7 @@ public class MainActivity extends AppCompatActivity {
      *
      * @return the connected user's name
      */
-    String getUsername() {
+    private String getUsername() {
         return sharedPreferences.getString("name", null);
     }
 
@@ -343,7 +345,7 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param name the connected user's name
      */
-    void setUsername(String name) {
+    private void setUsername(String name) {
         sharedPreferences.edit().putString("name", name).apply();
     }
 
