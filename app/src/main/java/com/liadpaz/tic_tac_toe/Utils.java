@@ -26,14 +26,8 @@ import java.util.Random;
  * This class is for general utilities
  */
 class Utils {
-    /**
-     * This enum is to differ a 'TwoPlayer', 'Computer' or Multiplayer game mode
-     */
-    public enum Mode {TwoPlayer, Computer, Multiplayer}
-
     static Uri localPhotoUri;
     static Uri remotePhotoUri;
-
     /**
      * This variable is the last time that was recorded
      */
@@ -76,8 +70,13 @@ class Utils {
      */
     static int[] getRandom() {
         Random rnd = new Random();
-        return new int[] {rnd.nextInt(3), rnd.nextInt(3)};
+        return new int[]{rnd.nextInt(3), rnd.nextInt(3)};
     }
+
+    /**
+     * This enum is to differ a 'TwoPlayer', 'Computer' or Multiplayer game mode
+     */
+    public enum Mode {TwoPlayer, Computer, Multiplayer}
 
 //    static int[] getSmartTurn(Cell[][] cells) {
 //        return null;
@@ -106,30 +105,9 @@ class Firebase {
  * This class represents the game cell
  */
 class Cell {
-    /**
-     * This is the type of the cell. eg. X, O
-     */
-    public enum Type {
-        None,
-        X,
-        O;
-
-        /**
-         * This function flips the type. eg. X to O and O to X
-         *
-         * @return X if the type was O, and O if the type was X
-         */
-        Type flip() {
-            if (this == X)
-                return O;
-            return X;
-        }
-    }
-
     private ImageView XO;
     private Type type;
     private boolean visible = false;
-
     /**
      * Constructor, attaches 2 ImageViews (X, O) to the cell
      *
@@ -152,7 +130,6 @@ class Cell {
      * This function sets the cell type to the {@code type} param
      *
      * @param type the type to set the cell as
-     *
      * @return true if the function have done the transformation, otherwise false
      */
     boolean setType(Type type) {
@@ -208,23 +185,35 @@ class Cell {
         type = null;
         XO.setVisibility(View.GONE);
     }
+
+    /**
+     * This is the type of the cell. eg. X, O
+     */
+    public enum Type {
+        None,
+        X,
+        O;
+
+        /**
+         * This function flips the type. eg. X to O and O to X
+         *
+         * @return X if the type was O, and O if the type was X
+         */
+        Type flip() {
+            if (this == X) {
+                return O;
+            }
+            return X;
+        }
+    }
 }
 
 /**
  * This class represents the player
  */
 class Player {
-    /**
-     * The player type. eg. 'CPU', 'Human'
-     */
-    public enum Type {
-        Human,
-        CPU
-    }
-
     final Type playerType;
     private int wins = 0;
-
     /**
      * Constructor, sets the player type to the {@code player} type
      *
@@ -249,21 +238,20 @@ class Player {
     int getWins() {
         return wins;
     }
+
+    /**
+     * The player type. eg. 'CPU', 'Human'
+     */
+    public enum Type {
+        Human,
+        CPU
+    }
 }
 
 /**
  * This class is for the statistics
  */
-class Stats{
-
-    /**
-     * This is the possible readings from the local file
-     */
-    public enum Readables {
-        Xwins,
-        Owins,
-        Time
-    }
+class Stats {
 
     /**
      * The app's shared preferences
@@ -314,6 +302,7 @@ class Stats{
      *
      * @return true if the user prefer to his google photo in multiplayer or not
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     static boolean getGooglePhoto() {
         return sharedPreferences.getBoolean("google_photo", false);
     }
@@ -322,7 +311,6 @@ class Stats{
      * This function reads from the local file info depending on the {@param param}
      *
      * @param param the stat to read from the file
-     *
      * @return the stat from the file
      */
     static int readStat(Readables param) {
@@ -332,8 +320,8 @@ class Stats{
     /**
      * This function writes to the local file based on the {@param type} and the {@param message}
      *
-     * @param type      the type to write to
-     * @param message   the message to write to the type
+     * @param type    the type to write to
+     * @param message the message to write to the type
      */
     @SuppressLint("DefaultLocale")
     static private void writeFile(Readables type, int message) {
@@ -414,6 +402,15 @@ class Stats{
         sharedPreferences.edit()
                 .putInt("Time", time)
                 .apply();
+    }
+
+    /**
+     * This is the possible readings from the local file
+     */
+    public enum Readables {
+        Xwins,
+        Owins,
+        Time
     }
 }
 

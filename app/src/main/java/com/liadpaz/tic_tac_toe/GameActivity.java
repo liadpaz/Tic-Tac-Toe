@@ -25,6 +25,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.liadpaz.tic_tac_toe.databinding.ActivityGameBinding;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -33,101 +34,111 @@ import java.util.Objects;
 
 public class GameActivity extends AppCompatActivity {
 
-    DatabaseReference gameRef;
-    StorageReference storageRef;
+    private DatabaseReference gameRef;
+    private StorageReference storageRef;
 
-    Cell.Type turn;
-    Cell.Type thisType;
-    int maxGames;
-    int timer;
-    Utils.Mode mode;
-    Cell.Type startingType;
-    CountDownTimer counter;
-    boolean difficulty;
+    private Cell.Type turn;
+    private Cell.Type thisType;
+    private int maxGames;
+    private int timer;
+    private Cell.Type startingType;
+    private CountDownTimer counter;
+//    private boolean difficulty;
 
-    int topScreen = 0;
-    DisplayMetrics screen;
+    private int topScreen = 0;
 
-    String thisName;
-    String otherName;
-    String Xname;
-    String Oname;
-    String lobbyNumber;
-    String multiType;
-    String lastHostMessage;
-    String lastClientMessage;
-    String lastSentMessage;
-    boolean canPlay = true;
-    boolean thisCanPlay = true;
-    Boolean privacy;
+    private String thisName;
+    private String otherName;
+    private String Xname;
+    private String Oname;
+    private String lobbyNumber;
+    private String multiType;
+    private String lastHostMessage;
+    private String lastClientMessage;
+    private String lastSentMessage;
+    private boolean canPlay = true;
+    private boolean thisCanPlay = true;
+    private Boolean privacy;
 
-    ImageView iv_board;
-    Player[] players = new Player[2];
-    Cell[][] cells = new Cell[3][3];
-    Rect[][] over_cells = new Rect[3][3];
+    private Player[] players = new Player[2];
+    private Cell[][] cells = new Cell[3][3];
+    private Rect[][] over_cells = new Rect[3][3];
 
-    ImageView iv_playerX;
-    ImageView iv_playerO;
+    private ImageView iv_playerX;
+    private ImageView iv_playerO;
 
-    Button btn_resign;
-    Button btn_reset;
+    private TextView tv_time_text;
+    private TextView tv_timer;
+    private TextView tv_playerX;
+    private TextView tv_playerXwins;
+    private TextView tv_playerO;
+    private TextView tv_playerOwins;
+    private TextView tv_maxgames;
+    private TextView tv_turn;
 
-    TextView tv_time_text;
-    TextView tv_timer;
-    TextView tv_playerX;
-    TextView tv_playerXwins;
-    TextView tv_playerO;
-    TextView tv_playerOwins;
-    TextView tv_maxgames;
-    TextView tv_turn;
-
-    boolean vs_multiplayer;
-    boolean vs_computer;
-    boolean vs_on_this_device;
+    private boolean vs_multiplayer;
+    private boolean vs_computer;
+    private boolean vs_on_this_device;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game);
+        ActivityGameBinding binding = ActivityGameBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         maxGames = getIntent().getIntExtra("Max", -1);
         timer = getIntent().getIntExtra("Timer", -1);
-        mode = (Utils.Mode) getIntent().getSerializableExtra("Mode");
+        Utils.Mode mode = (Utils.Mode) getIntent().getSerializableExtra("Mode");
         startingType = (Cell.Type) getIntent().getSerializableExtra("Starting");
         lobbyNumber = getIntent().getStringExtra("LobbyNumber");
         multiType = getIntent().getStringExtra("Multiplayer");
-        difficulty = getIntent().getBooleanExtra("Difficulty", false);
+//        difficulty = getIntent().getBooleanExtra("Difficulty", false);
 
         vs_multiplayer = mode == null;
 
         turn = startingType;
 
-        iv_board = findViewById(R.id.iv_board);
-        cells[0][0] = new Cell(findViewById(R.id.iv_tl));
-        cells[0][1] = new Cell(findViewById(R.id.iv_tm));
-        cells[0][2] = new Cell(findViewById(R.id.iv_tr));
-        cells[1][0] = new Cell(findViewById(R.id.iv_ml));
-        cells[1][1] = new Cell(findViewById(R.id.iv_mm));
-        cells[1][2] = new Cell(findViewById(R.id.iv_mr));
-        cells[2][0] = new Cell(findViewById(R.id.iv_bl));
-        cells[2][1] = new Cell(findViewById(R.id.iv_bm));
-        cells[2][2] = new Cell(findViewById(R.id.iv_br));
-        btn_resign = findViewById(R.id.btn_resign);
-        btn_reset = findViewById(R.id.btn_reset);
-        iv_playerX = findViewById(R.id.iv_playerX);
-        tv_playerX = findViewById(R.id.tv_playerX);
-        tv_playerXwins = findViewById(R.id.tv_playerXwins);
-        iv_playerO = findViewById(R.id.iv_playerO);
-        tv_playerO = findViewById(R.id.tv_playerO);
-        tv_playerOwins = findViewById(R.id.tv_playerOwins);
-        tv_maxgames = findViewById(R.id.tv_maxgames);
-        tv_time_text = findViewById(R.id.tv_time_text);
-        tv_timer = findViewById(R.id.tv_timer);
-        tv_turn = findViewById(R.id.tv_turn);
+        ImageView iv_board = binding.ivBoard;
+        cells = new Cell[][]{
+            {
+                new Cell(binding.ivTl),
+                new Cell(binding.ivTm),
+                new Cell(binding.ivTr)
+            }, {
+                new Cell(binding.ivMl),
+                new Cell(binding.ivMm),
+                new Cell(binding.ivMr)
+            }, {
+                new Cell(binding.ivBl),
+                new Cell(binding.ivBm),
+                new Cell(binding.ivBr)
+            }
+        };
+//        cells[0][0] = new Cell(binding.ivTl);
+//        cells[0][1] = new Cell(binding.ivTm);
+//        cells[0][2] = new Cell(binding.ivTr);
+//        cells[1][0] = new Cell(findViewById(R.id.iv_ml));
+//        cells[1][1] = new Cell(findViewById(R.id.iv_mm));
+//        cells[1][2] = new Cell(findViewById(R.id.iv_mr));
+//        cells[2][0] = new Cell(findViewById(R.id.iv_bl));
+//        cells[2][1] = new Cell(findViewById(R.id.iv_bm));
+//        cells[2][2] = new Cell(findViewById(R.id.iv_br));
+        Button btn_resign = binding.btnResign;
+        Button btn_reset = binding.btnReset;
+        iv_playerX = binding.ivPlayerX;
+        tv_playerX = binding.tvPlayerX;
+        tv_playerXwins = binding.tvPlayerXwins;
+        iv_playerO = binding.ivPlayerO;
+        tv_playerO = binding.tvPlayerO;
+        tv_playerOwins = binding.tvPlayerOwins;
+        tv_maxgames = binding.tvMaxgames;
+        tv_time_text = binding.tvTimeText;
+        tv_timer = binding.tvTimer;
+        tv_turn = binding.tvTurn;
 
         if (!vs_multiplayer) {
-            findViewById(R.id.toolbar_game).setVisibility(View.VISIBLE);
-            setSupportActionBar(findViewById(R.id.toolbar_game));
+            binding.toolbarGame.setVisibility(View.VISIBLE);
+            setSupportActionBar(binding.toolbarGame);
             Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.game);
             Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
@@ -190,7 +201,8 @@ public class GameActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {}
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                }
             });
             gameRef.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -298,7 +310,7 @@ public class GameActivity extends AppCompatActivity {
                 .setMessage(R.string.restart_question)
                 .show());
 
-        screen = new DisplayMetrics();
+        DisplayMetrics screen = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(screen);
         int x = screen.widthPixels;
 
@@ -376,7 +388,7 @@ public class GameActivity extends AppCompatActivity {
      * visible and checks for winner / tie.
      *
      * @param event touch location and info about the touch
-    */
+     */
     @SuppressLint("DefaultLocale")
     @Override
     public boolean onTouchEvent(@NotNull MotionEvent event) {
@@ -430,9 +442,8 @@ public class GameActivity extends AppCompatActivity {
     /**
      * This function builds and returns a winner AlertDialog with the winner name in it
      *
-     * @param player_won    player_won: a String contains the player name
-     *
-     * @return              winner AlertDialog
+     * @param player_won player_won: a String contains the player name
+     * @return winner AlertDialog
      */
     private AlertDialog.Builder winnerAlert(boolean player, String player_won) {
         thisCanPlay = false;
@@ -459,10 +470,9 @@ public class GameActivity extends AppCompatActivity {
      *
      * <p>This function builds and returns an absolute winner AlertDialog with the winner name in it</p>
      *
-     * @param player        true to show 'player' at the start
-     * @param player_won    a String contains the player name
-     *
-     * @return              absolute winner AlertDialog
+     * @param player     true to show 'player' at the start
+     * @param player_won a String contains the player name
+     * @return absolute winner AlertDialog
      */
     private AlertDialog.Builder absoluteWinnerAlert(boolean player, String player_won) {
         return new AlertDialog.Builder(this)
@@ -568,8 +578,12 @@ public class GameActivity extends AppCompatActivity {
      */
     private boolean checkWinner() {
         for (int i = 0; i < 3; i++) {
-            if (checkColumn(i)) return true;
-            if (checkRow(i)) return true;
+            if (checkColumn(i)) {
+                return true;
+            }
+            if (checkRow(i)) {
+                return true;
+            }
         }
         return checkDiagonals();
     }
@@ -577,9 +591,8 @@ public class GameActivity extends AppCompatActivity {
     /**
      * This function checks if there is a winner on the {@code column} row
      *
-     * @param column    the row to check
-     *
-     * @return          true if there is a winner on the {@code column} row, otherwise false
+     * @param column the row to check
+     * @return true if there is a winner on the {@code column} row, otherwise false
      */
     private boolean checkRow(int column) {
         return cells[column][0].getType() == cells[column][1].getType() && cells[column][1].getType() == cells[column][2].getType() && cells[column][0].getType() != null;
@@ -588,9 +601,8 @@ public class GameActivity extends AppCompatActivity {
     /**
      * This function checks if there is a winner on the {@code row} column
      *
-     * @param row   the column to check
-     *
-     * @return      true if there is a winner on the {@code row} column, otherwise false
+     * @param row the column to check
+     * @return true if there is a winner on the {@code row} column, otherwise false
      */
     private boolean checkColumn(int row) {
         return cells[0][row].getType() == cells[1][row].getType() && cells[1][row].getType() == cells[2][row].getType() && cells[0][row].getType() != null;

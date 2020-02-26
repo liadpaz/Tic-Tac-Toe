@@ -27,6 +27,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.liadpaz.tic_tac_toe.databinding.ActivityMainBinding;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -38,35 +39,68 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int USER_AUTH = 578;
     public static final int SETTINGS_ACTIVITY = 275;
+    private static final int USER_AUTH = 578;
+    private static boolean first_open = true;
+    private FirebaseAuth auth;
+    private DatabaseReference mainRef;
+    private TextView tv_user_state;
+    private Button btn_singleplayer;
+    private Button btn_multiplayer;
+    private Button btn_user_action;
+    private CountDownTimer count;
+    private SharedPreferences sharedPreferences;
+    private int devCounter;
+    private boolean can_open_menu = true;
+    private boolean stats;
 
-    FirebaseAuth auth;
-    DatabaseReference mainRef;
+    @SuppressWarnings("ConstantConditions")
+    private ValueEventListener valueEventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            int localTime = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Time) : 0, serverTime;
+            int localX = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Xwins) : 0, serverX;
+            int localO = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Owins) : 0, serverO;
+            if (dataSnapshot.hasChild("Time")) {
+                if (localTime > (serverTime = dataSnapshot.child("Time").getValue(Integer.class))) {
+                    mainRef.child("Time").setValue(localTime);
+                } else {
+                    Stats.setTime(serverTime);
+                }
+            } else {
+                mainRef.child("Time").setValue(localTime);
+            }
+            if (dataSnapshot.hasChild("Xwins")) {
+                if (localX > (serverX = dataSnapshot.child("Xwins").getValue(Integer.class))) {
+                    mainRef.child("Xwins").setValue(localX);
+                } else {
+                    Stats.setXwins(serverX);
+                }
+            } else {
+                mainRef.child("Xwins").setValue(localX);
+            }
+            if (dataSnapshot.hasChild("Owins")) {
+                if (localO > (serverO = dataSnapshot.child("Owins").getValue(Integer.class))) {
+                    mainRef.child("Owins").setValue(localO);
+                } else {
+                    Stats.setOwins(serverO);
+                }
+            } else {
+                mainRef.child("Owins").setValue(localO);
+            }
+        }
 
-    boolean stats;
-
-    TextView tv_title;
-    TextView tv_user_state;
-
-    Button btn_singleplayer;
-    Button btn_multiplayer;
-    Button btn_user_action;
-
-    CountDownTimer count;
-
-    SharedPreferences sharedPreferences;
-
-    int devCounter;
-
-    static boolean first_open = true;
-    boolean can_open_menu = true;
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        setSupportActionBar(findViewById(R.id.toolbar_main));
+        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        setSupportActionBar(binding.toolbarMain);
         Objects.requireNonNull(getSupportActionBar()).setTitle(null);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -83,23 +117,7 @@ public class MainActivity extends AppCompatActivity {
         new Stats(PreferenceManager.getDefaultSharedPreferences(MainActivity.this));
         auth = FirebaseAuth.getInstance();
 
-        tv_title = findViewById(R.id.tv_title);
-        tv_user_state = findViewById(R.id.tv_user_state);
-        btn_singleplayer = findViewById(R.id.btn_singleplayer);
-        btn_multiplayer = findViewById(R.id.btn_multiplayer);
-        btn_user_action = findViewById(R.id.btn_user_action);
-
-        count = new CountDownTimer(1500, 1500) {
-            @Override
-            public void onTick(long millisUntilFinished) {}
-
-            @Override
-            public void onFinish() {
-                devCounter = 0;
-            }
-        };
-
-        tv_title.setOnClickListener(v -> {
+        binding.tvTitle.setOnClickListener(v -> {
             count.cancel();
             devCounter++;
             if (devCounter != 5) {
@@ -118,6 +136,21 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        tv_user_state = binding.tvUserState;
+        btn_singleplayer = binding.btnSingleplayer;
+        btn_multiplayer = binding.btnMultiplayer;
+        btn_user_action = binding.btnUserAction;
+
+        count = new CountDownTimer(1500, 1500) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+            }
+
+            @Override
+            public void onFinish() {
+                devCounter = 0;
+            }
+        };
 
         btn_singleplayer.setOnClickListener(v -> MainActivity.this.startActivity(new Intent(MainActivity.this, OptionsActivity.class)));
         btn_multiplayer.setOnClickListener(v -> new InternetTask(MainActivity.this).execute());
@@ -128,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                         setUsername(null);
                         Firebase.userRef = null;
                         btn_user_action.setText(R.string.login);
-                        tv_user_state.setText(String.format("%s", getString(R.string.not_connected)));
+                        tv_user_state.setText(R.string.not_connected);
                         Toast.makeText(MainActivity.this, R.string.logout_message, Toast.LENGTH_LONG).show();
                     }
                 });
@@ -144,11 +177,12 @@ public class MainActivity extends AppCompatActivity {
         Utils.setTime();
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     protected void onStart() {
         super.onStart();
         // If the user is authenticated
-        if (auth.getCurrentUser() != null) {
+        if (isUserConnected()) {
             btn_user_action.setText(R.string.logout);
             btn_singleplayer.setEnabled(false);
             btn_multiplayer.setEnabled(false);
@@ -158,51 +192,14 @@ public class MainActivity extends AppCompatActivity {
                 can_open_menu = true;
                 btn_singleplayer.setEnabled(true);
                 btn_multiplayer.setEnabled(true);
-                if (auth.getCurrentUser() != null) {
+                if (isUserConnected()) {
                     mainRef = (Firebase.userRef = Firebase.dataRef.child("Users").child(auth.getCurrentUser().getUid()));
                     if (first_open) {
                         new HelloDialog(MainActivity.this, getUsername()).show();
                         first_open = false;
                     }
                     tv_user_state.setText(String.format("%s: %s", getString(R.string.connected), getUsername()));
-                    mainRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            int localTime = getUsername().equals(auth.getCurrentUser().getDisplayName())? Stats.readStat(Stats.Readables.Time) : 0, serverTime;
-                            if (dataSnapshot.hasChild("Time")) {
-                                if (localTime > (serverTime = Objects.requireNonNull(dataSnapshot.child("Time").getValue(Integer.class)))) {
-                                    mainRef.child("Time").setValue(localTime);
-                                } else {
-                                    Stats.setTime(serverTime);
-                                }
-                            } else {
-                                mainRef.child("Time").setValue(localTime);
-                            }
-                            int localX = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Xwins) : 0, serverX;
-                            if (dataSnapshot.hasChild("Xwins")) {
-                                if (localX > (serverX = Objects.requireNonNull(dataSnapshot.child("Xwins").getValue(Integer.class)))) {
-                                    mainRef.child("Xwins").setValue(localX);
-                                } else {
-                                    Stats.setXwins(serverX);
-                                }
-                            } else {
-                                mainRef.child("Xwins").setValue(localX);
-                            }
-                            int localO = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Owins) : 0, serverO;
-                            if (dataSnapshot.hasChild("Owins")) {
-                                if (localO > (serverO = Objects.requireNonNull(dataSnapshot.child("Owins").getValue(Integer.class)))) {
-                                    mainRef.child("Owins").setValue(localO);
-                                } else {
-                                    Stats.setOwins(serverO);
-                                }
-                            } else {
-                                    mainRef.child("Owins").setValue(localO);
-                                }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {}
-                    });
+                    mainRef.addListenerForSingleValueEvent(valueEventListener);
                 } else {
                     btn_user_action.setText(R.string.login);
                     tv_user_state.setText(R.string.not_connected);
@@ -220,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
         if (!stats) {
             final long time = Utils.getTime();
             Stats.addTime(time);
-            if (auth.getCurrentUser() != null && getUsername() != null) {
+            if (isUserConnected() && getUsername() != null) {
                 try {
                     mainRef.child("Time").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -229,9 +226,11 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {}
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                        }
                     });
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }
         super.onPause();
@@ -277,54 +276,18 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == USER_AUTH) {
             if (resultCode == RESULT_OK) {  //User connected
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                setUsername(Objects.requireNonNull(user).getDisplayName());
+                setUsername(user.getDisplayName());
                 new HelloDialog(MainActivity.this, getUsername()).show();
                 btn_user_action.setText(R.string.logout);
                 tv_user_state.setText(String.format("%s: %s", getString(R.string.connected), getUsername()));
-                (mainRef = Firebase.userRef = Firebase.dataRef.child("Users").child(user.getUid())).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        int localTime = getUsername().equals(Objects.requireNonNull(auth.getCurrentUser()).getDisplayName()) ? Stats.readStat(Stats.Readables.Time) : 0, serverTime;
-                        if (dataSnapshot.hasChild("Time")) {
-                            if (localTime > (serverTime = Objects.requireNonNull(dataSnapshot.child("Time").getValue(Integer.class)))) {
-                                mainRef.child("Time").setValue(localTime);
-                            } else {
-                                Stats.setTime(serverTime);
-                            }
-                        } else {
-                            mainRef.child("Time").setValue(localTime);
-                        }
-                        int localX = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Xwins) : 0, serverX;
-                        if (dataSnapshot.hasChild("Xwins")) {
-                            if (localX > (serverX = Objects.requireNonNull(dataSnapshot.child("Xwins").getValue(Integer.class)))) {
-                                mainRef.child("Xwins").setValue(localX);
-                            } else {
-                                Stats.setXwins(serverX);
-                            }
-                        } else {
-                            mainRef.child("Xwins").setValue(localX);
-                        }
-                        int localO = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Owins) : 0, serverO;
-                        if (dataSnapshot.hasChild("Owins")) {
-                            if (localO > (serverO = Objects.requireNonNull(dataSnapshot.child("Owins").getValue(Integer.class)))) {
-                                mainRef.child("Owins").setValue(localO);
-                            } else {
-                                Stats.setOwins(serverO);
-                            }
-                        } else {
-                            mainRef.child("Owins").setValue(localO);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {}
-                });
+                (mainRef = Firebase.userRef = Firebase.dataRef.child("Users").child(user.getUid())).addListenerForSingleValueEvent(valueEventListener);
             }
         } else if (requestCode == SETTINGS_ACTIVITY) {
             recreate();
@@ -350,6 +313,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * This function checks if a user is connected
+     *
+     * @return true if a user is connected
+     */
+    private boolean isUserConnected() {
+        return auth.getCurrentUser() != null;
+    }
+
+    /**
      * The AsyncTask to check if the user is connected to the internet
      */
     private static class InternetTask extends AsyncTask<Void, Void, Boolean> {
@@ -368,56 +340,57 @@ public class MainActivity extends AppCompatActivity {
             this.activityReference = new WeakReference<>(activityReference);
         }
 
-            @Override
-            protected Boolean doInBackground(Void... voids) {
-                try {
-                    return InetAddress.getByName("www.google.com").isReachable(2000);
-                } catch (Exception ignored) {
-                    return false;
-                }
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            try {
+                return InetAddress.getByName("www.google.com").isReachable(2000);
+            } catch (Exception ignored) {
+                return false;
             }
+        }
 
-            @Override
-            protected void onPostExecute(Boolean aBoolean) {
-                if (aBoolean) {
-                    if (time != 0) {
-                        if (activityReference.get().auth.getCurrentUser() != null) {
-                            activityReference.get().mainRef.child("Time").addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    activityReference.get().mainRef.child("Time").setValue(Objects.requireNonNull(dataSnapshot.getValue(Integer.class)) + time)
-                                            .addOnCompleteListener(task -> activityReference.get().startActivity(new Intent(activityReference.get(), StatisticsActivity.class)));
-                                }
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            if (aBoolean) {
+                if (time != 0) {
+                    if (activityReference.get().auth.getCurrentUser() != null) {
+                        activityReference.get().mainRef.child("Time").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                activityReference.get().mainRef.child("Time").setValue(Objects.requireNonNull(dataSnapshot.getValue(Integer.class)) + time)
+                                        .addOnCompleteListener(task -> activityReference.get().startActivity(new Intent(activityReference.get(), StatisticsActivity.class)));
+                            }
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {}
-                            });
-                        } else {
-                            activityReference.get().startActivity(new Intent(activityReference.get(), StatisticsActivity.class));
-                        }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                            }
+                        });
                     } else {
-                        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                            new AlertDialog.Builder(activityReference.get())
-                                    .setNegativeButton(R.string.host_game, (dialogInterface, i) -> activityReference.get()
-                                            .startActivity(new Intent(activityReference.get(), OptionsActivity.class)
-                                                    .putExtra("Mode", Utils.Mode.Multiplayer)))
-                                    .setPositiveButton(R.string.join_game, (dialogInterface, i) -> activityReference.get()
-                                            .startActivity(new Intent(activityReference.get(), JoinMultiplayerActivity.class)))
-                                    .setTitle(R.string.multiplayer_settings)
-                                    .setMessage(R.string.multiplayer_dialog)
-                                    .show();
-                        } else {
-                            Toast.makeText(activityReference.get(), R.string.unauthed_user, Toast.LENGTH_LONG).show();
-                        }
+                        activityReference.get().startActivity(new Intent(activityReference.get(), StatisticsActivity.class));
                     }
                 } else {
-                    if (time != 0) {
-                        activityReference.get().startActivity(new Intent(activityReference.get(), StatisticsActivity.class));
+                    if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                        new AlertDialog.Builder(activityReference.get())
+                                .setNegativeButton(R.string.host_game, (dialogInterface, i) -> activityReference.get()
+                                        .startActivity(new Intent(activityReference.get(), OptionsActivity.class)
+                                                .putExtra("Mode", Utils.Mode.Multiplayer)))
+                                .setPositiveButton(R.string.join_game, (dialogInterface, i) -> activityReference.get()
+                                        .startActivity(new Intent(activityReference.get(), JoinMultiplayerActivity.class)))
+                                .setTitle(R.string.multiplayer_settings)
+                                .setMessage(R.string.multiplayer_dialog)
+                                .show();
                     } else {
-                        Toast.makeText(activityReference.get(), R.string.not_available_offline, Toast.LENGTH_LONG).show();
+                        Toast.makeText(activityReference.get(), R.string.unauthed_user, Toast.LENGTH_LONG).show();
                     }
                 }
-                super.onPostExecute(aBoolean);
+            } else {
+                if (time != 0) {
+                    activityReference.get().startActivity(new Intent(activityReference.get(), StatisticsActivity.class));
+                } else {
+                    Toast.makeText(activityReference.get(), R.string.not_available_offline, Toast.LENGTH_LONG).show();
+                }
             }
+            super.onPostExecute(aBoolean);
+        }
     }
 }

@@ -26,6 +26,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.liadpaz.tic_tac_toe.databinding.ActivityOptionsBinding;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,74 +34,59 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.URL;
-import java.util.Objects;
 
 public class OptionsActivity extends AppCompatActivity {
 
     private static final int CAMERA_ACTIVITY = 968;
 
-    DatabaseReference settingRef;
+    private DatabaseReference settingRef;
 
-    File photo;
-    boolean photoOk = false;
+    private File photo;
+    private boolean photoOk = false;
 
-    int max_games = 1;
-    int timer = 0;
-    Utils.Mode mode = Utils.Mode.Computer;
-    Cell.Type starting_player = Cell.Type.X;
-    boolean difficulty = false;
+    private int max_games = 1;
+    private int timer = 0;
+    private Utils.Mode mode = Utils.Mode.Computer;
+    private Cell.Type starting_player = Cell.Type.X;
+    private boolean difficulty = false;
 
-    NumberPicker numpic_maxgames;
-    NumberPicker numpic_timer;
+    private NumberPicker numpic_timer;
 
-    Switch sw_player_start;
+    private EditText et_name_host;
+    private boolean nameOk = false;
 
-    TextView tv_setting_computer;
-    TextView tv_setting_two_players;
-    TextView tv_singleplayer_mode;
-    Switch sw_singleplayer_mode;
+    private Button btn_play;
 
-    TextView tv_difficulty;
-//    TextView tv_easy;
-//    TextView tv_hard;
-    Switch sw_difficulty;
-
-    TextView tv_name_host;
-    EditText et_name_host;
-    boolean nameOk = false;
-    CheckBox ckbx_google_name;
-
-    CheckBox ckbx_timer;
-
-    Button btn_play;
-    Button btn_camera;
-
+    @SuppressWarnings("ConstantConditions")
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
-        setSupportActionBar(findViewById(R.id.toolbar_options));
+        ActivityOptionsBinding binding = ActivityOptionsBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        setSupportActionBar(binding.toolbarOptions);
 
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.options);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(R.string.options);
 
         mode = (Utils.Mode) getIntent().getSerializableExtra("Mode");
 
-        numpic_maxgames = findViewById(R.id.numpic_maxgames);
-        numpic_timer = findViewById(R.id.numpic_timer);
-        ckbx_timer = findViewById(R.id.chbx_timer);
-        ckbx_google_name = findViewById(R.id.ckbx_google_name);
-        btn_play = findViewById(R.id.btn_play);
-        btn_camera = findViewById(R.id.btn_settings_camera);
-        et_name_host = findViewById(R.id.et_name_host);
-        tv_name_host = findViewById(R.id.tv_name_host);
-        tv_singleplayer_mode = findViewById(R.id.tv_singleplayer_mode);
-        tv_setting_computer = findViewById(R.id.tv_setting_computer);
-        tv_setting_two_players = findViewById(R.id.tv_setting_two_players);
-        sw_singleplayer_mode = findViewById(R.id.sw_singleplayer_mode);
-        sw_player_start = findViewById(R.id.sw_player_start);
-        sw_difficulty = findViewById(R.id.sw_difficulty);
-        tv_difficulty = findViewById(R.id.tv_difficulty);
+        NumberPicker numpic_maxgames = binding.numpicMaxgames;
+        numpic_timer = binding.numpicTimer;
+        CheckBox ckbx_timer = binding.chbxTimer;
+        CheckBox ckbx_google_name = binding.ckbxGoogleName;
+        btn_play = binding.btnPlay;
+        Button btn_camera = binding.btnSettingsCamera;
+        et_name_host = binding.etNameHost;
+        TextView tv_name_host = binding.tvNameHost;
+        TextView tv_singleplayer_mode = binding.tvSingleplayerMode;
+        TextView tv_setting_computer = binding.tvSettingComputer;
+        TextView tv_setting_two_players = binding.tvSettingTwoPlayers;
+        Switch sw_singleplayer_mode = binding.swSingleplayerMode;
+        Switch sw_player_start = binding.swPlayerStart;
+//        TextView tv_easy;
+//        TextView tv_hard;
+        Switch sw_difficulty = binding.swDifficulty;
+//        TextView tv_difficulty = binding.tvDifficulty;
 //        tv_easy = findViewById(R.id.tv_easy);
 //        tv_hard = findViewById(R.id.tv_hard);
 
@@ -117,16 +103,6 @@ public class OptionsActivity extends AppCompatActivity {
         sw_player_start.setOnCheckedChangeListener((buttonView, isChecked) -> starting_player = isChecked ? Cell.Type.O : Cell.Type.X);
         sw_difficulty.setOnCheckedChangeListener((buttonView, isChecked) -> difficulty = isChecked);
 
-        ckbx_timer.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            numpic_timer.setEnabled(isChecked);
-            timer = isChecked ? timer : 0;
-        });
-        ckbx_google_name.setOnCheckedChangeListener(((buttonView, isChecked) -> {
-            Stats.setGoogleName(isChecked);
-            et_name_host.setText(isChecked ? Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName() : "");
-            et_name_host.setEnabled(!isChecked);
-        }));
-
         btn_play.setOnClickListener(v -> {
             if (mode == Utils.Mode.Multiplayer) {
                 OptionsActivity.this.initializeLobby();
@@ -139,6 +115,16 @@ public class OptionsActivity extends AppCompatActivity {
                         .putExtra("Difficulty", difficulty));
             }
         });
+
+        ckbx_timer.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            numpic_timer.setEnabled(isChecked);
+            timer = isChecked ? timer : 0;
+        });
+        ckbx_google_name.setOnCheckedChangeListener(((buttonView, isChecked) -> {
+            Stats.setGoogleName(isChecked);
+            et_name_host.setText(isChecked ? FirebaseAuth.getInstance().getCurrentUser().getDisplayName() : "");
+            et_name_host.setEnabled(!isChecked);
+        }));
 
         numpic_maxgames.setValue(max_games);
         numpic_timer.setValue(timer);
@@ -155,16 +141,17 @@ public class OptionsActivity extends AppCompatActivity {
             if (!Stats.getGooglePhoto()) {
                 btn_camera.setOnClickListener(v -> {
                     Utils.localPhotoUri = FileProvider.getUriForFile(OptionsActivity.this, "com.liadpaz.tic_tac_toe.fileprovider", photo);
-                    OptionsActivity.this.startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(MediaStore.EXTRA_OUTPUT, Utils.localPhotoUri), CAMERA_ACTIVITY);
+                    startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(MediaStore.EXTRA_OUTPUT, Utils.localPhotoUri), CAMERA_ACTIVITY);
                 });
             } else {
                 photoOk = true;
-                new PhotoTask(OptionsActivity.this, photo).execute(Objects.requireNonNull(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhotoUrl()).toString());
+                new PhotoTask(OptionsActivity.this, photo).execute(FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString());
                 btn_camera.setVisibility(View.INVISIBLE);
             }
             et_name_host.addTextChangedListener(new TextWatcher() {
                 @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                }
 
                 @Override
                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -205,7 +192,7 @@ public class OptionsActivity extends AppCompatActivity {
 
         if (Stats.getGoogleName() && mode == Utils.Mode.Multiplayer) {
             nameOk = true;
-            et_name_host.setText(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName());
+            et_name_host.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
             et_name_host.setEnabled(false);
         }
     }
@@ -235,7 +222,8 @@ public class OptionsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {}
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
         });
     }
 
@@ -261,7 +249,7 @@ public class OptionsActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(String... strings) {
             try {
-                URL url = new URL(Objects.requireNonNull(strings[0]));
+                URL url = new URL(strings[0]);
                 InputStream is = url.openStream();
                 OutputStream os = new FileOutputStream(photo);
 
@@ -284,7 +272,8 @@ public class OptionsActivity extends AppCompatActivity {
                     Bitmap bitmap = BitmapFactory.decodeResource(optionsActivity.get().getResources(), R.drawable.placeholder);
                     bitmap.compress(Bitmap.CompressFormat.JPEG, Bitmap.DENSITY_NONE, os);
                     os.close();
-                } catch (Exception ignored1) {}
+                } catch (Exception ignored1) {
+                }
             }
             return null;
         }

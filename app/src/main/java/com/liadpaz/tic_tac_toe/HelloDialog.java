@@ -2,8 +2,9 @@ package com.liadpaz.tic_tac_toe;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.widget.Button;
 import android.widget.TextView;
+
+import com.liadpaz.tic_tac_toe.databinding.LayoutHelloBinding;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -15,12 +16,12 @@ class HelloDialog extends Dialog {
 
     HelloDialog(Context context, @NotNull String name) {
         super(context);
-
-        setContentView(R.layout.layout_hello);
+        LayoutHelloBinding binding = LayoutHelloBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         setCancelable(true);
 
-        TextView tv_hello_name = findViewById(R.id.tv_hello_name);
-        Button btn_hello = findViewById(R.id.btn_hello);
+        TextView tv_hello_name = binding.tvHelloName;
+        binding.btnHello.setOnClickListener(v -> HelloDialog.this.dismiss());
 
         int time = Integer.parseInt(new SimpleDateFormat("HH", Locale.ENGLISH).format(new Date()));
         if (time <= 5) {
@@ -33,6 +34,5 @@ class HelloDialog extends Dialog {
             tv_hello_name.setText(String.format("%s %s!", context.getString(R.string.good_evening), name));
         }
 
-        btn_hello.setOnClickListener(v -> HelloDialog.this.dismiss());
     }
 }
