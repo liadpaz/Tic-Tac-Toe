@@ -2,6 +2,7 @@ package com.liadpaz.tic_tac_toe;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -14,64 +15,53 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-import com.liadpaz.tic_tac_toe.databinding.ActivityLobbyBinding;
-
-import org.jetbrains.annotations.NotNull;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.Objects;
 
 public class LobbyActivity extends AppCompatActivity {
 
-    private DatabaseReference lobbyRef;
+    DatabaseReference lobbyRef;
+    StorageReference storageRef;
 
-    private Integer max;
-    private Integer timer;
+    Integer max;
+    Integer timer;
 
-    private boolean isHost;
+    boolean isHost;
 
-    private TextView tv_host_name;
-    private TextView tv_client_name;
+    TextView tv_host_name;
+    TextView tv_client_name;
 
-    private Switch sw_host;
-    private Switch sw_client;
+    Switch sw_host;
+    Switch sw_client;
 
-    private CheckBox ckbx_ready;
+    CheckBox ckbx_ready;
 
-    private String lobbyNumber;
-    private String hostName;
-    private String clientName;
+    String lobbyNumber;
+    String hostName;
+    String clientName;
 
-    private ValueEventListener listener;
+    ValueEventListener listener;
 
-    private boolean ready_host = false;
-    private boolean ready_client = false;
+    boolean ready_host = false;
+    boolean ready_client = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityLobbyBinding binding = ActivityLobbyBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.activity_lobby);
 
         lobbyNumber = getIntent().getStringExtra("LobbyNumber");
         isHost = Objects.equals(getIntent().getStringExtra("Multiplayer"), "Host");
         hostName = getIntent().getStringExtra("HostName");
 
-        binding.btnExitLobby.setOnClickListener(v -> {
-            if (isHost) {
-                if (clientName != null) {
-                    writeDatabaseMessage("left");
-                }
-            } else {
-                writeDatabaseMessage("left");
-            }
-            finish();
-        });
-        tv_host_name = binding.tvHostName;
-        tv_client_name = binding.tvClientName;
-        TextView tv_room_number = binding.tvRoomNumber;
-        sw_host = binding.swHostSide;
-        sw_client = binding.swClientSide;
-        ckbx_ready = binding.ckbxReady;
+        Button btn_exit_lobby = findViewById(R.id.btn_exit_lobby);
+        tv_host_name = findViewById(R.id.tv_host_name);
+        tv_client_name = findViewById(R.id.tv_client_name);
+        TextView tv_room_number = findViewById(R.id.tv_room_number);
+        sw_host = findViewById(R.id.sw_host_side);
+        sw_client = findViewById(R.id.sw_client_side);
+        ckbx_ready = findViewById(R.id.ckbx_ready);
 
         tv_room_number.setText(lobbyNumber);
 
@@ -104,6 +94,16 @@ public class LobbyActivity extends AppCompatActivity {
             } else {
                 LobbyActivity.this.writeDatabaseMessage(isChecked ? "ready" : "not_ready");
             }
+        });
+        btn_exit_lobby.setOnClickListener(v -> {
+            if (isHost) {
+                if (clientName != null) {
+                    writeDatabaseMessage("left");
+                }
+            } else {
+                writeDatabaseMessage("left");
+            }
+            finish();
         });
 
         ckbx_ready.setEnabled(!isHost);
@@ -240,7 +240,7 @@ public class LobbyActivity extends AppCompatActivity {
      *
      * @param hostType the type of the host
      */
-    private void swapSwitches(@NotNull String hostType) {
+    private void swapSwitches(String hostType) {
         if (hostType.equals("X")) {
             sw_host.setChecked(true);
             sw_client.setChecked(false);
@@ -254,7 +254,8 @@ public class LobbyActivity extends AppCompatActivity {
      * This function uploads the photo the player took to the Firebase Storage
      */
     private void uploadPhoto() {
-        Firebase.storeRef.child("Lobbies").child(lobbyNumber).child(isHost ? "Host" : "Client").putFile(Utils.localPhotoUri);
+        storageRef = Firebase.storeRef.child("Lobbies").child(lobbyNumber);
+        storageRef.child(isHost ? "Host" : "Client").putFile(Utils.localPhotoUri);
     }
 
     @Override

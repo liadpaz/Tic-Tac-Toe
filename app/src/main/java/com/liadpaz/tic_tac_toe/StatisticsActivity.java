@@ -13,7 +13,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-import com.liadpaz.tic_tac_toe.databinding.ActivityStatisticsBinding;
 
 import java.lang.ref.WeakReference;
 import java.net.InetAddress;
@@ -21,25 +20,32 @@ import java.util.Objects;
 
 public class StatisticsActivity extends AppCompatActivity {
 
-    private TextView tv_globalO;
-    private TextView tv_globalX;
-    private TextView tv_globalTime;
+    DatabaseReference statsRef;
 
-    @SuppressWarnings("ConstantConditions")
+    TextView tv_localO;
+    TextView tv_localX;
+    TextView tv_globalO;
+    TextView tv_globalX;
+    TextView tv_localTime;
+    TextView tv_globalTime;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityStatisticsBinding binding = ActivityStatisticsBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-        setSupportActionBar(binding.toolbarStatistics);
+        setContentView(R.layout.activity_statistics);
+        setSupportActionBar(findViewById(R.id.toolbar_statistics));
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        binding.tvLocalWinsO.setText(String.valueOf(Stats.readStat(Stats.Readables.Owins)));
-        binding.tvLocalWinsX.setText(String.valueOf(Stats.readStat(Stats.Readables.Xwins)));
-        tv_globalO = binding.tvGlobalWinsO;
-        tv_globalX = binding.tvGlobalWinsX;
-        binding.tvLocalTime.setText(String.format("%s %s", String.valueOf(Stats.readStat(Stats.Readables.Time)), getString(R.string.seconds)));
-        tv_globalTime = binding.tvGlobalTime;
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        tv_localO = findViewById(R.id.tv_local_wins_O);
+        tv_localX = findViewById(R.id.tv_local_wins_X);
+        tv_globalO = findViewById(R.id.tv_global_wins_O);
+        tv_globalX = findViewById(R.id.tv_global_wins_X);
+        tv_localTime = findViewById(R.id.tv_local_time);
+        tv_globalTime = findViewById(R.id.tv_global_time);
+
+        tv_localO.setText(String.valueOf(Stats.readStat(Stats.Readables.Owins)));
+        tv_localX.setText(String.valueOf(Stats.readStat(Stats.Readables.Xwins)));
+        tv_localTime.setText(String.format("%s %s", String.valueOf(Stats.readStat(Stats.Readables.Time)), getString(R.string.seconds)));
 
         new Task(this).execute();
     }
@@ -52,10 +58,9 @@ public class StatisticsActivity extends AppCompatActivity {
         tv_globalX.setText(R.string.loading);
         tv_globalTime.setText(R.string.loading);
 
-        DatabaseReference statsRef = Firebase.dataRef.child("Users");
+        statsRef = Firebase.dataRef.child("Users");
 
         statsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @SuppressWarnings("ConstantConditions")
             @SuppressLint("DefaultLocale")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -65,11 +70,11 @@ public class StatisticsActivity extends AppCompatActivity {
                 for (DataSnapshot user : dataSnapshot.getChildren()) {
                     for (DataSnapshot info : user.getChildren()) {
                         if (Objects.equals(info.getKey(), "Time")) {
-                            time += info.getValue(Integer.class);
+                            time += Objects.requireNonNull(info.getValue(Integer.class));
                         } else if (Objects.equals(info.getKey(), "Xwins")) {
-                            xWins += info.getValue(Integer.class);
+                            xWins += Objects.requireNonNull(info.getValue(Integer.class));
                         } else {
-                            oWins += info.getValue(Integer.class);
+                            oWins += Objects.requireNonNull(info.getValue(Integer.class));
                         }
                     }
                 }
@@ -79,8 +84,7 @@ public class StatisticsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
+            public void onCancelled(@NonNull DatabaseError databaseError) {}
         });
     }
 
@@ -107,14 +111,14 @@ public class StatisticsActivity extends AppCompatActivity {
                 if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                     activityReference.get().getGlobals();
                 } else {
-                    activityReference.get().tv_globalO.setText(R.string.authenticated_users);
-                    activityReference.get().tv_globalX.setText(R.string.authenticated_users);
-                    activityReference.get().tv_globalTime.setText(R.string.authenticated_users);
+                    activityReference.get().tv_globalO.setText(activityReference.get().getString(R.string.authenticated_users));
+                    activityReference.get().tv_globalX.setText(activityReference.get().getString(R.string.authenticated_users));
+                    activityReference.get().tv_globalTime.setText(activityReference.get().getString(R.string.authenticated_users));
                 }
             } else {
-                activityReference.get().tv_globalO.setText(R.string.not_available_offline);
-                activityReference.get().tv_globalX.setText(R.string.not_available_offline);
-                activityReference.get().tv_globalTime.setText(R.string.not_available_offline);
+                activityReference.get().tv_globalO.setText(activityReference.get().getString(R.string.not_available_offline));
+                activityReference.get().tv_globalX.setText(activityReference.get().getString(R.string.not_available_offline));
+                activityReference.get().tv_globalTime.setText(activityReference.get().getString(R.string.not_available_offline));
             }
             super.onPostExecute(aBoolean);
         }

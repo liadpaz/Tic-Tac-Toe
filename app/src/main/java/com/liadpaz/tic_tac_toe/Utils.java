@@ -22,6 +22,9 @@ import java.util.Calendar;
 import java.util.Objects;
 import java.util.Random;
 
+import static com.liadpaz.tic_tac_toe.Cell.Type.None;
+import static com.liadpaz.tic_tac_toe.Cell.Type.X;
+
 /**
  * This class is for general utilities
  */
@@ -64,23 +67,9 @@ class Utils {
     }
 
     /**
-     * This function generates an array with a random location on the game board
-     *
-     * @return an array in size 2, containing a random location on the game board
-     */
-    static int[] getRandom() {
-        Random rnd = new Random();
-        return new int[]{rnd.nextInt(3), rnd.nextInt(3)};
-    }
-
-    /**
      * This enum is to differ a 'TwoPlayer', 'Computer' or Multiplayer game mode
      */
     public enum Mode {TwoPlayer, Computer, Multiplayer}
-
-//    static int[] getSmartTurn(Cell[][] cells) {
-//        return null;
-//    }
 }
 
 /**
@@ -115,6 +104,7 @@ class Cell {
      */
     Cell(ImageView XO) {
         this.XO = XO;
+        this.type = None;
     }
 
     /**
@@ -135,7 +125,7 @@ class Cell {
     boolean setType(Type type) {
         if (!visible) {
             this.type = type;
-            if (type == Type.X) {
+            if (type == X) {
                 XO.setImageResource(R.drawable.x);
                 XO.setVisibility(View.VISIBLE);
             } else {/*if (type == Type.O)*/
@@ -146,6 +136,11 @@ class Cell {
             return true;
         }
         return false;
+    }
+
+    void setInvisibleType(Type type) {
+        this.type = type;
+        visible = true;
     }
 
     /**
@@ -182,7 +177,7 @@ class Cell {
      */
     void hide() {
         visible = false;
-        type = null;
+        type = None;
         XO.setVisibility(View.GONE);
     }
 
@@ -205,46 +200,6 @@ class Cell {
             }
             return X;
         }
-    }
-}
-
-/**
- * This class represents the player
- */
-class Player {
-    final Type playerType;
-    private int wins = 0;
-    /**
-     * Constructor, sets the player type to the {@code player} type
-     *
-     * @param player the player type
-     */
-    Player(Type player) {
-        playerType = player;
-    }
-
-    /**
-     * This function adds 1 win to the player
-     */
-    void won() {
-        wins++;
-    }
-
-    /**
-     * This function returns the current wins of the player
-     *
-     * @return current wins of the player
-     */
-    int getWins() {
-        return wins;
-    }
-
-    /**
-     * The player type. eg. 'CPU', 'Human'
-     */
-    public enum Type {
-        Human,
-        CPU
     }
 }
 

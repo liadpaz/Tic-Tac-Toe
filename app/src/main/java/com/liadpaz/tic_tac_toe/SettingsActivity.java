@@ -1,6 +1,7 @@
 package com.liadpaz.tic_tac_toe;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -21,13 +22,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import static android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-
 public class SettingsActivity extends AppCompatActivity {
 
     public static final String DARK_MODE_PREFERENCES = "dark_mode";
 
-    private OnSharedPreferenceChangeListener listener;
+    SharedPreferences.OnSharedPreferenceChangeListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,26 +76,23 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        PreferenceManager.getDefaultSharedPreferences(SettingsActivity.this).unregisterOnSharedPreferenceChangeListener(listener);
         super.onPause();
+        PreferenceManager.getDefaultSharedPreferences(SettingsActivity.this).unregisterOnSharedPreferenceChangeListener(listener);
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
 
         private static final int LOGIN_ACTIVITY = 162;
 
-        private Preference delete;
+        Preference delete;
+        Preference about;
 
-        @SuppressWarnings("ConstantConditions")
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
-            delete = findPreference("delete");
-            findPreference("about").setOnPreferenceClickListener(preference -> {
-                startActivity(new Intent(getContext(), AboutActivity.class));
-                return true;
-            });
+            delete = Objects.requireNonNull(findPreference("delete"));
+            about = Objects.requireNonNull(findPreference("about"));
 
             if (FirebaseAuth.getInstance().getCurrentUser() == null) {
                 delete.setEnabled(false);
@@ -105,22 +101,26 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             delete.setOnPreferenceClickListener(preference -> {
-                new AlertDialog.Builder(getContext())
-                    .setTitle(R.string.delete_user)
-                    .setMessage(R.string.delete_user_message)
-                    .setPositiveButton(R.string.yes, (dialog, which) -> AuthUI.getInstance().delete(getContext()).addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            delete.setEnabled(false);
-                            Toast.makeText(getContext(), R.string.delete_user_success, Toast.LENGTH_LONG).show();
-                        } else {
-                            List<AuthUI.IdpConfig> providers = Collections.singletonList(new AuthUI.IdpConfig.GoogleBuilder().build());
-                            startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder()
-                                .setAvailableProviders(providers)
-                                .build(), LOGIN_ACTIVITY);
-                        }
-                    }))
-                    .setNegativeButton(R.string.no, null)
-                    .show();
+                new AlertDialog.Builder(Objects.requireNonNull(getContext()))
+                        .setTitle(R.string.delete_user)
+                        .setMessage(R.string.delete_user_message)
+                        .setPositiveButton(R.string.yes, (dialog, which) -> AuthUI.getInstance().delete(Objects.requireNonNull(getContext())).addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                delete.setEnabled(false);
+                                Toast.makeText(getContext(), R.string.delete_user_success, Toast.LENGTH_LONG).show();
+                            } else {
+                                List<AuthUI.IdpConfig> providers = Collections.singletonList(new AuthUI.IdpConfig.GoogleBuilder().build());
+                                startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder()
+                                        .setAvailableProviders(providers)
+                                        .build(), LOGIN_ACTIVITY);
+                            }
+                        }))
+                        .setNegativeButton(R.string.no, null)
+                        .show();
+                return true;
+            });
+            about.setOnPreferenceClickListener(preference -> {
+                startActivity(new Intent(getContext(), AboutActivity.class));
                 return true;
             });
         }

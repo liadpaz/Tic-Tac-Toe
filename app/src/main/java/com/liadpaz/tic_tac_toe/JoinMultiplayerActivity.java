@@ -24,7 +24,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-import com.liadpaz.tic_tac_toe.databinding.ActivityJoinMultiplayerBinding;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,40 +37,41 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
 
     private static final int PHOTO_ACTIVITY = 1;
 
-    private DatabaseReference joinRef;
+    DatabaseReference joinRef;
 
-    private File photo;
+    File photo;
 
-    private Button btn_join;
+    Button btn_join;
+    Button btn_camera;
 
-    private EditText et_name_join;
-    private EditText et_lobby_number;
+    EditText et_name_join;
+    EditText et_lobby_number;
 
-    private String clientName;
-    private String lobbyNumber;
+    String clientName;
+    String lobbyNumber;
 
-    private boolean photoOk = false;
-    private boolean nameOk = false;
-    private boolean numberOk = false;
+    CheckBox ckbx_google_name_join;
 
-    @SuppressWarnings("ConstantConditions")
+    boolean photoOk = false;
+    boolean nameOk = false;
+    boolean numberOk = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityJoinMultiplayerBinding binding = ActivityJoinMultiplayerBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-        setSupportActionBar(binding.toolbarJoin);
+        setContentView(R.layout.activity_join_multiplayer);
+        setSupportActionBar(findViewById(R.id.toolbar_join));
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(R.string.join_lobby);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.join_lobby);
 
         joinRef = Firebase.dataRef.child("Lobbies");
 
-        btn_join = binding.btnJoin;
-        Button btn_camera = binding.btnJoinCamera;
-        et_name_join = binding.etNameJoin;
-        et_lobby_number = binding.etLobbyNumber;
-        CheckBox ckbx_google_name_join = binding.ckbxGoogleNameJoin;
+        btn_join = findViewById(R.id.btn_join);
+        btn_camera = findViewById(R.id.btn_join_camera);
+        et_name_join = findViewById(R.id.et_name_join);
+        et_lobby_number = findViewById(R.id.et_lobby_number);
+        ckbx_google_name_join = findViewById(R.id.ckbx_google_name_join);
 
         ckbx_google_name_join.setChecked(Stats.getGoogleName());
 
@@ -104,8 +104,7 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
+                    public void onCancelled(@NonNull DatabaseError databaseError) {}
                 });
             }
         });
@@ -132,8 +131,7 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
 
         et_name_join.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -148,8 +146,7 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
         });
         et_lobby_number.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -158,8 +155,7 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-            }
+            public void afterTextChanged(Editable s) {}
         });
 
         if (Stats.getGoogleName()) {
@@ -217,8 +213,7 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
                     Bitmap bitmap = BitmapFactory.decodeResource(joinMultiplayer.get().getResources(), R.drawable.placeholder);
                     bitmap.compress(Bitmap.CompressFormat.JPEG, Bitmap.DENSITY_NONE, os);
                     os.close();
-                } catch (Exception ignored1) {
-                }
+                } catch (Exception ignored1) {}
             } finally {
                 joinMultiplayer.get().photoOk = true;
             }
@@ -226,3 +221,5 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
         }
     }
 }
+
+

@@ -3,15 +3,15 @@ package com.liadpaz.tic_tac_toe;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import com.liadpaz.tic_tac_toe.databinding.LayoutLobbiesBinding;
 
 import java.util.List;
 
@@ -22,6 +22,7 @@ public class LobbiesAdapter extends ArrayAdapter<String> {
 
     LobbiesAdapter(@NonNull Activity context, List<String> lobbyTitle) {
         super(context, R.layout.layout_lobbies, lobbyTitle);
+
         this.context = context;
         this.lobbyTitle = lobbyTitle;
     }
@@ -30,34 +31,24 @@ public class LobbiesAdapter extends ArrayAdapter<String> {
     @Override
     @SuppressLint({"ViewHolder", "InflateParams"})
     public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        LayoutLobbiesBinding binding = LayoutLobbiesBinding.inflate(context.getLayoutInflater(), parent, false);
+        LayoutInflater inflater = context.getLayoutInflater();
+        View rowView = inflater.inflate(R.layout.layout_lobbies, null, true);
 
-        final TextView tv_lobby_dev = binding.tvLobbyDev;
-        binding.ivDeleteLobby.setOnClickListener(v -> new AlertDialog.Builder(context)
-                .setMessage(String.format("Are you sure you want to delete %s?", tv_lobby_dev.getText()))
+        final TextView textView = rowView.findViewById(R.id.tv_lobby_dev);
+        ImageView delete = rowView.findViewById(R.id.iv_delete_lobby);
+
+        textView.setText(lobbyTitle.get(position));
+        delete.setOnClickListener(v -> new AlertDialog.Builder(context)
+                .setMessage(String.format("Are you sure you want to delete %s?", textView.getText()))
                 .setTitle("Delete Lobby")
                 .setPositiveButton("Yes", (dialog, which) -> {
-                    Firebase.dataRef.child("Lobbies").child(tv_lobby_dev.getText().toString()).removeValue();
+                    Firebase.dataRef.child("Lobbies").child(textView.getText().toString()).removeValue();
                     lobbyTitle.remove(position);
-                    notifyDataSetChanged();
+                    LobbiesAdapter.this.notifyDataSetChanged();
                 })
                 .setNegativeButton("No", null)
                 .show());
-        tv_lobby_dev.setText(lobbyTitle.get(position));
-        binding.getRoot().setOnLongClickListener(v -> {
-            new AlertDialog.Builder(context)
-                    .setMessage(String.format("Are you sure you want to delete %s?", binding.tvLobbyDev.getText()))
-                    .setTitle("Delete Lobby")
-                    .setPositiveButton("Yes", (dialog, which) -> {
-                        Firebase.dataRef.child("Lobbies").child(binding.tvLobbyDev.getText().toString()).removeValue();
-                        lobbyTitle.remove(position);
-                        notifyDataSetChanged();
-                    })
-                    .setNegativeButton("No", null)
-                    .show();
-            return true;
-        });
 
-        return binding.getRoot();
+        return rowView;
     }
 }

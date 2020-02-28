@@ -83,12 +83,10 @@ public class OptionsActivity extends AppCompatActivity {
         TextView tv_setting_two_players = binding.tvSettingTwoPlayers;
         Switch sw_singleplayer_mode = binding.swSingleplayerMode;
         Switch sw_player_start = binding.swPlayerStart;
-//        TextView tv_easy;
-//        TextView tv_hard;
+        TextView tv_easy = binding.tvEasy;
+        TextView tv_hard = binding.tvHard;
         Switch sw_difficulty = binding.swDifficulty;
-//        TextView tv_difficulty = binding.tvDifficulty;
-//        tv_easy = findViewById(R.id.tv_easy);
-//        tv_hard = findViewById(R.id.tv_hard);
+        TextView tv_difficulty = binding.tvDifficulty;
 
         ckbx_google_name.setChecked(Stats.getGoogleName());
 
@@ -105,9 +103,9 @@ public class OptionsActivity extends AppCompatActivity {
 
         btn_play.setOnClickListener(v -> {
             if (mode == Utils.Mode.Multiplayer) {
-                OptionsActivity.this.initializeLobby();
+                initializeLobby();
             } else {
-                OptionsActivity.this.startActivity(new Intent(OptionsActivity.this.getApplicationContext(), GameActivity.class)
+                startActivity(new Intent(OptionsActivity.this, GameActivity.class)
                         .putExtra("Mode", mode)
                         .putExtra("Max", max_games)
                         .putExtra("Timer", timer)
@@ -177,16 +175,16 @@ public class OptionsActivity extends AppCompatActivity {
             sw_singleplayer_mode.setVisibility(View.VISIBLE);
             sw_singleplayer_mode.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 mode = isChecked ? Utils.Mode.TwoPlayer : Utils.Mode.Computer;
-//                    tv_difficulty.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
-//                    tv_easy.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
-//                    tv_hard.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
-//                    sw_difficulty.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
+                tv_difficulty.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
+                tv_easy.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
+                tv_hard.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
+                sw_difficulty.setVisibility(mode == Utils.Mode.Computer ? View.VISIBLE : View.INVISIBLE);
             });
             mode = Utils.Mode.Computer;
-//            tv_difficulty.setVisibility(View.VISIBLE);
-//            tv_easy.setVisibility(View.VISIBLE);
-//            tv_hard.setVisibility(View.VISIBLE);
-//            sw_difficulty.setVisibility(View.VISIBLE);
+            tv_difficulty.setVisibility(View.VISIBLE);
+            tv_easy.setVisibility(View.VISIBLE);
+            tv_hard.setVisibility(View.VISIBLE);
+            sw_difficulty.setVisibility(View.VISIBLE);
             btn_play.setEnabled(true);
         }
 

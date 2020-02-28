@@ -11,25 +11,12 @@
         android:layout_width="100sp"
         android:layout_height="50sp"
         android:layout_marginStart="40dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="24dp"
         android:text="@string/resign"
         android:textAllCaps="false"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/btn_reset"
-        android:layout_width="100sp"
-        android:layout_height="50sp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginBottom="30dp"
-        android:text="@string/restart"
-        android:textAllCaps="false"
-        android:textSize="20sp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
     <ImageView
         android:id="@+id/iv_board"
@@ -47,11 +34,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="132dp"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/iv_board"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/x"
-        tools:visibility="gone"
         tools:ignore="ContentDescription" />
 
     <ImageView
@@ -59,11 +45,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="172dp"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/iv_board"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/x"
-        tools:visibility="gone"
         tools:ignore="ContentDescription" />
 
     <ImageView
@@ -71,11 +56,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="220dp"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/iv_board"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/x"
-        tools:visibility="gone"
         tools:ignore="ContentDescription" />
 
     <ImageView
@@ -84,11 +68,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="184dp"
         android:layout_marginTop="32dp"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/iv_board"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/x"
-        tools:visibility="gone"
         tools:ignore="ContentDescription" />
 
     <ImageView
@@ -97,11 +80,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="200dp"
         android:layout_marginTop="32dp"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/iv_board"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/x"
-        tools:visibility="gone"
         tools:ignore="ContentDescription" />
 
     <ImageView
@@ -110,11 +92,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="224dp"
         android:layout_marginTop="32dp"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/iv_board"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/x"
-        tools:visibility="gone"
         tools:ignore="ContentDescription" />
 
     <ImageView
@@ -123,11 +104,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="188dp"
         android:layout_marginTop="156dp"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/iv_board"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/x"
-        tools:visibility="gone"
         tools:ignore="ContentDescription" />
 
     <ImageView
@@ -136,11 +116,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="200dp"
         android:layout_marginTop="156dp"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/iv_board"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/x"
-        tools:visibility="gone"
         tools:ignore="ContentDescription" />
 
     <ImageView
@@ -149,11 +128,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="220dp"
         android:layout_marginTop="156dp"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/iv_board"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/x"
-        tools:visibility="gone"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -162,7 +140,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="160dp"
         android:layout_marginEnd="160dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="64dp"
         android:fontFamily="sans-serif"
         android:text="@string/time_left"
         android:textAlignment="center"
@@ -182,7 +160,6 @@
         android:textAlignment="center"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btn_reset"
         app:layout_constraintStart_toEndOf="@+id/btn_resign"
         app:layout_constraintTop_toBottomOf="@+id/tv_time_text" />
 
@@ -191,7 +168,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="8dp"
         android:textAlignment="center"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/tv_playerXwins"
@@ -202,7 +179,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
-        android:layout_marginBottom="15dp"
+        android:layout_marginBottom="16dp"
         android:textAlignment="center"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/btn_resign"
@@ -213,10 +190,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="40dp"
-        android:layout_marginBottom="15dp"
         android:textAlignment="center"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/btn_reset"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_playerXwins"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
@@ -224,7 +200,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="40dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="8dp"
         android:textAlignment="center"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/tv_playerOwins"
@@ -234,7 +210,7 @@
         android:id="@+id/tv_maxgames"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="16dp"
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/tv_time_text"
         app:layout_constraintEnd_toEndOf="parent"
@@ -244,7 +220,7 @@
         android:id="@+id/tv_turn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="16dp"
         android:textAlignment="center"
         app:layout_constraintBottom_toTopOf="@+id/tv_maxgames"
         app:layout_constraintEnd_toEndOf="parent"

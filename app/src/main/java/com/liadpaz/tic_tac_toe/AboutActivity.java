@@ -1,24 +1,26 @@
 package com.liadpaz.tic_tac_toe;
 
 import android.os.Bundle;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.liadpaz.tic_tac_toe.databinding.ActivityAboutBinding;
+import java.util.Objects;
 
 public class AboutActivity extends AppCompatActivity {
 
-    @SuppressWarnings("ConstantConditions")
+    TextView tv_about_version;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityAboutBinding binding = ActivityAboutBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-        setSupportActionBar(binding.toolbarAbout);
+        setContentView(R.layout.activity_about);
+        setSupportActionBar(findViewById(R.id.toolbar_about));
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setIcon(R.drawable.info);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setIcon(R.drawable.info);
 
-        binding.tvAboutVersion.setText(String.format("%s %s", getString(R.string.app_version), BuildConfig.VERSION_NAME));
+        tv_about_version = findViewById(R.id.tv_about_version);
+        tv_about_version.setText(String.format("%s %s", getString(R.string.app_version), BuildConfig.VERSION_NAME));
     }
 }
