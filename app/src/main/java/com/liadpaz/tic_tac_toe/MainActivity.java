@@ -27,6 +27,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.liadpaz.tic_tac_toe.databinding.ActivityMainBinding;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -39,35 +40,28 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
 
     private static final int USER_AUTH = 578;
-    public static final int SETTINGS_ACTIVITY = 275;
+    private static final int SETTINGS_ACTIVITY = 275;
+    private static boolean first_open = true;
+    private FirebaseAuth auth;
+    private DatabaseReference mainRef;
+    private boolean stats;
+    private TextView tv_user_state;
+    private Button btn_singleplayer;
+    private Button btn_multiplayer;
+    private Button btn_user_action;
+    private CountDownTimer count;
+    private SharedPreferences sharedPreferences;
+    private int devCounter;
+    private boolean can_open_menu = true;
 
-    FirebaseAuth auth;
-    DatabaseReference mainRef;
-
-    boolean stats;
-
-    TextView tv_title;
-    TextView tv_user_state;
-
-    Button btn_singleplayer;
-    Button btn_multiplayer;
-    Button btn_user_action;
-
-    CountDownTimer count;
-
-    SharedPreferences sharedPreferences;
-
-    int devCounter;
-
-    static boolean first_open = true;
-    boolean can_open_menu = true;
-
+    @SuppressWarnings("ConstantConditions")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        setSupportActionBar(findViewById(R.id.toolbar_main));
-        Objects.requireNonNull(getSupportActionBar()).setTitle(null);
+        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        setSupportActionBar(binding.toolbarMain);
+        getSupportActionBar().setTitle(null);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -83,23 +77,7 @@ public class MainActivity extends AppCompatActivity {
         new Stats(PreferenceManager.getDefaultSharedPreferences(MainActivity.this));
         auth = FirebaseAuth.getInstance();
 
-        tv_title = findViewById(R.id.tv_title);
-        tv_user_state = findViewById(R.id.tv_user_state);
-        btn_singleplayer = findViewById(R.id.btn_singleplayer);
-        btn_multiplayer = findViewById(R.id.btn_multiplayer);
-        btn_user_action = findViewById(R.id.btn_user_action);
-
-        count = new CountDownTimer(1500, 1500) {
-            @Override
-            public void onTick(long millisUntilFinished) {}
-
-            @Override
-            public void onFinish() {
-                devCounter = 0;
-            }
-        };
-
-        tv_title.setOnClickListener(v -> {
+        binding.tvTitle.setOnClickListener(v -> {
             count.cancel();
             devCounter++;
             if (devCounter != 5) {
@@ -118,6 +96,21 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        tv_user_state = binding.tvUserState;
+        btn_singleplayer = binding.btnSingleplayer;
+        btn_multiplayer = binding.btnMultiplayer;
+        btn_user_action = binding.btnUserAction;
+
+        count = new CountDownTimer(1500, 1500) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+            }
+
+            @Override
+            public void onFinish() {
+                devCounter = 0;
+            }
+        };
 
         btn_singleplayer.setOnClickListener(v -> MainActivity.this.startActivity(new Intent(MainActivity.this, OptionsActivity.class)));
         btn_multiplayer.setOnClickListener(v -> new InternetTask(MainActivity.this).execute());
@@ -168,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                     mainRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            int localTime = getUsername().equals(auth.getCurrentUser().getDisplayName())? Stats.readStat(Stats.Readables.Time) : 0, serverTime;
+                            int localTime = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Time) : 0, serverTime;
                             if (dataSnapshot.hasChild("Time")) {
                                 if (localTime > (serverTime = Objects.requireNonNull(dataSnapshot.child("Time").getValue(Integer.class)))) {
                                     mainRef.child("Time").setValue(localTime);
@@ -196,12 +189,13 @@ public class MainActivity extends AppCompatActivity {
                                     Stats.setOwins(serverO);
                                 }
                             } else {
-                                    mainRef.child("Owins").setValue(localO);
-                                }
+                                mainRef.child("Owins").setValue(localO);
+                            }
                         }
 
                         @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {}
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                        }
                     });
                 } else {
                     btn_user_action.setText(R.string.login);
@@ -229,9 +223,11 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {}
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                        }
                     });
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }
         super.onPause();
@@ -323,7 +319,8 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {}
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
                 });
             }
         } else if (requestCode == SETTINGS_ACTIVITY) {
@@ -368,56 +365,57 @@ public class MainActivity extends AppCompatActivity {
             this.activityReference = new WeakReference<>(activityReference);
         }
 
-            @Override
-            protected Boolean doInBackground(Void... voids) {
-                try {
-                    return InetAddress.getByName("www.google.com").isReachable(2000);
-                } catch (Exception ignored) {
-                    return false;
-                }
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            try {
+                return InetAddress.getByName("www.google.com").isReachable(2000);
+            } catch (Exception ignored) {
+                return false;
             }
+        }
 
-            @Override
-            protected void onPostExecute(Boolean aBoolean) {
-                if (aBoolean) {
-                    if (time != 0) {
-                        if (activityReference.get().auth.getCurrentUser() != null) {
-                            activityReference.get().mainRef.child("Time").addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    activityReference.get().mainRef.child("Time").setValue(Objects.requireNonNull(dataSnapshot.getValue(Integer.class)) + time)
-                                            .addOnCompleteListener(task -> activityReference.get().startActivity(new Intent(activityReference.get(), StatisticsActivity.class)));
-                                }
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            if (aBoolean) {
+                if (time != 0) {
+                    if (activityReference.get().auth.getCurrentUser() != null) {
+                        activityReference.get().mainRef.child("Time").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                activityReference.get().mainRef.child("Time").setValue(Objects.requireNonNull(dataSnapshot.getValue(Integer.class)) + time)
+                                        .addOnCompleteListener(task -> activityReference.get().startActivity(new Intent(activityReference.get(), StatisticsActivity.class)));
+                            }
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {}
-                            });
-                        } else {
-                            activityReference.get().startActivity(new Intent(activityReference.get(), StatisticsActivity.class));
-                        }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                            }
+                        });
                     } else {
-                        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                            new AlertDialog.Builder(activityReference.get())
-                                    .setNegativeButton(R.string.host_game, (dialogInterface, i) -> activityReference.get()
-                                            .startActivity(new Intent(activityReference.get(), OptionsActivity.class)
-                                                    .putExtra("Mode", Utils.Mode.Multiplayer)))
-                                    .setPositiveButton(R.string.join_game, (dialogInterface, i) -> activityReference.get()
-                                            .startActivity(new Intent(activityReference.get(), JoinMultiplayerActivity.class)))
-                                    .setTitle(R.string.multiplayer_settings)
-                                    .setMessage(R.string.multiplayer_dialog)
-                                    .show();
-                        } else {
-                            Toast.makeText(activityReference.get(), R.string.unauthed_user, Toast.LENGTH_LONG).show();
-                        }
+                        activityReference.get().startActivity(new Intent(activityReference.get(), StatisticsActivity.class));
                     }
                 } else {
-                    if (time != 0) {
-                        activityReference.get().startActivity(new Intent(activityReference.get(), StatisticsActivity.class));
+                    if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                        new AlertDialog.Builder(activityReference.get())
+                                .setNegativeButton(R.string.host_game, (dialogInterface, i) -> activityReference.get()
+                                        .startActivity(new Intent(activityReference.get(), OptionsActivity.class)
+                                                .putExtra("Mode", Utils.Mode.Multiplayer)))
+                                .setPositiveButton(R.string.join_game, (dialogInterface, i) -> activityReference.get()
+                                        .startActivity(new Intent(activityReference.get(), JoinMultiplayerActivity.class)))
+                                .setTitle(R.string.multiplayer_settings)
+                                .setMessage(R.string.multiplayer_dialog)
+                                .show();
                     } else {
-                        Toast.makeText(activityReference.get(), R.string.not_available_offline, Toast.LENGTH_LONG).show();
+                        Toast.makeText(activityReference.get(), R.string.unauthed_user, Toast.LENGTH_LONG).show();
                     }
                 }
-                super.onPostExecute(aBoolean);
+            } else {
+                if (time != 0) {
+                    activityReference.get().startActivity(new Intent(activityReference.get(), StatisticsActivity.class));
+                } else {
+                    Toast.makeText(activityReference.get(), R.string.not_available_offline, Toast.LENGTH_LONG).show();
+                }
             }
+            super.onPostExecute(aBoolean);
+        }
     }
 }

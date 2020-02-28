@@ -2,7 +2,6 @@ package com.liadpaz.tic_tac_toe;
 
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -15,27 +14,29 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.liadpaz.tic_tac_toe.databinding.ActivityDeveloperBinding;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class DeveloperActivity extends AppCompatActivity {
 
-    ArrayList<String> lobbiesNumber;
+    private ArrayList<String> lobbiesNumber;
 
-    ListView lv_lobbies;
+    private ListView lv_lobbies;
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_developer);
-        setSupportActionBar(findViewById(R.id.toolbar_developer));
+        ActivityDeveloperBinding binding = ActivityDeveloperBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        setSupportActionBar(binding.toolbarDeveloper);
 
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         lobbiesNumber = new ArrayList<>();
 
-        lv_lobbies = findViewById(R.id.lv_lobbies);
+        lv_lobbies = binding.lvLobbies;
         lv_lobbies.setOnItemLongClickListener((parent, view, position, id) -> {
             new AlertDialog.Builder(DeveloperActivity.this)
                     .setMessage(String.format("Are you sure you want to delete %s?", ((TextView) ((ConstraintLayout) view).getViewById(R.id.tv_lobby_dev)).getText().toString()))
@@ -54,8 +55,7 @@ public class DeveloperActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_dev, menu);
+        getMenuInflater().inflate(R.menu.menu_dev, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -88,7 +88,8 @@ public class DeveloperActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {}
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
         });
     }
 }

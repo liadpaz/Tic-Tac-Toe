@@ -15,6 +15,8 @@ import androidx.annotation.Nullable;
 
 import java.util.List;
 
+// TODO: 29/2/2020 add view binding
+
 public class LobbiesAdapter extends ArrayAdapter<String> {
 
     private final Activity context;

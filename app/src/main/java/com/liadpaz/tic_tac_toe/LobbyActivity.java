@@ -2,7 +2,6 @@ package com.liadpaz.tic_tac_toe;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -16,52 +15,62 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
+import com.liadpaz.tic_tac_toe.databinding.ActivityLobbyBinding;
 
 import java.util.Objects;
 
 public class LobbyActivity extends AppCompatActivity {
 
-    DatabaseReference lobbyRef;
-    StorageReference storageRef;
+    private DatabaseReference lobbyRef;
 
-    Integer max;
-    Integer timer;
+    private Integer max;
+    private Integer timer;
 
-    boolean isHost;
+    private boolean isHost;
 
-    TextView tv_host_name;
-    TextView tv_client_name;
+    private TextView tv_host_name;
+    private TextView tv_client_name;
 
-    Switch sw_host;
-    Switch sw_client;
+    private Switch sw_host;
+    private Switch sw_client;
 
-    CheckBox ckbx_ready;
+    private CheckBox ckbx_ready;
 
-    String lobbyNumber;
-    String hostName;
-    String clientName;
+    private String lobbyNumber;
+    private String hostName;
+    private String clientName;
 
-    ValueEventListener listener;
+    private ValueEventListener listener;
 
-    boolean ready_host = false;
-    boolean ready_client = false;
+    private boolean ready_host = false;
+    private boolean ready_client = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_lobby);
+        ActivityLobbyBinding binding = ActivityLobbyBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         lobbyNumber = getIntent().getStringExtra("LobbyNumber");
         isHost = Objects.equals(getIntent().getStringExtra("Multiplayer"), "Host");
         hostName = getIntent().getStringExtra("HostName");
 
-        Button btn_exit_lobby = findViewById(R.id.btn_exit_lobby);
-        tv_host_name = findViewById(R.id.tv_host_name);
-        tv_client_name = findViewById(R.id.tv_client_name);
-        TextView tv_room_number = findViewById(R.id.tv_room_number);
-        sw_host = findViewById(R.id.sw_host_side);
-        sw_client = findViewById(R.id.sw_client_side);
-        ckbx_ready = findViewById(R.id.ckbx_ready);
+        binding.btnExitLobby.setOnClickListener(v -> {
+            if (isHost) {
+                if (clientName != null) {
+                    writeDatabaseMessage("left");
+                }
+            } else {
+                writeDatabaseMessage("left");
+            }
+            finish();
+        });
+        tv_host_name = binding.tvHostName;
+        tv_client_name = binding.tvClientName;
+        TextView tv_room_number = binding.tvRoomNumber;
+        sw_host = binding.swHostSide;
+        sw_client = binding.swClientSide;
+        ckbx_ready = binding.ckbxReady;
 
         tv_room_number.setText(lobbyNumber);
 
@@ -94,16 +103,6 @@ public class LobbyActivity extends AppCompatActivity {
             } else {
                 LobbyActivity.this.writeDatabaseMessage(isChecked ? "ready" : "not_ready");
             }
-        });
-        btn_exit_lobby.setOnClickListener(v -> {
-            if (isHost) {
-                if (clientName != null) {
-                    writeDatabaseMessage("left");
-                }
-            } else {
-                writeDatabaseMessage("left");
-            }
-            finish();
         });
 
         ckbx_ready.setEnabled(!isHost);
@@ -254,7 +253,7 @@ public class LobbyActivity extends AppCompatActivity {
      * This function uploads the photo the player took to the Firebase Storage
      */
     private void uploadPhoto() {
-        storageRef = Firebase.storeRef.child("Lobbies").child(lobbyNumber);
+        StorageReference storageRef = Firebase.storeRef.child("Lobbies").child(lobbyNumber);
         storageRef.child(isHost ? "Host" : "Client").putFile(Utils.localPhotoUri);
     }
 

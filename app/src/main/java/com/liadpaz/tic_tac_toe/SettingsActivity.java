@@ -84,15 +84,18 @@ public class SettingsActivity extends AppCompatActivity {
 
         private static final int LOGIN_ACTIVITY = 162;
 
-        Preference delete;
-        Preference about;
+        private Preference delete;
 
+        @SuppressWarnings("ConstantConditions")
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
-            delete = Objects.requireNonNull(findPreference("delete"));
-            about = Objects.requireNonNull(findPreference("about"));
+            delete = findPreference("delete");
+            findPreference("about").setOnPreferenceClickListener(preference -> {
+                startActivity(new Intent(getContext(), AboutActivity.class));
+                return true;
+            });
 
             if (FirebaseAuth.getInstance().getCurrentUser() == null) {
                 delete.setEnabled(false);
@@ -101,10 +104,10 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             delete.setOnPreferenceClickListener(preference -> {
-                new AlertDialog.Builder(Objects.requireNonNull(getContext()))
+                new AlertDialog.Builder(getContext())
                         .setTitle(R.string.delete_user)
                         .setMessage(R.string.delete_user_message)
-                        .setPositiveButton(R.string.yes, (dialog, which) -> AuthUI.getInstance().delete(Objects.requireNonNull(getContext())).addOnCompleteListener(task -> {
+                        .setPositiveButton(R.string.yes, (dialog, which) -> AuthUI.getInstance().delete(getContext()).addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
                                 delete.setEnabled(false);
                                 Toast.makeText(getContext(), R.string.delete_user_success, Toast.LENGTH_LONG).show();
@@ -117,10 +120,6 @@ public class SettingsActivity extends AppCompatActivity {
                         }))
                         .setNegativeButton(R.string.no, null)
                         .show();
-                return true;
-            });
-            about.setOnPreferenceClickListener(preference -> {
-                startActivity(new Intent(getContext(), AboutActivity.class));
                 return true;
             });
         }
