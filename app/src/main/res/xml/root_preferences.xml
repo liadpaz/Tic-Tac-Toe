@@ -23,6 +23,7 @@
             app:key="privacy"
             app:icon="@android:drawable/ic_lock_lock"
             app:defaultValue="true"
+            android:disableDependentsState="true"
             app:summaryOn="@string/privacy_activated"
             app:summaryOff="@string/privacy_deactivated" />
 
@@ -34,6 +35,7 @@
         <CheckBoxPreference app:title="@string/use_google_photo"
             app:key="google_photo"
             app:defaultValue="true"
+            android:dependency="privacy"
             app:icon="@drawable/googleg_standard_color_18"/>
 
         <Preference app:title="@string/delete_user"
@@ -54,6 +56,11 @@
 
     <PreferenceCategory app:title="@string/general" >
 
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="music"
+            android:icon="@drawable/musical_note"
+            android:title="@string/hear_music" />
         <Preference app:title="@string/about"
             app:key="about"
             app:icon="@android:drawable/ic_menu_info_details" />

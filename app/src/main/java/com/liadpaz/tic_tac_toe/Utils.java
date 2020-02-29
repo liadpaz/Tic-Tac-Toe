@@ -19,7 +19,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.Calendar;
-import java.util.Objects;
 import java.util.Random;
 
 import static com.liadpaz.tic_tac_toe.Cell.Type.None;
@@ -288,13 +287,14 @@ class Stats {
     /**
      * This function adds 1 X win to the shared preferences
      */
+    @SuppressWarnings("ConstantConditions")
     static void addXwins() {
         writeFile(Readables.Xwins, readStat(Readables.Xwins) + 1);
         if (Firebase.userRef != null) {
             Firebase.userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Firebase.userRef.child("Xwins").setValue(Objects.requireNonNull(dataSnapshot.child("Xwins").getValue(Integer.class)) + 1);
+                    Firebase.userRef.child("Xwins").setValue(dataSnapshot.child("Xwins").getValue(Integer.class) + 1);
                 }
 
                 @Override
@@ -316,13 +316,14 @@ class Stats {
     /**
      * This function adds 1 O win to the shared preferences
      */
+    @SuppressWarnings("ConstantConditions")
     static void addOwins() {
         writeFile(Readables.Owins, readStat(Readables.Owins) + 1);
         if (Firebase.userRef != null) {
             Firebase.userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Firebase.userRef.child("Owins").setValue(Objects.requireNonNull(dataSnapshot.child("Owins").getValue(Integer.class)) + 1);
+                    Firebase.userRef.child("Owins").setValue(dataSnapshot.child("Owins").getValue(Integer.class) + 1);
                 }
 
                 @Override

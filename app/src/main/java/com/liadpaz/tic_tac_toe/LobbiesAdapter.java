@@ -3,7 +3,6 @@ package com.liadpaz.tic_tac_toe;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -12,6 +11,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.liadpaz.tic_tac_toe.databinding.LayoutLobbiesBinding;
 
 import java.util.List;
 
@@ -33,11 +34,12 @@ public class LobbiesAdapter extends ArrayAdapter<String> {
     @Override
     @SuppressLint({"ViewHolder", "InflateParams"})
     public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        LayoutInflater inflater = context.getLayoutInflater();
-        View rowView = inflater.inflate(R.layout.layout_lobbies, null, true);
-
-        final TextView textView = rowView.findViewById(R.id.tv_lobby_dev);
-        ImageView delete = rowView.findViewById(R.id.iv_delete_lobby);
+        LayoutLobbiesBinding binding = LayoutLobbiesBinding.inflate(context.getLayoutInflater(), parent, false);
+        if (convertView == null) {
+            convertView = binding.getRoot();
+        }
+        final TextView textView = binding.tvLobbyDev;
+        ImageView delete = binding.ivDeleteLobby;
 
         textView.setText(lobbyTitle.get(position));
         delete.setOnClickListener(v -> new AlertDialog.Builder(context)
@@ -46,11 +48,11 @@ public class LobbiesAdapter extends ArrayAdapter<String> {
                 .setPositiveButton("Yes", (dialog, which) -> {
                     Firebase.dataRef.child("Lobbies").child(textView.getText().toString()).removeValue();
                     lobbyTitle.remove(position);
-                    LobbiesAdapter.this.notifyDataSetChanged();
+                    notifyDataSetChanged();
                 })
                 .setNegativeButton("No", null)
                 .show());
 
-        return rowView;
+        return convertView;
     }
 }

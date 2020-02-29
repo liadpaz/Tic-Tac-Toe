@@ -7,6 +7,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -17,6 +18,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.FileProvider;
+import androidx.preference.PreferenceManager;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -42,6 +44,8 @@ import static java.lang.Math.min;
 
 public class GameActivity extends AppCompatActivity {
 
+    private Intent musicService;
+
     private DatabaseReference gameRef;
     private StorageReference storageRef;
 
@@ -62,13 +66,12 @@ public class GameActivity extends AppCompatActivity {
 
     private String thisName;
     private String otherName;
-    private String Xname;
-    private String Oname;
+    private String xName;
+    private String oName;
     private String lobbyNumber;
     private String multiType;
     private String lastHostMessage;
     private String lastClientMessage;
-    private String lastSentMessage;
     private boolean canPlay = true;
     private boolean thisCanPlay = true;
     private Boolean privacy;
@@ -107,6 +110,11 @@ public class GameActivity extends AppCompatActivity {
         multiType = getIntent().getStringExtra("Multiplayer");
         difficulty = getIntent().getBooleanExtra("Difficulty", false);
 
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("music", false)) {
+            musicService = new Intent(this, MusicPlayerService.class);
+            startService(musicService);
+        }
+
         vs_multiplayer = mode == null;
 
         turn = startingType;
@@ -126,10 +134,10 @@ public class GameActivity extends AppCompatActivity {
                 .setMessage(R.string.resign_message)
                 .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
                     if (vs_multiplayer) {
-                        GameActivity.this.writeDatabaseMessage("left");
+                        gameRef.removeValue();
                     }
-                    GameActivity.this.finishAffinity();
-                    GameActivity.this.startActivity(new Intent(GameActivity.this, MainActivity.class));
+                    finishAffinity();
+                    startActivity(new Intent(GameActivity.this, MainActivity.class));
                 })
                 .setNegativeButton(R.string.no, null)
                 .setCancelable(true)
@@ -161,6 +169,7 @@ public class GameActivity extends AppCompatActivity {
             initialize();
         } else {
             gameRef = Firebase.dataRef.child("Lobbies").child(lobbyNumber);
+            gameRef.onDisconnect().removeValue();
             gameRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -174,25 +183,25 @@ public class GameActivity extends AppCompatActivity {
 
                     if (Objects.equals(dataSnapshot.child("hostType").getValue(String.class), "X")) {
                         thisType = multiType.equals("Host") ? X : O;
-                        Xname = dataSnapshot.child("hostName").getValue(String.class);
-                        Oname = dataSnapshot.child("clientName").getValue(String.class);
+                        xName = dataSnapshot.child("hostName").getValue(String.class);
+                        oName = dataSnapshot.child("clientName").getValue(String.class);
 
-                        thisName = multiType.equals("Host") ? Xname : Oname;
-                        otherName = multiType.equals("Host") ? Oname : Xname;
+                        thisName = multiType.equals("Host") ? xName : oName;
+                        otherName = multiType.equals("Host") ? oName : xName;
                     } else {
                         thisType = multiType.equals("Host") ? O : X;
-                        Xname = dataSnapshot.child("clientName").getValue(String.class);
-                        Oname = dataSnapshot.child("hostName").getValue(String.class);
+                        xName = dataSnapshot.child("clientName").getValue(String.class);
+                        oName = dataSnapshot.child("hostName").getValue(String.class);
 
-                        thisName = multiType.equals("Host") ? Oname : Xname;
-                        otherName = multiType.equals("Host") ? Xname : Oname;
+                        thisName = multiType.equals("Host") ? oName : xName;
+                        otherName = multiType.equals("Host") ? xName : oName;
                     }
 
                     timer = dataSnapshot.child("timer").getValue(Integer.class);
                     maxGames = dataSnapshot.child("max").getValue(Integer.class);
 
-                    tv_playerO.setText(Oname);
-                    tv_playerX.setText(Xname);
+                    tv_playerO.setText(oName);
+                    tv_playerX.setText(xName);
                     tv_playerX.setVisibility(View.VISIBLE);
                     tv_playerO.setVisibility(View.VISIBLE);
                     tv_playerXwins.setVisibility(View.VISIBLE);
@@ -212,6 +221,15 @@ public class GameActivity extends AppCompatActivity {
             gameRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (!dataSnapshot.hasChildren()) {
+                        try {
+                            addWins(thisType);
+                            absoluteWinnerAlert(false, thisName).show();
+                            return;
+                        } catch (Exception ignored) {
+                            return;
+                        }
+                    }
                     if (multiType.equals("Host")) {
                         String message = dataSnapshot.child("clientMessage").getValue(String.class);
                         if (lastClientMessage == null) {
@@ -222,13 +240,6 @@ public class GameActivity extends AppCompatActivity {
                             switch (messages[0]) {
                                 case "turn": {
                                     play(Integer.parseInt(messages[1]), Integer.parseInt(messages[2]));
-                                    break;
-                                }
-
-                                case "left": {
-                                    addWins(thisType);
-                                    gameRef.removeValue();
-                                    absoluteWinnerAlert(false, thisName).show();
                                     break;
                                 }
 
@@ -254,13 +265,6 @@ public class GameActivity extends AppCompatActivity {
                             switch (messages[0]) {
                                 case "turn": {
                                     play(Integer.parseInt(messages[1]), Integer.parseInt(messages[2]));
-                                    break;
-                                }
-
-                                case "left": {
-                                    addWins(thisType);
-                                    gameRef.removeValue();
-                                    absoluteWinnerAlert(false, thisName).show();
                                     break;
                                 }
 
@@ -315,8 +319,9 @@ public class GameActivity extends AppCompatActivity {
                         scores.putAll(new HashMap<Type, Integer>() {{
                             put(X, -10);
                             put(O, 10);
-                            put(Type.None, 0);
+                            put(None, 0);
                         }});
+                        thisType = X;
                         comType = O;
                         tv_playerO.setText(R.string.computer);
                         tv_playerX.setText(R.string.you);
@@ -335,8 +340,9 @@ public class GameActivity extends AppCompatActivity {
                         scores.putAll(new HashMap<Type, Integer>() {{
                             put(X, 10);
                             put(O, -10);
-                            put(Type.None, 0);
+                            put(None, 0);
                         }});
+                        thisType = O;
                         comType = X;
                         tv_playerO.setText(R.string.you);
                         tv_playerX.setText(R.string.computer);
@@ -409,11 +415,11 @@ public class GameActivity extends AppCompatActivity {
                     resetGame();
                     if (vs_multiplayer) {
                         writeDatabaseMessage("go");
-                        tv_turn.setText(String.format("%s %s%s (%s)", GameActivity.this.getString(R.string.its), thisType == turn ? thisName : otherName, GameActivity.this.getString(R.string.turn), turn.toString()));
+                        tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.its), thisType == turn ? thisName : otherName, getString(R.string.turn), turn.toString()));
                     } else {
-                        tv_turn.setText(String.format("%s %s%s", GameActivity.this.getString(R.string.its), turn.toString(), GameActivity.this.getString(R.string.turn)));
+                        tv_turn.setText(String.format("%s %s%s", getString(R.string.its), turn.toString(), getString(R.string.turn)));
                     }
-                    if (timer != 0 && (notCpuTurn() || (vs_multiplayer && canPlay))) {
+                    if (timer != 0 && (turn == thisType || (vs_multiplayer && canPlay))) {
                         if (!vs_multiplayer || canPlay) {
                             counter.start();
                         }
@@ -437,9 +443,9 @@ public class GameActivity extends AppCompatActivity {
                     resetGame();
                     thisCanPlay = true;
                     if (vs_multiplayer) {
-                        GameActivity.this.writeDatabaseMessage("go");
+                        writeDatabaseMessage("go");
                     }
-                    if (timer != 0 && (GameActivity.this.notCpuTurn() || (vs_multiplayer && canPlay))) {
+                    if (timer != 0 && (turn == thisType || (vs_multiplayer && canPlay))) {
                         if (!vs_multiplayer || canPlay) {
                             counter.start();
                         }
@@ -462,8 +468,8 @@ public class GameActivity extends AppCompatActivity {
                 .setTitle(R.string.winner)
                 .setMessage(player ? String.format("%s %s %s", getString(R.string.player), player_won, getString(R.string.won_the_game)) : String.format("%s %s", player_won, getString(R.string.won_the_game)))
                 .setPositiveButton(R.string.continue_dialog, (dialog, which) -> {
-                    GameActivity.this.finishAffinity();
-                    GameActivity.this.startActivity(new Intent(GameActivity.this, MainActivity.class));
+                    finishAffinity();
+                    startActivity(new Intent(GameActivity.this, MainActivity.class));
                 });
     }
 
@@ -484,7 +490,7 @@ public class GameActivity extends AppCompatActivity {
         if (!(oWins == maxGames || xWins == maxGames)) {
             winnerAlert(!vs_multiplayer, winner.toString()).show();
         } else {
-            if (vs_on_this_device || notCpuTurn() || (vs_multiplayer && (winner == thisType))) {
+            if (vs_on_this_device || winner == thisType) {
                 addWins(winner);
             }
             absoluteWinnerAlert(!vs_multiplayer, vs_multiplayer ? (thisType == winner ? thisName : otherName) : winner.toString()).show();
@@ -626,15 +632,6 @@ public class GameActivity extends AppCompatActivity {
     }
 
     /**
-     * This function checks whether it's a CPU turn
-     *
-     * @return true if it's a CPU turn, otherwise false
-     */
-    private boolean notCpuTurn() {
-        return (!vs_computer || ((turn != O || comType == O) && (turn != X || comType == X)));
-    }
-
-    /**
      * This function plays a turn, if needed a CPU turn afterwards it does this
      *
      * @param i the y index of the cell
@@ -689,7 +686,6 @@ public class GameActivity extends AppCompatActivity {
      * @param message the message to write
      */
     private void writeDatabaseMessage(String message) {
-        lastSentMessage = message;
         gameRef.child(multiType.equals("Host") ? "hostMessage" : "clientMessage").setValue(message);
     }
 
@@ -744,6 +740,7 @@ public class GameActivity extends AppCompatActivity {
      * @param type the type of winner
      */
     private void addWins(Type type) {
+        Log.d("GAME_ACTIVITY", "addWins: WINS");
         if (type == X) {
             Stats.addXwins();
         } else {
@@ -785,7 +782,10 @@ public class GameActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        if (vs_multiplayer && lastSentMessage != null && !lastSentMessage.equals("left")) {
+        if (musicService != null) {
+            stopService(musicService);
+        }
+        if (vs_multiplayer) {
             gameRef.removeValue();
         }
         super.onDestroy();

@@ -80,7 +80,7 @@
     <string name="game">Game</string>
     <string name="not_authorized">You are not authorized…</string>
     <string name="whats_new">What\'s New:</string>
-    <string name="new_things">-Added server function, so when a user who is connected to a lobby unexpectedly losing connection, the other player gets notified</string>
+    <string name="new_things">-Added Smart AI, so now there are two AI difficulties\n-Added broadcast receiver to check internet connectivity\n-Added background music while in-game option (Porter Robinson &amp; Madeon - Shelter)\n-Added player left lobby failsafe</string>
     <string name="logout">Logout</string>
     <string name="login">Login</string>
     <string name="unauthed_user" tools:ignore="Typos">You need to be signed in in order to play online</string>
@@ -111,4 +111,5 @@
     <string name="delete_user_message">Are you sure you want to delete your user?</string>
     <string name="use_google_photo">Use Google photo</string>
     <string name="photo_not_found">Your Google photo was not found, using a placeholder instead…</string>
+    <string name="hear_music">Hear music while in game</string>
 </resources>

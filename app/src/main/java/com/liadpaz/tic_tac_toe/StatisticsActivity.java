@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.liadpaz.tic_tac_toe.databinding.ActivityStatisticsBinding;
 
@@ -52,9 +51,7 @@ public class StatisticsActivity extends AppCompatActivity {
         tv_globalX.setText(R.string.loading);
         tv_globalTime.setText(R.string.loading);
 
-        DatabaseReference statsRef = Firebase.dataRef.child("Users");
-
-        statsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        Firebase.dataRef.child("Users").addValueEventListener(new ValueEventListener() {
             @SuppressWarnings("ConstantConditions")
             @SuppressLint("DefaultLocale")
             @Override

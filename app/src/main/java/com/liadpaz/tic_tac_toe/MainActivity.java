@@ -1,9 +1,13 @@
 package com.liadpaz.tic_tac_toe;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.os.AsyncTask;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.Menu;
@@ -31,8 +35,6 @@ import com.liadpaz.tic_tac_toe.databinding.ActivityMainBinding;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.ref.WeakReference;
-import java.net.InetAddress;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -45,12 +47,15 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private DatabaseReference mainRef;
     private boolean stats;
+
     private TextView tv_user_state;
     private Button btn_singleplayer;
     private Button btn_multiplayer;
     private Button btn_user_action;
+
     private CountDownTimer count;
     private SharedPreferences sharedPreferences;
+
     private int devCounter;
     private boolean can_open_menu = true;
 
@@ -86,8 +91,8 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 devCounter = 0;
                 if (auth.getCurrentUser() != null) {
-                    if (Objects.equals(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail(), "liadpazhamud@gmail.com")) {
-                        MainActivity.this.startActivity(new Intent(MainActivity.this, DeveloperActivity.class));
+                    if (Objects.equals(auth.getCurrentUser().getEmail(), "liadpazhamud@gmail.com")) {
+                        startActivity(new Intent(MainActivity.this, DeveloperActivity.class));
                     } else {
                         Toast.makeText(MainActivity.this, R.string.not_authorized, Toast.LENGTH_LONG).show();
                     }
@@ -113,7 +118,37 @@ public class MainActivity extends AppCompatActivity {
         };
 
         btn_singleplayer.setOnClickListener(v -> MainActivity.this.startActivity(new Intent(MainActivity.this, OptionsActivity.class)));
-        btn_multiplayer.setOnClickListener(v -> new InternetTask(MainActivity.this).execute());
+        btn_multiplayer.setOnClickListener(v -> {
+            registerReceiver(new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                    //noinspection deprecation
+                    NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                    //noinspection deprecation
+                    NetworkInfo mobile = connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+                    boolean isConnected = (wifi != null && wifi.isConnected()) || (mobile != null && mobile.isConnected());
+                    if (isConnected) {
+                        if (auth.getCurrentUser() != null) {
+                            new AlertDialog.Builder(MainActivity.this)
+                                    .setNegativeButton(R.string.host_game, (dialogInterface, i) -> startActivity(new Intent(MainActivity.this, OptionsActivity.class)
+                                            .putExtra("Mode", Utils.Mode.Multiplayer)))
+                                    .setPositiveButton(R.string.join_game, (dialogInterface, i) -> startActivity(new Intent(MainActivity.this, JoinMultiplayerActivity.class)))
+                                    .setTitle(R.string.multiplayer_settings)
+                                    .setMessage(R.string.multiplayer_dialog)
+                                    .show();
+                        } else {
+                            Toast.makeText(MainActivity.this, R.string.unauthed_user, Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        Toast.makeText(MainActivity.this, R.string.not_available_offline, Toast.LENGTH_LONG).show();
+                    }
+                    context.unregisterReceiver(this);
+                }
+            }, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+            //new InternetTask(MainActivity.this).execute());
+        });
         btn_user_action.setOnClickListener(v -> {
             if (auth.getCurrentUser() != null) {    //User connected (logout active)
                 AuthUI.getInstance().signOut(MainActivity.this).addOnCompleteListener(task -> {
@@ -142,13 +177,12 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         // If the user is authenticated
         if (auth.getCurrentUser() != null) {
+            can_open_menu = false;
             btn_user_action.setText(R.string.logout);
             btn_singleplayer.setEnabled(false);
             btn_multiplayer.setEnabled(false);
-            can_open_menu = false;
             auth.getCurrentUser().reload().addOnCompleteListener(task -> {
                 setUsername(auth.getCurrentUser().getDisplayName());
-                can_open_menu = true;
                 btn_singleplayer.setEnabled(true);
                 btn_multiplayer.setEnabled(true);
                 if (auth.getCurrentUser() != null) {
@@ -157,13 +191,15 @@ public class MainActivity extends AppCompatActivity {
                         new HelloDialog(MainActivity.this, getUsername()).show();
                         first_open = false;
                     }
+                    can_open_menu = true;
                     tv_user_state.setText(String.format("%s: %s", getString(R.string.connected), getUsername()));
                     mainRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @SuppressWarnings("ConstantConditions")
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             int localTime = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Time) : 0, serverTime;
                             if (dataSnapshot.hasChild("Time")) {
-                                if (localTime > (serverTime = Objects.requireNonNull(dataSnapshot.child("Time").getValue(Integer.class)))) {
+                                if (localTime > (serverTime = dataSnapshot.child("Time").getValue(Integer.class))) {
                                     mainRef.child("Time").setValue(localTime);
                                 } else {
                                     Stats.setTime(serverTime);
@@ -173,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                             int localX = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Xwins) : 0, serverX;
                             if (dataSnapshot.hasChild("Xwins")) {
-                                if (localX > (serverX = Objects.requireNonNull(dataSnapshot.child("Xwins").getValue(Integer.class)))) {
+                                if (localX > (serverX = dataSnapshot.child("Xwins").getValue(Integer.class))) {
                                     mainRef.child("Xwins").setValue(localX);
                                 } else {
                                     Stats.setXwins(serverX);
@@ -183,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                             int localO = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Owins) : 0, serverO;
                             if (dataSnapshot.hasChild("Owins")) {
-                                if (localO > (serverO = Objects.requireNonNull(dataSnapshot.child("Owins").getValue(Integer.class)))) {
+                                if (localO > (serverO = dataSnapshot.child("Owins").getValue(Integer.class))) {
                                     mainRef.child("Owins").setValue(localO);
                                 } else {
                                     Stats.setOwins(serverO);
@@ -217,9 +253,10 @@ public class MainActivity extends AppCompatActivity {
             if (auth.getCurrentUser() != null && getUsername() != null) {
                 try {
                     mainRef.child("Time").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @SuppressWarnings("ConstantConditions")
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            mainRef.child("Time").setValue(Objects.requireNonNull(dataSnapshot.getValue(Integer.class)) + time);
+                            mainRef.child("Time").setValue(dataSnapshot.getValue(Integer.class) + time);
                         }
 
                         @Override
@@ -248,7 +285,41 @@ public class MainActivity extends AppCompatActivity {
                     final long time = Utils.getTime();
                     Stats.addTime(time);
                     stats = true;
-                    new InternetTask(MainActivity.this, time).execute();
+
+                    BroadcastReceiver checkInternet = new BroadcastReceiver() {
+                        @SuppressWarnings("ConstantConditions")
+                        @Override
+                        public void onReceive(@NotNull Context context, Intent intent) {
+                            ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                            //noinspection deprecation
+                            NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                            //noinspection deprecation
+                            NetworkInfo mobile = connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+                            boolean isConnected = (wifi != null && wifi.isConnected()) || (mobile != null && mobile.isConnected());
+                            if (isConnected) {
+                                if (auth.getCurrentUser() != null) {
+                                    mainRef.child("Time").addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @SuppressWarnings("ConstantConditions")
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            mainRef.child("Time").setValue(dataSnapshot.getValue(Integer.class) + time).addOnCompleteListener(task -> startActivity(new Intent(MainActivity.this, StatisticsActivity.class)));
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        }
+                                    });
+                                } else {
+                                    startActivity(new Intent(MainActivity.this, StatisticsActivity.class));
+                                }
+                            } else {
+                                startActivity(new Intent(MainActivity.this, StatisticsActivity.class));
+                            }
+                            context.unregisterReceiver(this);
+                        }
+                    };
+                    registerReceiver(checkInternet, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
                     break;
                 }
 
@@ -273,22 +344,23 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == USER_AUTH) {
             if (resultCode == RESULT_OK) {  //User connected
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                setUsername(Objects.requireNonNull(user).getDisplayName());
+                setUsername(user.getDisplayName());
                 new HelloDialog(MainActivity.this, getUsername()).show();
                 btn_user_action.setText(R.string.logout);
                 tv_user_state.setText(String.format("%s: %s", getString(R.string.connected), getUsername()));
                 (mainRef = Firebase.userRef = Firebase.dataRef.child("Users").child(user.getUid())).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        int localTime = getUsername().equals(Objects.requireNonNull(auth.getCurrentUser()).getDisplayName()) ? Stats.readStat(Stats.Readables.Time) : 0, serverTime;
+                        int localTime = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Time) : 0, serverTime;
                         if (dataSnapshot.hasChild("Time")) {
-                            if (localTime > (serverTime = Objects.requireNonNull(dataSnapshot.child("Time").getValue(Integer.class)))) {
+                            if (localTime > (serverTime = dataSnapshot.child("Time").getValue(Integer.class))) {
                                 mainRef.child("Time").setValue(localTime);
                             } else {
                                 Stats.setTime(serverTime);
@@ -298,7 +370,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         int localX = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Xwins) : 0, serverX;
                         if (dataSnapshot.hasChild("Xwins")) {
-                            if (localX > (serverX = Objects.requireNonNull(dataSnapshot.child("Xwins").getValue(Integer.class)))) {
+                            if (localX > (serverX = dataSnapshot.child("Xwins").getValue(Integer.class))) {
                                 mainRef.child("Xwins").setValue(localX);
                             } else {
                                 Stats.setXwins(serverX);
@@ -308,7 +380,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         int localO = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Owins) : 0, serverO;
                         if (dataSnapshot.hasChild("Owins")) {
-                            if (localO > (serverO = Objects.requireNonNull(dataSnapshot.child("Owins").getValue(Integer.class)))) {
+                            if (localO > (serverO = dataSnapshot.child("Owins").getValue(Integer.class))) {
                                 mainRef.child("Owins").setValue(localO);
                             } else {
                                 Stats.setOwins(serverO);
@@ -344,78 +416,5 @@ public class MainActivity extends AppCompatActivity {
      */
     private void setUsername(String name) {
         sharedPreferences.edit().putString("name", name).apply();
-    }
-
-    /**
-     * The AsyncTask to check if the user is connected to the internet
-     */
-    private static class InternetTask extends AsyncTask<Void, Void, Boolean> {
-        /**
-         * The weak reference to main activity object
-         */
-        private WeakReference<MainActivity> activityReference;
-        private long time = 0;
-
-        InternetTask(MainActivity activityReference, long time) {
-            this.activityReference = new WeakReference<>(activityReference);
-            this.time = time;
-        }
-
-        InternetTask(MainActivity activityReference) {
-            this.activityReference = new WeakReference<>(activityReference);
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            try {
-                return InetAddress.getByName("www.google.com").isReachable(2000);
-            } catch (Exception ignored) {
-                return false;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            if (aBoolean) {
-                if (time != 0) {
-                    if (activityReference.get().auth.getCurrentUser() != null) {
-                        activityReference.get().mainRef.child("Time").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                activityReference.get().mainRef.child("Time").setValue(Objects.requireNonNull(dataSnapshot.getValue(Integer.class)) + time)
-                                        .addOnCompleteListener(task -> activityReference.get().startActivity(new Intent(activityReference.get(), StatisticsActivity.class)));
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                            }
-                        });
-                    } else {
-                        activityReference.get().startActivity(new Intent(activityReference.get(), StatisticsActivity.class));
-                    }
-                } else {
-                    if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                        new AlertDialog.Builder(activityReference.get())
-                                .setNegativeButton(R.string.host_game, (dialogInterface, i) -> activityReference.get()
-                                        .startActivity(new Intent(activityReference.get(), OptionsActivity.class)
-                                                .putExtra("Mode", Utils.Mode.Multiplayer)))
-                                .setPositiveButton(R.string.join_game, (dialogInterface, i) -> activityReference.get()
-                                        .startActivity(new Intent(activityReference.get(), JoinMultiplayerActivity.class)))
-                                .setTitle(R.string.multiplayer_settings)
-                                .setMessage(R.string.multiplayer_dialog)
-                                .show();
-                    } else {
-                        Toast.makeText(activityReference.get(), R.string.unauthed_user, Toast.LENGTH_LONG).show();
-                    }
-                }
-            } else {
-                if (time != 0) {
-                    activityReference.get().startActivity(new Intent(activityReference.get(), StatisticsActivity.class));
-                } else {
-                    Toast.makeText(activityReference.get(), R.string.not_available_offline, Toast.LENGTH_LONG).show();
-                }
-            }
-            super.onPostExecute(aBoolean);
-        }
     }
 }

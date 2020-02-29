@@ -19,7 +19,6 @@
         <activity
             android:name=".SettingsActivity"
             android:configChanges="uiMode"
-            android:label="@string/title_activity_options"
             android:launchMode="singleTask"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
@@ -30,7 +29,6 @@
         <activity
             android:name=".AboutActivity"
             android:configChanges="uiMode"
-            android:label="@string/about"
             android:launchMode="singleTask"
             android:parentActivityName=".SettingsActivity"
             android:screenOrientation="portrait">
@@ -41,7 +39,6 @@
         <activity
             android:name=".DeveloperActivity"
             android:configChanges="uiMode"
-            android:label="@string/developer"
             android:launchMode="singleTask"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
@@ -52,7 +49,6 @@
         <activity
             android:name=".StatisticsActivity"
             android:configChanges="uiMode"
-            android:label="@string/statistics"
             android:launchMode="singleTask"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
@@ -63,13 +59,11 @@
         <activity
             android:name=".LobbyActivity"
             android:configChanges="uiMode"
-            android:label="@string/lobby"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
             android:name=".JoinMultiplayerActivity"
             android:configChanges="uiMode"
-            android:label="@string/join_lobby"
             android:launchMode="singleTask"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
@@ -80,7 +74,6 @@
         <activity
             android:name=".GameActivity"
             android:configChanges="uiMode"
-            android:label="@string/game"
             android:launchMode="singleTask"
             android:parentActivityName=".OptionsActivity"
             android:screenOrientation="portrait">
@@ -91,7 +84,6 @@
         <activity
             android:name=".OptionsActivity"
             android:configChanges="uiMode"
-            android:label="@string/options"
             android:launchMode="singleTask"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
@@ -121,6 +113,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+        <service android:name=".MusicPlayerService" />
     </application>
 
 </manifest>
