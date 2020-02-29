@@ -7,7 +7,6 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -740,7 +739,6 @@ public class GameActivity extends AppCompatActivity {
      * @param type the type of winner
      */
     private void addWins(Type type) {
-        Log.d("GAME_ACTIVITY", "addWins: WINS");
         if (type == X) {
             Stats.addXwins();
         } else {
