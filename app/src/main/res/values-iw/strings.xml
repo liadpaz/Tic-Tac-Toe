@@ -76,7 +76,7 @@
     <string name="game">משחק</string>
     <string name="not_authorized">אין לך הרשאה…</string>
     <string name="whats_new">מה חדש:</string>
-    <string name="new_things">-נוסף מחשב חכם, אז מעכשיו יש שתי רמות למחשב\n-נוספה דרך חדשה לבדוק חיבור לאינטרנט\n-מוזיקת רקע בזמן משחק (Porter Robinson &amp; Madeon - Shelter)\n-נוסף מנגון אל כשל למקרה ששחקן עזב את המשחק באמצע</string>
+    <string name="new_things">-נוסף מחשב חכם, אז מעכשיו יש שתי רמות למחשב\n-נוספה דרך חדשה לבדוק חיבור לאינטרנט\n-מוזיקת רקע בזמן משחק (Porter Robinson &amp; Madeon - Shelter)\n-נוסף מנגון אל כשל למקרה ששחקן עזב את המשחק באמצע\n-שונתה הדרך ליצור לובי חדש לדרך יותר בטוחה</string>
     <string name="logout">התנתק/י</string>
     <string name="login">התבחר/י</string>
     <string name="unauthed_user">כדי לשחק ברשת את/ה צריך/צריכה להיות מחובר/ת</string>
@@ -108,4 +108,5 @@
     <string name="use_google_photo">השתמש/י בתמונה של גוגל</string>
     <string name="photo_not_found">תמונת גוגל שלך לא נמצאה, משתמש בממלא מקום במקום…</string>
     <string name="hear_music">לשמוע מוזיקה בזמן משחק</string>
+    <string name="lobby_couldnt_make">אי אפשר היה ליצור לובי חדש</string>
 </resources>

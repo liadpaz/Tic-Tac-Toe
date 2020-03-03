@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
@@ -25,7 +26,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.liadpaz.tic_tac_toe.databinding.ActivityOptionsBinding;
 
 import java.io.File;
@@ -200,27 +202,36 @@ public class OptionsActivity extends AppCompatActivity {
      */
     private void initializeLobby() {
         settingRef = Firebase.dataRef.child("Lobbies");
-        settingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        settingRef.runTransaction(new Transaction.Handler() {
+            @NonNull
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            public Transaction.Result doTransaction(@NonNull MutableData currentData) {
                 String lobbyNumber = Utils.getRoomNumber();
-
-                while (dataSnapshot.hasChild(lobbyNumber)) {
+                int tries = 1;
+                while (currentData.hasChild(lobbyNumber)) {
                     lobbyNumber = Utils.getRoomNumber();
+                    if (++tries == 9999) {
+                        return Transaction.abort();
+                    }
                 }
 
-                settingRef.child(lobbyNumber).setValue(new Lobby(et_name_host.getText().toString(), lobbyNumber, starting_player.toString(), timer, max_games, Stats.readPrivacy()));
-                settingRef.child(lobbyNumber).child("startingType").setValue(starting_player.toString());
+                currentData.child(lobbyNumber).setValue(new Lobby(et_name_host.getText().toString(), lobbyNumber, starting_player.toString(), timer, max_games, Stats.readPrivacy()));
+                currentData.child(lobbyNumber).child("startingType").setValue(starting_player.toString());
 
                 startActivity(new Intent(OptionsActivity.this, LobbyActivity.class)
                         .putExtra("HostName", et_name_host.getText().toString())
                         .putExtra("Multiplayer", "Host")
                         .putExtra("Starting", starting_player)
                         .putExtra("LobbyNumber", lobbyNumber));
+
+                return Transaction.success(currentData);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
+                if (!committed) {
+                    Toast.makeText(OptionsActivity.this, R.string.lobby_couldnt_make, Toast.LENGTH_LONG).show();
+                }
             }
         });
     }

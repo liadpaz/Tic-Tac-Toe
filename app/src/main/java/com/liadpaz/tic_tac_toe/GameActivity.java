@@ -547,6 +547,7 @@ public class GameActivity extends AppCompatActivity {
         if (checkWinner(board) != null) {
             return scores.get(checkWinner(board));
         }
+
         if (isMaximizing) {
             int bestScore = Integer.MIN_VALUE;
             for (int i = 0; i < 3; i++) {
@@ -574,7 +575,7 @@ public class GameActivity extends AppCompatActivity {
                         cells[i][j].hide();
                         bestScore = min(bestScore, score);
                         beta = min(beta, score);
-                        if (bestScore <= alpha) {
+                        if (beta <= alpha) {
                             break;
                         }
                     }
