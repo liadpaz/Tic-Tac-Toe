@@ -76,7 +76,7 @@
     <string name="game">משחק</string>
     <string name="not_authorized">אין לך הרשאה…</string>
     <string name="whats_new">מה חדש:</string>
-    <string name="new_things">-נוסף מחשב חכם, אז מעכשיו יש שתי רמות למחשב\n-נוספה דרך חדשה לבדוק חיבור לאינטרנט\n-מוזיקת רקע בזמן משחק (Porter Robinson &amp; Madeon - Shelter)\n-נוסף מנגון אל כשל למקרה ששחקן עזב את המשחק באמצע\n-שונתה הדרך ליצור לובי חדש לדרך יותר בטוחה</string>
+    <string name="new_things">-נוסף מחשב חכם, אז מעכשיו יש שתי רמות למחשב\n-נוספה דרך חדשה לבדוק חיבור לאינטרנט\n-מוזיקת רקע בזמן משחק (Porter Robinson &amp; Madeon - Shelter)\n-נוסף מנגון אל כשל למקרה ששחקן עזב את המשחק באמצע\n-שונתה הדרך ליצור לובי חדש לדרך יותר בטוחה\n-נוסף בר התקדמות להעלאת תמונה ללובי משחק מרובה שחקנים</string>
     <string name="logout">התנתק/י</string>
     <string name="login">התבחר/י</string>
     <string name="unauthed_user">כדי לשחק ברשת את/ה צריך/צריכה להיות מחובר/ת</string>

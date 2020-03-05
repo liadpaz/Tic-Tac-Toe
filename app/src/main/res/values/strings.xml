@@ -80,7 +80,7 @@
     <string name="game">Game</string>
     <string name="not_authorized">You are not authorized…</string>
     <string name="whats_new">What\'s New:</string>
-    <string name="new_things">-Added Smart AI, so now there are two AI difficulties\n-Added broadcast receiver to check internet connectivity\n-Added background music while in-game option (Porter Robinson &amp; Madeon - Shelter)\n-Added player left lobby failsafe\n-Changed the create lobby to a safer method</string>
+    <string name="new_things">-Added Smart AI, so now there are two AI difficulties\n-Added broadcast receiver to check internet connectivity\n-Added background music while in-game option (Porter Robinson &amp; Madeon - Shelter)\n-Added player left lobby failsafe\n-Changed the create lobby to a safer method\n-Added uploading photo progress bar to multiplayer lobby</string>
     <string name="logout">Logout</string>
     <string name="login">Login</string>
     <string name="unauthed_user" tools:ignore="Typos">You need to be signed in in order to play online</string>
