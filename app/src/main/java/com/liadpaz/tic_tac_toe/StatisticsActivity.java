@@ -16,7 +16,6 @@ import com.liadpaz.tic_tac_toe.databinding.ActivityStatisticsBinding;
 
 import java.lang.ref.WeakReference;
 import java.net.InetAddress;
-import java.util.Objects;
 
 public class StatisticsActivity extends AppCompatActivity {
 
@@ -40,11 +39,11 @@ public class StatisticsActivity extends AppCompatActivity {
         binding.tvLocalTime.setText(String.format("%s %s", String.valueOf(Stats.readStat(Stats.Readables.Time)), getString(R.string.seconds)));
         tv_globalTime = binding.tvGlobalTime;
 
-        new Task(this).execute();
+        new CheckInternetConnection(this).execute();
     }
 
     /**
-     * This function gets the global stats and writes them
+     * This function gets the global stats and puts them on the proper text views
      */
     void getGlobals() {
         tv_globalO.setText(R.string.loading);
@@ -55,15 +54,15 @@ public class StatisticsActivity extends AppCompatActivity {
             @SuppressWarnings("ConstantConditions")
             @SuppressLint("DefaultLocale")
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 long time = 0;
                 int xWins = 0;
                 int oWins = 0;
-                for (DataSnapshot user : dataSnapshot.getChildren()) {
+                for (DataSnapshot user : snapshot.getChildren()) {
                     for (DataSnapshot info : user.getChildren()) {
-                        if (Objects.equals(info.getKey(), "Time")) {
+                        if ("Time".equals(info.getKey())) {
                             time += info.getValue(Integer.class);
-                        } else if (Objects.equals(info.getKey(), "Xwins")) {
+                        } else if ("Xwins".equals(info.getKey())) {
                             xWins += info.getValue(Integer.class);
                         } else {
                             oWins += info.getValue(Integer.class);
@@ -76,15 +75,18 @@ public class StatisticsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {}
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
-    private static class Task extends AsyncTask<Void, Void, Boolean> {
+    /**
+     * This class is used to check for internet connection by pinging google site (google.com).
+     */
+    private static class CheckInternetConnection extends AsyncTask<Void, Void, Boolean> {
 
         private WeakReference<StatisticsActivity> activityReference;
 
-        Task(StatisticsActivity activityReference) {
+        CheckInternetConnection(StatisticsActivity activityReference) {
             this.activityReference = new WeakReference<>(activityReference);
         }
 

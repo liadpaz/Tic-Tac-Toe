@@ -41,6 +41,9 @@ import static com.liadpaz.tic_tac_toe.Cell.Type.X;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+/**
+ * This class is the game activity. It contains all the game graphics and mechanics.
+ */
 public class GameActivity extends AppCompatActivity {
 
     private Intent musicService;
@@ -103,8 +106,8 @@ public class GameActivity extends AppCompatActivity {
 
         maxGames = getIntent().getIntExtra("Max", -1);
         timer = getIntent().getIntExtra("Timer", -1);
-        Utils.Mode mode = (Utils.Mode) getIntent().getSerializableExtra("Mode");
-        startingType = (Type) getIntent().getSerializableExtra("Starting");
+        Utils.Mode mode = (Utils.Mode)getIntent().getSerializableExtra("Mode");
+        startingType = (Type)getIntent().getSerializableExtra("Starting");
         lobbyNumber = getIntent().getStringExtra("LobbyNumber");
         multiType = getIntent().getStringExtra("Multiplayer");
         difficulty = getIntent().getBooleanExtra("Difficulty", false);
@@ -128,19 +131,13 @@ public class GameActivity extends AppCompatActivity {
         cells[2][0] = new Cell(binding.ivBl);
         cells[2][1] = new Cell(binding.ivBm);
         cells[2][2] = new Cell(binding.ivBr);
-        binding.btnResign.setOnClickListener(v -> new AlertDialog.Builder(GameActivity.this)
-                .setTitle(R.string.resign)
-                .setMessage(R.string.resign_message)
-                .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
-                    if (vs_multiplayer) {
-                        gameRef.removeValue();
-                    }
-                    finishAffinity();
-                    startActivity(new Intent(GameActivity.this, MainActivity.class));
-                })
-                .setNegativeButton(R.string.no, null)
-                .setCancelable(true)
-                .show());
+        binding.btnResign.setOnClickListener(v -> new AlertDialog.Builder(GameActivity.this).setTitle(R.string.resign).setMessage(R.string.resign_message).setPositiveButton(R.string.yes, (dialogInterface, i) -> {
+            if (vs_multiplayer) {
+                gameRef.removeValue();
+            }
+            finishAffinity();
+            startActivity(new Intent(GameActivity.this, MainActivity.class));
+        }).setNegativeButton(R.string.no, null).setCancelable(true).show());
         iv_playerX = binding.ivPlayerX;
         tv_playerX = binding.tvPlayerX;
         tv_playerXwins = binding.tvPlayerXwins;
@@ -214,8 +211,7 @@ public class GameActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                }
+                public void onCancelled(@NonNull DatabaseError databaseError) {}
             });
             gameRef.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -283,8 +279,7 @@ public class GameActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                }
+                public void onCancelled(@NonNull DatabaseError databaseError) {}
             });
         }
 
@@ -310,53 +305,47 @@ public class GameActivity extends AppCompatActivity {
         if (vs_computer) {
             cancelCounter();
             tv_turn.setVisibility(View.INVISIBLE);
-            new AlertDialog.Builder(this)
-                    .setCancelable(false)
-                    .setMessage(R.string.player_chooser)
-                    .setTitle(R.string.choose_player)
-                    .setPositiveButton("X", (dialog, which) -> {
-                        scores.putAll(new HashMap<Type, Integer>() {{
-                            put(X, -10);
-                            put(O, 10);
-                            put(None, 0);
-                        }});
-                        thisType = X;
-                        comType = O;
-                        tv_playerO.setText(R.string.computer);
-                        tv_playerX.setText(R.string.you);
-                        tv_playerX.setVisibility(View.VISIBLE);
-                        tv_playerO.setVisibility(View.VISIBLE);
-                        tv_playerXwins.setVisibility(View.VISIBLE);
-                        tv_playerOwins.setVisibility(View.VISIBLE);
-                        if (startingType == O) {
-                            putCPU();
-                        }
-                        if (timer != 0) {
-                            counter.start();
-                        }
-                    })
-                    .setNegativeButton("O", (dialog, which) -> {
-                        scores.putAll(new HashMap<Type, Integer>() {{
-                            put(X, 10);
-                            put(O, -10);
-                            put(None, 0);
-                        }});
-                        thisType = O;
-                        comType = X;
-                        tv_playerO.setText(R.string.you);
-                        tv_playerX.setText(R.string.computer);
-                        tv_playerX.setVisibility(View.VISIBLE);
-                        tv_playerO.setVisibility(View.VISIBLE);
-                        tv_playerXwins.setVisibility(View.VISIBLE);
-                        tv_playerOwins.setVisibility(View.VISIBLE);
-                        if (startingType == X) {
-                            putCPU();
-                        }
-                        if (timer != 0) {
-                            counter.start();
-                        }
-                    })
-                    .show();
+            new AlertDialog.Builder(this).setCancelable(false).setMessage(R.string.player_chooser).setTitle(R.string.choose_player).setPositiveButton("X", (dialog, which) -> {
+                scores = new HashMap<Type, Integer>() {{
+                    put(X, -10);
+                    put(O, 10);
+                    put(None, 0);
+                }};
+                thisType = X;
+                comType = O;
+                tv_playerO.setText(R.string.computer);
+                tv_playerX.setText(R.string.you);
+                tv_playerX.setVisibility(View.VISIBLE);
+                tv_playerO.setVisibility(View.VISIBLE);
+                tv_playerXwins.setVisibility(View.VISIBLE);
+                tv_playerOwins.setVisibility(View.VISIBLE);
+                if (startingType == O) {
+                    putCPU();
+                }
+                if (timer != 0) {
+                    counter.start();
+                }
+            }).setNegativeButton("O", (dialog, which) -> {
+                scores = new HashMap<Type, Integer>() {{
+                    put(X, 10);
+                    put(O, -10);
+                    put(None, 0);
+                }};
+                thisType = O;
+                comType = X;
+                tv_playerO.setText(R.string.you);
+                tv_playerX.setText(R.string.computer);
+                tv_playerX.setVisibility(View.VISIBLE);
+                tv_playerO.setVisibility(View.VISIBLE);
+                tv_playerXwins.setVisibility(View.VISIBLE);
+                tv_playerOwins.setVisibility(View.VISIBLE);
+                if (startingType == X) {
+                    putCPU();
+                }
+                if (timer != 0) {
+                    counter.start();
+                }
+            }).show();
 
         } else if (vs_on_this_device) {
             tv_turn.setText(String.format("%s %s%s", getString(R.string.its), turn.toString(), getString(R.string.turn)));
@@ -370,17 +359,16 @@ public class GameActivity extends AppCompatActivity {
     }
 
     /**
-     * This function gets triggered whenever the user touches the screen, and
-     * decides whether to count as a valid XO press, if so, it makes the X / O
-     * visible and checks for winner / tie.
+     * This function gets triggered whenever the user touches the screen, and decides whether to
+     * count as a valid XO press, if so, it makes the X / O visible and checks for winner / tie.
      *
      * @param event touch location and info about the touch
      */
     @SuppressLint("DefaultLocale")
     @Override
     public boolean onTouchEvent(@NotNull MotionEvent event) {
-        final int touchX = (int) event.getRawX();
-        final int touchY = (int) event.getRawY();
+        final int touchX = (int)event.getRawX();
+        final int touchY = (int)event.getRawY();
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
@@ -405,25 +393,21 @@ public class GameActivity extends AppCompatActivity {
      */
     private AlertDialog.Builder tieAlert() {
         thisCanPlay = false;
-        return new AlertDialog.Builder(this)
-                .setCancelable(false)
-                .setTitle(R.string.tie)
-                .setMessage(R.string.its_a_tie)
-                .setPositiveButton(R.string.continue_dialog, (dialog, which) -> {
-                    thisCanPlay = true;
-                    resetGame();
-                    if (vs_multiplayer) {
-                        writeDatabaseMessage("go");
-                        tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.its), thisType == turn ? thisName : otherName, getString(R.string.turn), turn.toString()));
-                    } else {
-                        tv_turn.setText(String.format("%s %s%s", getString(R.string.its), turn.toString(), getString(R.string.turn)));
-                    }
-                    if (timer != 0 && (turn == thisType || (vs_multiplayer && canPlay))) {
-                        if (!vs_multiplayer || canPlay) {
-                            counter.start();
-                        }
-                    }
-                });
+        return new AlertDialog.Builder(this).setCancelable(false).setTitle(R.string.tie).setMessage(R.string.its_a_tie).setPositiveButton(R.string.continue_dialog, (dialog, which) -> {
+            thisCanPlay = true;
+            resetGame();
+            if (vs_multiplayer) {
+                writeDatabaseMessage("go");
+                tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.its), thisType == turn ? thisName : otherName, getString(R.string.turn), turn.toString()));
+            } else {
+                tv_turn.setText(String.format("%s %s%s", getString(R.string.its), turn.toString(), getString(R.string.turn)));
+            }
+            if (timer != 0 && (turn == thisType || (vs_multiplayer && canPlay))) {
+                if (!vs_multiplayer || canPlay) {
+                    counter.start();
+                }
+            }
+        });
     }
 
     /**
@@ -434,42 +418,35 @@ public class GameActivity extends AppCompatActivity {
      */
     private AlertDialog.Builder winnerAlert(boolean player, String player_won) {
         thisCanPlay = false;
-        return new AlertDialog.Builder(this)
-                .setCancelable(false)
-                .setTitle(R.string.congratulations)
-                .setMessage(player ? String.format("%s %s %s", getString(R.string.player), player_won, getString(R.string.won)) : String.format("%s %s", player_won, getString(R.string.won)))
-                .setPositiveButton(R.string.continue_dialog, (dialog, which) -> {
-                    resetGame();
-                    thisCanPlay = true;
-                    if (vs_multiplayer) {
-                        writeDatabaseMessage("go");
-                    }
-                    if (timer != 0 && (turn == thisType || (vs_multiplayer && canPlay))) {
-                        if (!vs_multiplayer || canPlay) {
-                            counter.start();
-                        }
-                    }
-                });
+        return new AlertDialog.Builder(this).setCancelable(false).setTitle(R.string.congratulations).setMessage(player ? String.format("%s %s %s", getString(R.string.player), player_won, getString(R.string.won)) : String.format("%s %s", player_won, getString(R.string.won))).setPositiveButton(R.string.continue_dialog, (dialog, which) -> {
+            resetGame();
+            thisCanPlay = true;
+            if (vs_multiplayer) {
+                writeDatabaseMessage("go");
+            }
+            if (timer != 0 && (turn == thisType || (vs_multiplayer && canPlay))) {
+                if (!vs_multiplayer || canPlay) {
+                    counter.start();
+                }
+            }
+        });
     }
 
     /**
      * This function builds a winner dialog
      *
-     * <p>This function builds and returns an absolute winner AlertDialog with the winner name in it</p>
+     * <p>This function builds and returns an absolute winner AlertDialog with the winner name in
+     * it</p>
      *
      * @param player     true to show 'player' at the start
      * @param player_won a String contains the player name
      * @return absolute winner AlertDialog
      */
     private AlertDialog.Builder absoluteWinnerAlert(boolean player, String player_won) {
-        return new AlertDialog.Builder(this)
-                .setCancelable(false)
-                .setTitle(R.string.winner)
-                .setMessage(player ? String.format("%s %s %s", getString(R.string.player), player_won, getString(R.string.won_the_game)) : String.format("%s %s", player_won, getString(R.string.won_the_game)))
-                .setPositiveButton(R.string.continue_dialog, (dialog, which) -> {
-                    finishAffinity();
-                    startActivity(new Intent(GameActivity.this, MainActivity.class));
-                });
+        return new AlertDialog.Builder(this).setCancelable(false).setTitle(R.string.winner).setMessage(player ? String.format("%s %s %s", getString(R.string.player), player_won, getString(R.string.won_the_game)) : String.format("%s %s", player_won, getString(R.string.won_the_game))).setPositiveButton(R.string.continue_dialog, (dialog, which) -> {
+            finishAffinity();
+            startActivity(new Intent(GameActivity.this, MainActivity.class));
+        });
     }
 
     /**
@@ -605,9 +582,11 @@ public class GameActivity extends AppCompatActivity {
      * This function hides all the X's and O's
      */
     private void hideAll() {
-        for (Cell[] cellRow : cells)
-            for (Cell cell : cellRow)
+        for (Cell[] cellRow : cells) {
+            for (Cell cell : cellRow) {
                 cell.hide();
+            }
+        }
     }
 
     /**
@@ -680,8 +659,8 @@ public class GameActivity extends AppCompatActivity {
     }
 
     /**
-     * This function writes a message to the current lobby in the FireBase database according
-     * to this player type (Host / Client)
+     * This function writes a message to the current lobby in the FireBase database according to
+     * this player type (Host / Client)
      *
      * @param message the message to write
      */
@@ -690,8 +669,8 @@ public class GameActivity extends AppCompatActivity {
     }
 
     /**
-     * This function initialize all components that require local variables that may be stored
-     * in the database
+     * This function initialize all components that require local variables that may be stored in
+     * the database
      */
     @SuppressLint("DefaultLocale")
     private void initialize() {
@@ -704,7 +683,7 @@ public class GameActivity extends AppCompatActivity {
             counter = new CountDownTimer(timer * 1000, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
-                    tv_timer.setText(String.format("%s %s", String.valueOf((int) millisUntilFinished / 1000 + 1), getString(R.string.seconds)));
+                    tv_timer.setText(String.format("%s %s", String.valueOf((int)millisUntilFinished / 1000 + 1), getString(R.string.seconds)));
                 }
 
                 @Override
@@ -748,10 +727,10 @@ public class GameActivity extends AppCompatActivity {
     }
 
     /**
-     * This function places the multiplayer photos in their respective places
+     * This function puts the players' photos in their respective places
      */
     private void putPhotos() {
-        final File remotePhoto = new File(getFilesDir(), "Photo1.jpg");
+        final File remotePhoto = new File(getFilesDir(), "PhotoRemote.jpg");
         storageRef.child(multiType.equals("Host") ? "Client" : "Host").getFile(remotePhoto).addOnCompleteListener(task -> {
             Utils.remotePhotoUri = FileProvider.getUriForFile(GameActivity.this, "com.liadpaz.tic_tac_toe.fileprovider", remotePhoto);
             if (thisType == X) {
@@ -769,8 +748,8 @@ public class GameActivity extends AppCompatActivity {
     }
 
     /**
-     * This function gets called when the user pressed the 'back button' and it prevents
-     * the user from closing the lobby on multiplayer
+     * This function gets called when the user pressed the 'back button' and it prevents the user
+     * from closing the lobby on multiplayer
      */
     @Override
     public void onBackPressed() {

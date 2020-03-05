@@ -2,7 +2,9 @@ package com.liadpaz.tic_tac_toe;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.CheckBox;
+import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -16,8 +18,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.liadpaz.tic_tac_toe.databinding.ActivityLobbyBinding;
-
-import java.util.Objects;
 
 public class LobbyActivity extends AppCompatActivity {
 
@@ -40,10 +40,15 @@ public class LobbyActivity extends AppCompatActivity {
     private String hostName;
     private String clientName;
 
+    private TextView tv_uploading_photo;
+    private ProgressBar progressBar_uploading_photo;
+
     private ValueEventListener listener;
 
     private boolean ready_host = false;
     private boolean ready_client = false;
+
+    private boolean isLaunchingGame = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +57,7 @@ public class LobbyActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         lobbyNumber = getIntent().getStringExtra("LobbyNumber");
-        isHost = Objects.equals(getIntent().getStringExtra("Multiplayer"), "Host");
+        isHost = "Host".equals(getIntent().getStringExtra("Multiplayer"));
         hostName = getIntent().getStringExtra("HostName");
 
         binding.btnExitLobby.setOnClickListener(v -> {
@@ -61,12 +66,12 @@ public class LobbyActivity extends AppCompatActivity {
         });
         tv_host_name = binding.tvHostName;
         tv_client_name = binding.tvClientName;
-        TextView tv_room_number = binding.tvRoomNumber;
+        binding.tvRoomNumber.setText(lobbyNumber);
         sw_host = binding.swHostSide;
         sw_client = binding.swClientSide;
         checkbox_ready = binding.ckbxReady;
-
-        tv_room_number.setText(lobbyNumber);
+        tv_uploading_photo = binding.tvUploadingPhoto;
+        progressBar_uploading_photo = binding.progressBarUploadingPhoto;
 
         tv_host_name.setText(hostName);
         tv_client_name.setText(R.string.waiting);
@@ -77,7 +82,7 @@ public class LobbyActivity extends AppCompatActivity {
         if (isHost) {
             sw_host.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 sw_client.setChecked(!isChecked);
-                LobbyActivity.this.setHostType(isChecked);
+                setHostType(isChecked);
             });
         } else {
             sw_host.setEnabled(false);
@@ -88,14 +93,13 @@ public class LobbyActivity extends AppCompatActivity {
                 ready_host = isChecked;
                 sw_host.setEnabled(!isChecked);
                 if (ready_host && ready_client) {
-                    LobbyActivity.this.writeDatabaseMessage("play");
-                    LobbyActivity.this.startActivity(new Intent(LobbyActivity.this, GameActivity.class)
-                            .putExtra("LobbyNumber", lobbyNumber)
-                            .putExtra("Multiplayer", "Host"));
+                    isLaunchingGame = true;
+                    writeDatabaseMessage("play");
+                    startActivity(new Intent(LobbyActivity.this, GameActivity.class).putExtra("LobbyNumber", lobbyNumber).putExtra("Multiplayer", "Host"));
 
                 }
             } else {
-                LobbyActivity.this.writeDatabaseMessage(isChecked ? "ready" : "not_ready");
+                writeDatabaseMessage(isChecked ? "ready" : "not_ready");
             }
         });
 
@@ -109,15 +113,11 @@ public class LobbyActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.hasChildren()) {
-                    new AlertDialog.Builder(LobbyActivity.this)
-                            .setMessage(R.string.lobby_left_message)
-                            .setPositiveButton(R.string.back_main_menu, (dialog, which) -> {
-                                lobbyRef.removeValue();
-                                finishAffinity();
-                                startActivity(new Intent(LobbyActivity.this, MainActivity.class));
-                            })
-                            .setCancelable(false)
-                            .show();
+                    new AlertDialog.Builder(LobbyActivity.this).setMessage(R.string.lobby_left_message).setPositiveButton(R.string.back_main_menu, (dialog, which) -> {
+                        lobbyRef.removeValue();
+                        finishAffinity();
+                        startActivity(new Intent(LobbyActivity.this, MainActivity.class));
+                    }).setCancelable(false).show();
                     return;
                 }
                 if (max == null || timer == null) {
@@ -133,25 +133,16 @@ public class LobbyActivity extends AppCompatActivity {
                         }
                     } else {
                         String clientMessage = dataSnapshot.child("clientMessage").getValue(String.class);
-                        if (clientMessage != null) {
-                            switch (clientMessage) {
-                                case "ready": {
-                                    ready_client = true;
-                                    if (ready_host) {
-                                        writeDatabaseMessage("play");
-                                        startActivity(new Intent(LobbyActivity.this, GameActivity.class)
-                                                .putExtra("LobbyNumber", lobbyNumber)
-                                                .putExtra("Multiplayer", "Host"));
-                                        finish();
-                                    }
-                                    break;
-                                }
-
-                                case "not_ready": {
-                                    ready_client = false;
-                                    break;
-                                }
+                        if ("ready".equals(clientMessage)) {
+                            ready_client = true;
+                            if (ready_host) {
+                                isLaunchingGame = true;
+                                writeDatabaseMessage("play");
+                                startActivity(new Intent(LobbyActivity.this, GameActivity.class).putExtra("LobbyNumber", lobbyNumber).putExtra("Multiplayer", "Host"));
+                                finish();
                             }
+                        } else if ("not_ready".equals(clientMessage)) {
+                            ready_client = false;
                         }
                     }
                 } else {
@@ -168,20 +159,16 @@ public class LobbyActivity extends AppCompatActivity {
                     }
 
                     String hostMessage = dataSnapshot.child("hostMessage").getValue(String.class);
-                    if (hostMessage != null) {
-                        if (hostMessage.equals("play")) {
-                            startActivity(new Intent(LobbyActivity.this, GameActivity.class)
-                                    .putExtra("LobbyNumber", lobbyNumber)
-                                    .putExtra("Multiplayer", "Client"));
-                            finish();
-                        }
+                    if ("play".equals(hostMessage)) {
+                        isLaunchingGame = true;
+                        startActivity(new Intent(LobbyActivity.this, GameActivity.class).putExtra("LobbyNumber", lobbyNumber).putExtra("Multiplayer", "Client"));
+                        finish();
                     }
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
+            public void onCancelled(@NonNull DatabaseError databaseError) {}
         });
 
         if (!Stats.readPrivacy()) {
@@ -230,14 +217,26 @@ public class LobbyActivity extends AppCompatActivity {
      * This function uploads the photo the player took to the Firebase Storage
      */
     private void uploadPhoto() {
+        checkbox_ready.setEnabled(false);
+        tv_uploading_photo.setVisibility(View.VISIBLE);
+        progressBar_uploading_photo.setVisibility(View.VISIBLE);
         StorageReference storageRef = Firebase.storeRef.child("Lobbies").child(lobbyNumber);
-        storageRef.child(isHost ? "Host" : "Client").putFile(Utils.localPhotoUri);
+        storageRef.child(isHost ? "Host" : "Client").putFile(Utils.localPhotoUri).addOnProgressListener(taskSnapshot -> {
+            if (progressBar_uploading_photo.getMax() == 0) {
+                progressBar_uploading_photo.setMax((int)taskSnapshot.getTotalByteCount());
+            }
+            progressBar_uploading_photo.setProgress((int) taskSnapshot.getBytesTransferred(), true);
+        }).addOnCompleteListener(task -> {
+            checkbox_ready.setEnabled(true);
+            tv_uploading_photo.setVisibility(View.INVISIBLE);
+            progressBar_uploading_photo.setVisibility(View.INVISIBLE);
+        });
     }
 
     @Override
     protected void onDestroy() {
         lobbyRef.removeEventListener(listener);
-        if (isHost && clientName == null) {
+        if (!isLaunchingGame) {
             lobbyRef.removeValue();
         }
         super.onDestroy();

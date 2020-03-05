@@ -109,4 +109,5 @@
     <string name="photo_not_found">תמונת גוגל שלך לא נמצאה, משתמש בממלא מקום במקום…</string>
     <string name="hear_music">לשמוע מוזיקה בזמן משחק</string>
     <string name="lobby_couldnt_make">אי אפשר היה ליצור לובי חדש</string>
+    <string name="uploading_photo">בתהליך העלת התמונה</string>
 </resources>

@@ -3,18 +3,12 @@ package com.liadpaz.tic_tac_toe;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
-import android.os.Binder;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
 public class MusicPlayerService extends Service {
 
-    private final IBinder binder = new Binder() {
-        MusicPlayerService getService() {
-            return MusicPlayerService.this;
-        }
-    };
     private MediaPlayer player;
 
     @Override

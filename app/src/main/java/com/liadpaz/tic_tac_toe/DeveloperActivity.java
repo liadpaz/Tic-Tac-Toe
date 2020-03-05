@@ -18,6 +18,9 @@ import com.liadpaz.tic_tac_toe.databinding.ActivityDeveloperBinding;
 
 import java.util.ArrayList;
 
+/**
+ *
+ */
 public class DeveloperActivity extends AppCompatActivity {
 
     private ArrayList<String> lobbiesNumber;
@@ -38,15 +41,10 @@ public class DeveloperActivity extends AppCompatActivity {
 
         lv_lobbies = binding.lvLobbies;
         lv_lobbies.setOnItemLongClickListener((parent, view, position, id) -> {
-            new AlertDialog.Builder(DeveloperActivity.this)
-                    .setMessage(String.format("Are you sure you want to delete %s?", ((TextView) ((ConstraintLayout) view).getViewById(R.id.tv_lobby_dev)).getText().toString()))
-                    .setTitle("Delete Lobby")
-                    .setPositiveButton("Yes", (dialog, which) -> {
-                        Firebase.dataRef.child("Lobbies").child(((TextView) ((ConstraintLayout) view).getViewById(R.id.tv_lobby_dev)).getText().toString()).removeValue();
-                        getLobbies();
-                    })
-                    .setNegativeButton("No", null)
-                    .show();
+            new AlertDialog.Builder(DeveloperActivity.this).setMessage(String.format("Are you sure you want to delete %s?", ((TextView)((ConstraintLayout)view).getViewById(R.id.tv_lobby_dev)).getText().toString())).setTitle("Delete Lobby").setPositiveButton("Yes", (dialog, which) -> {
+                Firebase.dataRef.child("Lobbies").child(((TextView)((ConstraintLayout)view).getViewById(R.id.tv_lobby_dev)).getText().toString()).removeValue();
+                getLobbies();
+            }).setNegativeButton("No", null).show();
             return true;
         });
 
@@ -61,20 +59,19 @@ public class DeveloperActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        new AlertDialog.Builder(DeveloperActivity.this)
-                .setTitle(R.string.delete_all)
-                .setMessage(R.string.delete_all_message)
-                .setPositiveButton(R.string.yes, (dialog, which) -> {
-                    for (String lobby : lobbiesNumber) {
-                        Firebase.dataRef.child("Lobbies").child(lobby).removeValue();
-                    }
-                    getLobbies();
-                })
-                .setNegativeButton(R.string.no, null)
-                .show();
+        new AlertDialog.Builder(DeveloperActivity.this).setTitle(R.string.delete_all).setMessage(R.string.delete_all_message).setPositiveButton(R.string.yes, (dialog, which) -> {
+            for (String lobby : lobbiesNumber) {
+                Firebase.dataRef.child("Lobbies").child(lobby).removeValue();
+            }
+            getLobbies();
+        }).setNegativeButton(R.string.no, null).show();
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * This function downloads all the lobbies to the {@code lobbiesNumber} variable and displays it
+     * on screen as a list
+     */
     private void getLobbies() {
         Firebase.dataRef.child("Lobbies").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -88,8 +85,7 @@ public class DeveloperActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
+            public void onCancelled(@NonNull DatabaseError databaseError) {}
         });
     }
 }

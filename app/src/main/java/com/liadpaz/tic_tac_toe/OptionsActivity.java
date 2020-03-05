@@ -41,8 +41,6 @@ public class OptionsActivity extends AppCompatActivity {
 
     private static final int CAMERA_ACTIVITY = 968;
 
-    private DatabaseReference settingRef;
-
     private File photo;
     private boolean photoOk = false;
 
@@ -57,6 +55,8 @@ public class OptionsActivity extends AppCompatActivity {
     private EditText et_name_host;
     private boolean nameOk = false;
 
+    private String lobbyNumber;
+
     private Button btn_play;
 
     @SuppressWarnings("ConstantConditions")
@@ -70,12 +70,12 @@ public class OptionsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.options);
 
-        mode = (Utils.Mode) getIntent().getSerializableExtra("Mode");
+        mode = (Utils.Mode)getIntent().getSerializableExtra("Mode");
 
         NumberPicker numpic_maxgames = binding.numpicMaxgames;
         numpic_timer = binding.numpicTimer;
-        CheckBox ckbx_timer = binding.chbxTimer;
-        CheckBox ckbx_google_name = binding.ckbxGoogleName;
+        CheckBox checkbox_timer = binding.chbxTimer;
+        CheckBox checkbox_google_name = binding.ckbxGoogleName;
         btn_play = binding.btnPlay;
         Button btn_camera = binding.btnSettingsCamera;
         et_name_host = binding.etNameHost;
@@ -90,7 +90,7 @@ public class OptionsActivity extends AppCompatActivity {
         Switch sw_difficulty = binding.swDifficulty;
         TextView tv_difficulty = binding.tvDifficulty;
 
-        ckbx_google_name.setChecked(Stats.getGoogleName());
+        checkbox_google_name.setChecked(Stats.getGoogleName());
 
         numpic_maxgames.setMinValue(1);
         numpic_maxgames.setMaxValue(10);
@@ -107,20 +107,15 @@ public class OptionsActivity extends AppCompatActivity {
             if (mode == Utils.Mode.Multiplayer) {
                 initializeLobby();
             } else {
-                startActivity(new Intent(OptionsActivity.this, GameActivity.class)
-                        .putExtra("Mode", mode)
-                        .putExtra("Max", max_games)
-                        .putExtra("Timer", timer)
-                        .putExtra("Starting", starting_player)
-                        .putExtra("Difficulty", difficulty));
+                startActivity(new Intent(OptionsActivity.this, GameActivity.class).putExtra("Mode", mode).putExtra("Max", max_games).putExtra("Timer", timer).putExtra("Starting", starting_player).putExtra("Difficulty", difficulty));
             }
         });
 
-        ckbx_timer.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        checkbox_timer.setOnCheckedChangeListener((buttonView, isChecked) -> {
             numpic_timer.setEnabled(isChecked);
             timer = isChecked ? timer : 0;
         });
-        ckbx_google_name.setOnCheckedChangeListener(((buttonView, isChecked) -> {
+        checkbox_google_name.setOnCheckedChangeListener(((buttonView, isChecked) -> {
             Stats.setGoogleName(isChecked);
             et_name_host.setText(isChecked ? FirebaseAuth.getInstance().getCurrentUser().getDisplayName() : "");
             et_name_host.setEnabled(!isChecked);
@@ -132,7 +127,7 @@ public class OptionsActivity extends AppCompatActivity {
 
         if (mode == Utils.Mode.Multiplayer) {
             et_name_host.setVisibility(View.VISIBLE);
-            ckbx_google_name.setVisibility(View.VISIBLE);
+            checkbox_google_name.setVisibility(View.VISIBLE);
             tv_name_host.setVisibility(View.VISIBLE);
             if (!Stats.readPrivacy()) {
                 btn_camera.setVisibility(View.VISIBLE);
@@ -144,18 +139,16 @@ public class OptionsActivity extends AppCompatActivity {
                     startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(MediaStore.EXTRA_OUTPUT, Utils.localPhotoUri), CAMERA_ACTIVITY);
                 });
             } else {
-                photoOk = true;
-                new PhotoTask(OptionsActivity.this, photo).execute(FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString());
+                new GooglePhotoTask(OptionsActivity.this, photo).execute(FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString());
                 btn_camera.setVisibility(View.INVISIBLE);
             }
             et_name_host.addTextChangedListener(new TextWatcher() {
                 @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
                 @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                    if (charSequence.length() == 0) {
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (s.length() == 0) {
                         nameOk = false;
                         btn_play.setEnabled(false);
                     } else {
@@ -165,8 +158,8 @@ public class OptionsActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void afterTextChanged(Editable editable) {
-                    nameOk = editable.length() > 0;
+                public void afterTextChanged(Editable s) {
+                    nameOk = s.length() > 0;
                 }
             });
             btn_play.setEnabled(false);
@@ -201,12 +194,12 @@ public class OptionsActivity extends AppCompatActivity {
      * This function initializes a lobby
      */
     private void initializeLobby() {
-        settingRef = Firebase.dataRef.child("Lobbies");
+        DatabaseReference settingRef = Firebase.dataRef.child("Lobbies");
         settingRef.runTransaction(new Transaction.Handler() {
             @NonNull
             @Override
             public Transaction.Result doTransaction(@NonNull MutableData currentData) {
-                String lobbyNumber = Utils.getRoomNumber();
+                lobbyNumber = Utils.getRoomNumber();
                 int tries = 1;
                 while (currentData.hasChild(lobbyNumber)) {
                     lobbyNumber = Utils.getRoomNumber();
@@ -218,18 +211,14 @@ public class OptionsActivity extends AppCompatActivity {
                 currentData.child(lobbyNumber).setValue(new Lobby(et_name_host.getText().toString(), lobbyNumber, starting_player.toString(), timer, max_games, Stats.readPrivacy()));
                 currentData.child(lobbyNumber).child("startingType").setValue(starting_player.toString());
 
-                startActivity(new Intent(OptionsActivity.this, LobbyActivity.class)
-                        .putExtra("HostName", et_name_host.getText().toString())
-                        .putExtra("Multiplayer", "Host")
-                        .putExtra("Starting", starting_player)
-                        .putExtra("LobbyNumber", lobbyNumber));
-
                 return Transaction.success(currentData);
             }
 
             @Override
             public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
-                if (!committed) {
+                if (committed) {
+                    startActivity(new Intent(OptionsActivity.this, LobbyActivity.class).putExtra("HostName", et_name_host.getText().toString()).putExtra("Multiplayer", "Host").putExtra("Starting", starting_player).putExtra("LobbyNumber", lobbyNumber));
+                } else {
                     Toast.makeText(OptionsActivity.this, R.string.lobby_couldnt_make, Toast.LENGTH_LONG).show();
                 }
             }
@@ -245,12 +234,16 @@ public class OptionsActivity extends AppCompatActivity {
         }
     }
 
-    private static class PhotoTask extends AsyncTask<String, Void, Void> {
+    /**
+     * This class is for downloading the user's photo from his google account and storing it
+     * locally, if it has failed to do so it will store a placeholder photo instead.
+     */
+    private static class GooglePhotoTask extends AsyncTask<String, Void, Void> {
 
         private WeakReference<OptionsActivity> optionsActivity;
         private File photo;
 
-        PhotoTask(OptionsActivity optionsActivity, File photo) {
+        GooglePhotoTask(OptionsActivity optionsActivity, File photo) {
             this.optionsActivity = new WeakReference<>(optionsActivity);
             this.photo = photo;
         }
@@ -282,6 +275,11 @@ public class OptionsActivity extends AppCompatActivity {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, Bitmap.DENSITY_NONE, os);
                     os.close();
                 } catch (Exception ignored1) {
+                }
+            } finally {
+                optionsActivity.get().photoOk = true;
+                if (optionsActivity.get().nameOk) {
+                    optionsActivity.get().runOnUiThread(() -> optionsActivity.get().btn_play.setEnabled(true));
                 }
             }
             return null;

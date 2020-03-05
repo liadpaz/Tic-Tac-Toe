@@ -113,4 +113,5 @@
     <string name="photo_not_found">Your Google photo was not found, using a placeholder instead…</string>
     <string name="hear_music">Hear music while in game</string>
     <string name="lobby_couldnt_make">Couldn\'t make new lobby</string>
+    <string name="uploading_photo">Uploading photo in progress</string>
 </resources>

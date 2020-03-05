@@ -60,8 +60,9 @@ class Utils {
      */
     static String getRoomNumber() {
         StringBuilder number = new StringBuilder();
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 4; i++) {
             number.append((new Random()).nextInt(10));
+        }
         return number.toString();
     }
 
@@ -96,6 +97,7 @@ class Cell {
     private ImageView XO;
     private Type type;
     private boolean visible = false;
+
     /**
      * Constructor, attaches 2 ImageViews (X, O) to the cell
      *
@@ -137,6 +139,10 @@ class Cell {
         return false;
     }
 
+    /**
+     * This function sets the cell type to the {@code type} type without the visual representation in order not to overload the ui thread work on the minimax algorithm.
+     * @param type the type to set the cell to
+     */
     void setInvisibleType(Type type) {
         this.type = type;
         visible = true;
@@ -184,9 +190,7 @@ class Cell {
      * This is the type of the cell. eg. X, O
      */
     public enum Type {
-        None,
-        X,
-        O;
+        None, X, O;
 
         /**
          * This function flips the type. eg. X to O and O to X
@@ -241,14 +245,13 @@ class Stats {
     }
 
     /**
-     * This function sets the user preference of his name in multiplayer game (google name or custom)
+     * This function sets the user preference of his name in multiplayer game (google name or
+     * custom)
      *
      * @param googleName true if the user prefer to use his google name
      */
     static void setGoogleName(boolean googleName) {
-        sharedPreferences.edit()
-                .putBoolean("google_name", googleName)
-                .apply();
+        sharedPreferences.edit().putBoolean("google_name", googleName).apply();
     }
 
     /**
@@ -279,9 +282,7 @@ class Stats {
      */
     @SuppressLint("DefaultLocale")
     static private void writeFile(Readables type, int message) {
-        sharedPreferences.edit()
-                .putInt(type.toString(), message)
-                .apply();
+        sharedPreferences.edit().putInt(type.toString(), message).apply();
     }
 
     /**
@@ -293,13 +294,12 @@ class Stats {
         if (Firebase.userRef != null) {
             Firebase.userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Firebase.userRef.child("Xwins").setValue(dataSnapshot.child("Xwins").getValue(Integer.class) + 1);
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    Firebase.userRef.child("Xwins").setValue(snapshot.child("Xwins").getValue(Integer.class) + 1);
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                }
+                public void onCancelled(@NonNull DatabaseError error) {}
             });
         }
     }
@@ -322,13 +322,12 @@ class Stats {
         if (Firebase.userRef != null) {
             Firebase.userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Firebase.userRef.child("Owins").setValue(dataSnapshot.child("Owins").getValue(Integer.class) + 1);
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    Firebase.userRef.child("Owins").setValue(snapshot.child("Owins").getValue(Integer.class) + 1);
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                }
+                public void onCancelled(@NonNull DatabaseError error) {}
             });
         }
     }
@@ -346,7 +345,7 @@ class Stats {
      * This function adds {@param time} seconds to the shared preferences
      */
     static void addTime(long time) {
-        writeFile(Readables.Time, readStat(Readables.Time) + (int) time);
+        writeFile(Readables.Time, readStat(Readables.Time) + (int)time);
     }
 
     /**
@@ -355,18 +354,14 @@ class Stats {
      * @param time the time to write to the shared preferences
      */
     static void setTime(int time) {
-        sharedPreferences.edit()
-                .putInt("Time", time)
-                .apply();
+        sharedPreferences.edit().putInt("Time", time).apply();
     }
 
     /**
      * This is the possible readings from the local file
      */
     public enum Readables {
-        Xwins,
-        Owins,
-        Time
+        Xwins, Owins, Time
     }
 }
 

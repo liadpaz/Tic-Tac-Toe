@@ -108,8 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
         count = new CountDownTimer(1500, 1500) {
             @Override
-            public void onTick(long millisUntilFinished) {
-            }
+            public void onTick(long millisUntilFinished) {}
 
             @Override
             public void onFinish() {
@@ -122,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
             registerReceiver(new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                    ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
                     //noinspection deprecation
                     NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                     //noinspection deprecation
@@ -131,13 +130,7 @@ public class MainActivity extends AppCompatActivity {
                     boolean isConnected = (wifi != null && wifi.isConnected()) || (mobile != null && mobile.isConnected());
                     if (isConnected) {
                         if (auth.getCurrentUser() != null) {
-                            new AlertDialog.Builder(MainActivity.this)
-                                    .setNegativeButton(R.string.host_game, (dialogInterface, i) -> startActivity(new Intent(MainActivity.this, OptionsActivity.class)
-                                            .putExtra("Mode", Utils.Mode.Multiplayer)))
-                                    .setPositiveButton(R.string.join_game, (dialogInterface, i) -> startActivity(new Intent(MainActivity.this, JoinMultiplayerActivity.class)))
-                                    .setTitle(R.string.multiplayer_settings)
-                                    .setMessage(R.string.multiplayer_dialog)
-                                    .show();
+                            new AlertDialog.Builder(MainActivity.this).setNegativeButton(R.string.host_game, (dialogInterface, i) -> startActivity(new Intent(MainActivity.this, OptionsActivity.class).putExtra("Mode", Utils.Mode.Multiplayer))).setPositiveButton(R.string.join_game, (dialogInterface, i) -> startActivity(new Intent(MainActivity.this, JoinMultiplayerActivity.class))).setTitle(R.string.multiplayer_settings).setMessage(R.string.multiplayer_dialog).show();
                         } else {
                             Toast.makeText(MainActivity.this, R.string.unauthed_user, Toast.LENGTH_LONG).show();
                         }
@@ -162,10 +155,7 @@ public class MainActivity extends AppCompatActivity {
                 });
             } else {    //No user connected (login active)
                 List<AuthUI.IdpConfig> providers = Collections.singletonList(new AuthUI.IdpConfig.GoogleBuilder().build());
-                startActivityForResult(AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .build(), USER_AUTH);
+                startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(providers).build(), USER_AUTH);
             }
         });
 
@@ -230,8 +220,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                        }
+                        public void onCancelled(@NonNull DatabaseError databaseError) {}
                     });
                 } else {
                     btn_user_action.setText(R.string.login);
@@ -260,8 +249,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                        }
+                        public void onCancelled(@NonNull DatabaseError databaseError) {}
                     });
                 } catch (Exception ignored) {
                 }
@@ -290,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
                         @SuppressWarnings("ConstantConditions")
                         @Override
                         public void onReceive(@NotNull Context context, Intent intent) {
-                            ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                            ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
                             //noinspection deprecation
                             NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                             //noinspection deprecation
@@ -307,8 +295,7 @@ public class MainActivity extends AppCompatActivity {
                                         }
 
                                         @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                                        }
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {}
                                     });
                                 } else {
                                     startActivity(new Intent(MainActivity.this, StatisticsActivity.class));
@@ -391,8 +378,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
+                    public void onCancelled(@NonNull DatabaseError databaseError) {}
                 });
             }
         } else if (requestCode == SETTINGS_ACTIVITY) {

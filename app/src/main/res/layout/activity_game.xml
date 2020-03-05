@@ -231,11 +231,10 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/tv_playerX"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_turn"
         app:layout_constraintEnd_toStartOf="@+id/tv_maxgames"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/iv_board"
-        app:srcCompat="@color/colorAccent"
         tools:ignore="ContentDescription" />
 
     <ImageView
@@ -243,11 +242,10 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/tv_playerO"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_turn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/tv_maxgames"
         app:layout_constraintTop_toBottomOf="@+id/iv_board"
-        app:srcCompat="@color/colorAccent"
         tools:ignore="ContentDescription" />
 
     <androidx.appcompat.widget.Toolbar

@@ -6,6 +6,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.liadpaz.tic_tac_toe.databinding.ActivityAboutBinding;
 
+/**
+ * This class is the 'about page' activity.
+ */
 public class AboutActivity extends AppCompatActivity {
 
     @SuppressWarnings("ConstantConditions")

@@ -12,6 +12,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * This class the hello dialog on first open app event.
+ */
 class HelloDialog extends Dialog {
 
     HelloDialog(Context context, @NotNull String name) {

@@ -71,9 +71,9 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
         Button btn_camera = binding.btnJoinCamera;
         et_name_join = binding.etNameJoin;
         et_lobby_number = binding.etLobbyNumber;
-        CheckBox ckbx_google_name_join = binding.ckbxGoogleNameJoin;
+        CheckBox checkbox_google_name_join = binding.ckbxGoogleNameJoin;
 
-        ckbx_google_name_join.setChecked(Stats.getGoogleName());
+        checkbox_google_name_join.setChecked(Stats.getGoogleName());
 
         btn_join.setOnClickListener(v -> {
             clientName = et_name_join.getText().toString();
@@ -87,10 +87,7 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.hasChild(lobbyNumber)) {
                             if (dataSnapshot.child(lobbyNumber).child("clientName").getValue(String.class) == null) {
-                                startActivity(new Intent(JoinMultiplayerActivity.this, LobbyActivity.class)
-                                        .putExtra("ClientName", clientName)
-                                        .putExtra("Multiplayer", "Client")
-                                        .putExtra("LobbyNumber", lobbyNumber));
+                                startActivity(new Intent(JoinMultiplayerActivity.this, LobbyActivity.class).putExtra("ClientName", clientName).putExtra("Multiplayer", "Client").putExtra("LobbyNumber", lobbyNumber));
                                 joinRef.child(lobbyNumber).child("clientName").setValue(clientName);
                                 if (!Objects.requireNonNull(dataSnapshot.child(lobbyNumber).child("privacy").getValue(Boolean.class))) {
                                     joinRef.child(lobbyNumber).child("privacy").setValue(Stats.readPrivacy());
@@ -110,19 +107,19 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
         });
         if (!Stats.readPrivacy()) {
             btn_camera.setVisibility(View.VISIBLE);
-            photo = new File(JoinMultiplayerActivity.this.getFilesDir(), "Photo.jpg");
+            photo = new File(JoinMultiplayerActivity.this.getFilesDir(), "PhotoLocal.jpg");
             if (!Stats.getGooglePhoto()) {
                 btn_camera.setOnClickListener(v -> {
                     Utils.localPhotoUri = FileProvider.getUriForFile(JoinMultiplayerActivity.this, "com.liadpaz.tic_tac_toe.fileprovider", photo);
                     startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(MediaStore.EXTRA_OUTPUT, Utils.localPhotoUri), PHOTO_ACTIVITY);
                 });
             } else {
-                new PhotoTask(JoinMultiplayerActivity.this, photo).execute(Objects.requireNonNull(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhotoUrl()).toString());
+                new GooglePhotoTask(JoinMultiplayerActivity.this, photo).execute(FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString());
                 btn_camera.setVisibility(View.INVISIBLE);
             }
         }
 
-        ckbx_google_name_join.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        checkbox_google_name_join.setOnCheckedChangeListener((buttonView, isChecked) -> {
             nameOk = isChecked;
             Stats.setGoogleName(isChecked);
             et_name_join.setText(isChecked ? Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName() : "");
@@ -178,12 +175,16 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
         }
     }
 
-    private static class PhotoTask extends AsyncTask<String, Void, Void> {
+    /**
+     * This class is for downloading the player's photo to the device. It stores a weak reference of
+     * the activity
+     */
+    private static class GooglePhotoTask extends AsyncTask<String, Void, Void> {
 
         private WeakReference<JoinMultiplayerActivity> joinMultiplayer;
         private File photo;
 
-        PhotoTask(JoinMultiplayerActivity joinMultiplayerActivity, File photo) {
+        GooglePhotoTask(JoinMultiplayerActivity joinMultiplayerActivity, File photo) {
             this.joinMultiplayer = new WeakReference<>(joinMultiplayerActivity);
             this.photo = photo;
         }
@@ -210,8 +211,7 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
                 Toast.makeText(joinMultiplayer.get(), R.string.photo_not_found, Toast.LENGTH_LONG).show();
                 try {
                     OutputStream os = new FileOutputStream(photo);
-                    Bitmap bitmap = BitmapFactory.decodeResource(joinMultiplayer.get().getResources(), R.drawable.placeholder);
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, Bitmap.DENSITY_NONE, os);
+                    BitmapFactory.decodeResource(joinMultiplayer.get().getResources(), R.drawable.placeholder).compress(Bitmap.CompressFormat.JPEG, Bitmap.DENSITY_NONE, os);
                     os.close();
                 } catch (Exception ignored1) {}
             } finally {

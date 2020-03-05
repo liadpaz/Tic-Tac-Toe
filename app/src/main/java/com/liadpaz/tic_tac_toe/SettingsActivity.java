@@ -33,10 +33,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_activity);
         setSupportActionBar(findViewById(R.id.toolbar_settings));
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.settings, new SettingsFragment())
-                .commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.settings, new SettingsFragment()).commit();
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -104,22 +101,15 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             delete.setOnPreferenceClickListener(preference -> {
-                new AlertDialog.Builder(getContext())
-                        .setTitle(R.string.delete_user)
-                        .setMessage(R.string.delete_user_message)
-                        .setPositiveButton(R.string.yes, (dialog, which) -> AuthUI.getInstance().delete(getContext()).addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                delete.setEnabled(false);
-                                Toast.makeText(getContext(), R.string.delete_user_success, Toast.LENGTH_LONG).show();
-                            } else {
-                                List<AuthUI.IdpConfig> providers = Collections.singletonList(new AuthUI.IdpConfig.GoogleBuilder().build());
-                                startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder()
-                                        .setAvailableProviders(providers)
-                                        .build(), LOGIN_ACTIVITY);
-                            }
-                        }))
-                        .setNegativeButton(R.string.no, null)
-                        .show();
+                new AlertDialog.Builder(getContext()).setTitle(R.string.delete_user).setMessage(R.string.delete_user_message).setPositiveButton(R.string.yes, (dialog, which) -> AuthUI.getInstance().delete(getContext()).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        delete.setEnabled(false);
+                        Toast.makeText(getContext(), R.string.delete_user_success, Toast.LENGTH_LONG).show();
+                    } else {
+                        List<AuthUI.IdpConfig> providers = Collections.singletonList(new AuthUI.IdpConfig.GoogleBuilder().build());
+                        startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(providers).build(), LOGIN_ACTIVITY);
+                    }
+                })).setNegativeButton(R.string.no, null).show();
                 return true;
             });
         }
