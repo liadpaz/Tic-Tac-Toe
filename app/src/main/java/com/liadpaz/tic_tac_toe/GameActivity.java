@@ -30,7 +30,6 @@ import com.liadpaz.tic_tac_toe.databinding.ActivityGameBinding;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.Random;
 
@@ -62,7 +61,6 @@ public class GameActivity extends AppCompatActivity {
     private CountDownTimer counter;
 
     private boolean difficulty;
-    private HashMap<Type, Integer> scores = new HashMap<>();
 
     private int topScreen = 0;
 
@@ -306,11 +304,6 @@ public class GameActivity extends AppCompatActivity {
             cancelCounter();
             tv_turn.setVisibility(View.INVISIBLE);
             new AlertDialog.Builder(this).setCancelable(false).setMessage(R.string.player_chooser).setTitle(R.string.choose_player).setPositiveButton("X", (dialog, which) -> {
-                scores = new HashMap<Type, Integer>() {{
-                    put(X, -10);
-                    put(O, 10);
-                    put(None, 0);
-                }};
                 thisType = X;
                 comType = O;
                 tv_playerO.setText(R.string.computer);
@@ -326,11 +319,6 @@ public class GameActivity extends AppCompatActivity {
                     counter.start();
                 }
             }).setNegativeButton("O", (dialog, which) -> {
-                scores = new HashMap<Type, Integer>() {{
-                    put(X, 10);
-                    put(O, -10);
-                    put(None, 0);
-                }};
                 thisType = O;
                 comType = X;
                 tv_playerO.setText(R.string.you);
@@ -492,13 +480,7 @@ public class GameActivity extends AppCompatActivity {
      */
     @SuppressLint("DefaultLocale")
     private void putCPU() {
-        if (!difficulty) {  // easy difficulty
-            Random random = new Random();
-            int[] rand = new int[]{random.nextInt(3), random.nextInt(3)};
-            while (!cells[rand[0]][rand[1]].setType(turn)) {
-                rand = new int[]{random.nextInt(3), random.nextInt(3)};
-            }
-        } else {    // hard difficulty
+        if (difficulty) {    // hard difficulty
             int bestScore = Integer.MIN_VALUE;
             int[] move = new int[0];
             for (int i = 0; i < 3; i++) {
@@ -515,14 +497,23 @@ public class GameActivity extends AppCompatActivity {
                 }
             }
             cells[move[0]][move[1]].setType(comType);
+        } else {  // easy difficulty
+            Random random = new Random();
+            int[] rand = new int[]{random.nextInt(3), random.nextInt(3)};
+            while (!cells[rand[0]][rand[1]].setType(turn)) {
+                rand = new int[]{random.nextInt(3), random.nextInt(3)};
+            }
         }
         turn = comType.flip();
     }
 
-    @SuppressWarnings("ConstantConditions")
     private int minimax(Cell[][] board, int depth, int alpha, int beta, boolean isMaximizing) {
-        if (checkWinner(board) != null) {
-            return scores.get(checkWinner(board));
+        Type result;
+        if ((result = checkWinner(board)) != null) {
+            if (result == None) {
+                return 0;
+            }
+            return result == comType ? 10 - depth : depth - 10;
         }
 
         if (isMaximizing) {
@@ -536,7 +527,7 @@ public class GameActivity extends AppCompatActivity {
                         bestScore = max(bestScore, score);
                         alpha = max(alpha, score);
                         if (beta <= alpha) {
-                            break;
+                            return bestScore;
                         }
                     }
                 }
@@ -553,7 +544,7 @@ public class GameActivity extends AppCompatActivity {
                         bestScore = min(bestScore, score);
                         beta = min(beta, score);
                         if (beta <= alpha) {
-                            break;
+                            return bestScore;
                         }
                     }
                 }

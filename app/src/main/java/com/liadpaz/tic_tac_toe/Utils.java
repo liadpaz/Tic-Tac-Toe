@@ -375,13 +375,11 @@ class Lobby {
     private int timer;
     private boolean privacy;
     private String hostName;
-    private String number;
     private String hostType;
     private String startingType;
 
-    Lobby(String hostName, String number, String startingType, int timer, int max, boolean privacy) {
+    Lobby(String hostName, String startingType, int timer, int max, boolean privacy) {
         this.hostName = hostName;
-        this.number = number;
         this.startingType = startingType;
         this.timer = timer;
         this.max = max;
@@ -419,14 +417,6 @@ class Lobby {
 
     public void setHostName(String hostName) {
         this.hostName = hostName;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
     }
 
     public String getHostType() {

@@ -208,7 +208,7 @@ public class OptionsActivity extends AppCompatActivity {
                     }
                 }
 
-                currentData.child(lobbyNumber).setValue(new Lobby(et_name_host.getText().toString(), lobbyNumber, starting_player.toString(), timer, max_games, Stats.readPrivacy()));
+                currentData.child(lobbyNumber).setValue(new Lobby(et_name_host.getText().toString(), starting_player.toString(), timer, max_games, Stats.readPrivacy()));
                 currentData.child(lobbyNumber).child("startingType").setValue(starting_player.toString());
 
                 return Transaction.success(currentData);

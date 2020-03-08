@@ -14,57 +14,57 @@
   ~ limitations under the License.
   -->
 
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory app:title="@string/multiplayer_settings" >
-
-        <CheckBoxPreference app:title="@string/privacy"
-            app:key="privacy"
-            app:icon="@android:drawable/ic_lock_lock"
-            app:defaultValue="true"
+    <PreferenceCategory app:title="@string/multiplayer_settings">
+        <CheckBoxPreference
             android:disableDependentsState="true"
+            app:defaultValue="true"
+            app:icon="@android:drawable/ic_lock_lock"
+            app:key="privacy"
+            app:summaryOff="@string/privacy_deactivated"
             app:summaryOn="@string/privacy_activated"
-            app:summaryOff="@string/privacy_deactivated" />
-
-        <CheckBoxPreference app:title="@string/use_google_name"
-            app:key="google_name"
-            app:defaultValue="true"
-            app:icon="@drawable/googleg_standard_color_18"/>
-
-        <CheckBoxPreference app:title="@string/use_google_photo"
-            app:key="google_photo"
-            app:defaultValue="true"
-            android:dependency="privacy"
-            app:icon="@drawable/googleg_standard_color_18"/>
-
-        <Preference app:title="@string/delete_user"
-            app:key="delete"
-            app:icon="@android:drawable/ic_menu_delete"
-            app:summary="@string/delete_user_warning" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory app:title="@string/display" >
-
-        <SwitchPreferenceCompat app:title="@string/dark_mode"
-            app:key="dark_mode"
-            app:icon="@drawable/daynight"
-            app:defaultValue="true" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory app:title="@string/general" >
+            app:title="@string/privacy" />
 
         <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="music"
-            android:icon="@drawable/musical_note"
-            android:title="@string/hear_music" />
-        <Preference app:title="@string/about"
-            app:key="about"
-            app:icon="@android:drawable/ic_menu_info_details" />
+            app:defaultValue="true"
+            app:icon="@drawable/googleg_standard_color_18"
+            app:key="google_name"
+            app:title="@string/use_google_name" />
 
+        <CheckBoxPreference
+            android:dependency="privacy"
+            app:defaultValue="true"
+            app:icon="@drawable/googleg_standard_color_18"
+            app:key="google_photo"
+            app:title="@string/use_google_photo" />
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/display">
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:icon="@drawable/daynight"
+            app:key="dark_mode"
+            app:title="@string/dark_mode" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/general">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:icon="@drawable/musical_note"
+            android:key="music"
+            android:title="@string/hear_music" />
+
+        <Preference
+            app:icon="@android:drawable/ic_menu_delete"
+            app:key="delete"
+            app:summary="@string/delete_user_warning"
+            app:title="@string/delete_user" />
+
+        <Preference
+            app:icon="@android:drawable/ic_menu_info_details"
+            app:key="about"
+            app:title="@string/about" />
+    </PreferenceCategory>
 </PreferenceScreen>

@@ -19,6 +19,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.liadpaz.tic_tac_toe.databinding.ActivityLobbyBinding;
 
+import static com.liadpaz.tic_tac_toe.Stats.readPrivacy;
+
 public class LobbyActivity extends AppCompatActivity {
 
     private DatabaseReference lobbyRef;
@@ -47,6 +49,7 @@ public class LobbyActivity extends AppCompatActivity {
 
     private boolean ready_host = false;
     private boolean ready_client = false;
+    private boolean ready_photo = true;
 
     private boolean isLaunchingGame = false;
 
@@ -105,7 +108,7 @@ public class LobbyActivity extends AppCompatActivity {
 
         checkbox_ready.setEnabled(!isHost);
 
-        lobbyRef = Firebase.dataRef.child("Lobbies").child(lobbyNumber);
+        lobbyRef = Firebase.dataRef.child("Lobbies/" + lobbyNumber);
 
         lobbyRef.onDisconnect().removeValue();
 
@@ -126,16 +129,15 @@ public class LobbyActivity extends AppCompatActivity {
                 }
                 if (isHost) {
                     if (clientName == null) {
-                        clientName = dataSnapshot.child("clientName").getValue(String.class);
-                        if (clientName != null) {
+                        if ((clientName = dataSnapshot.child("clientName").getValue(String.class)) != null) {
                             tv_client_name.setText(clientName);
-                            checkbox_ready.setEnabled(true);
+                            checkbox_ready.setEnabled(ready_photo);
                         }
                     } else {
                         String clientMessage = dataSnapshot.child("clientMessage").getValue(String.class);
                         if ("ready".equals(clientMessage)) {
                             ready_client = true;
-                            if (ready_host) {
+                            if (ready_host && ready_photo) {
                                 isLaunchingGame = true;
                                 writeDatabaseMessage("play");
                                 startActivity(new Intent(LobbyActivity.this, GameActivity.class).putExtra("LobbyNumber", lobbyNumber).putExtra("Multiplayer", "Host"));
@@ -171,7 +173,7 @@ public class LobbyActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {}
         });
 
-        if (!Stats.readPrivacy()) {
+        if (!readPrivacy()) {
             uploadPhoto();
         }
     }
@@ -217,6 +219,7 @@ public class LobbyActivity extends AppCompatActivity {
      * This function uploads the photo the player took to the Firebase Storage
      */
     private void uploadPhoto() {
+        ready_photo = false;
         checkbox_ready.setEnabled(false);
         tv_uploading_photo.setVisibility(View.VISIBLE);
         progressBar_uploading_photo.setVisibility(View.VISIBLE);
@@ -227,7 +230,8 @@ public class LobbyActivity extends AppCompatActivity {
             }
             progressBar_uploading_photo.setProgress((int) taskSnapshot.getBytesTransferred(), true);
         }).addOnCompleteListener(task -> {
-            checkbox_ready.setEnabled(true);
+            ready_photo = true;
+            checkbox_ready.setEnabled(clientName != null);
             tv_uploading_photo.setVisibility(View.INVISIBLE);
             progressBar_uploading_photo.setVisibility(View.INVISIBLE);
         });
