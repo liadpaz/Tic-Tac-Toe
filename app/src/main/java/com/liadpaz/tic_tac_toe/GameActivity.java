@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -120,15 +121,7 @@ public class GameActivity extends AppCompatActivity {
         turn = startingType;
 
         ImageView iv_board = binding.ivBoard;
-        cells[0][0] = new Cell(binding.ivTl);
-        cells[0][1] = new Cell(binding.ivTm);
-        cells[0][2] = new Cell(binding.ivTr);
-        cells[1][0] = new Cell(binding.ivMl);
-        cells[1][1] = new Cell(binding.ivMm);
-        cells[1][2] = new Cell(binding.ivMr);
-        cells[2][0] = new Cell(binding.ivBl);
-        cells[2][1] = new Cell(binding.ivBm);
-        cells[2][2] = new Cell(binding.ivBr);
+        cells = new Cell[][]{{new Cell(binding.ivTl), new Cell(binding.ivTm), new Cell(binding.ivTr)}, {new Cell(binding.ivMl), new Cell(binding.ivMm), new Cell(binding.ivMr)}, {new Cell(binding.ivBl), new Cell(binding.ivBm), new Cell(binding.ivBr)}};
         binding.btnResign.setOnClickListener(v -> new AlertDialog.Builder(GameActivity.this).setTitle(R.string.resign).setMessage(R.string.resign_message).setPositiveButton(R.string.yes, (dialogInterface, i) -> {
             if (vs_multiplayer) {
                 gameRef.removeValue();
@@ -175,20 +168,20 @@ public class GameActivity extends AppCompatActivity {
                         }
                     }
 
-                    if (Objects.equals(dataSnapshot.child("hostType").getValue(String.class), "X")) {
-                        thisType = multiType.equals("Host") ? X : O;
+                    if ("X".equals(dataSnapshot.child("hostType").getValue(String.class))) {
+                        thisType = "Host".equals(multiType) ? X : O;
                         xName = dataSnapshot.child("hostName").getValue(String.class);
                         oName = dataSnapshot.child("clientName").getValue(String.class);
 
-                        thisName = multiType.equals("Host") ? xName : oName;
-                        otherName = multiType.equals("Host") ? oName : xName;
+                        thisName = "Host".equals(multiType) ? xName : oName;
+                        otherName = "Host".equals(multiType) ? oName : xName;
                     } else {
                         thisType = multiType.equals("Host") ? O : X;
                         xName = dataSnapshot.child("clientName").getValue(String.class);
                         oName = dataSnapshot.child("hostName").getValue(String.class);
 
-                        thisName = multiType.equals("Host") ? oName : xName;
-                        otherName = multiType.equals("Host") ? xName : oName;
+                        thisName = "Host".equals(multiType) ? oName : xName;
+                        otherName = "Host".equals(multiType) ? xName : oName;
                     }
 
                     timer = dataSnapshot.child("timer").getValue(Integer.class);
@@ -201,7 +194,7 @@ public class GameActivity extends AppCompatActivity {
                     tv_playerXwins.setVisibility(View.VISIBLE);
                     tv_playerOwins.setVisibility(View.VISIBLE);
 
-                    startingType = Objects.equals(dataSnapshot.child("startingType").getValue(String.class), "X") ? X : O;
+                    startingType = "X".equals(dataSnapshot.child("startingType").getValue(String.class)) ? X : O;
                     turn = startingType;
                     tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.its), thisType == startingType ? thisName : otherName, getString(R.string.turn), startingType.toString()));
 
@@ -223,7 +216,7 @@ public class GameActivity extends AppCompatActivity {
                             return;
                         }
                     }
-                    if (multiType.equals("Host")) {
+                    if ("Host".equals(multiType)) {
                         String message = dataSnapshot.child("clientMessage").getValue(String.class);
                         if (lastClientMessage == null) {
                             lastClientMessage = message;
@@ -379,6 +372,7 @@ public class GameActivity extends AppCompatActivity {
      *
      * @return tie AlertDialog
      */
+    @NonNull
     private AlertDialog.Builder tieAlert() {
         thisCanPlay = false;
         return new AlertDialog.Builder(this).setCancelable(false).setTitle(R.string.tie).setMessage(R.string.its_a_tie).setPositiveButton(R.string.continue_dialog, (dialog, which) -> {
@@ -404,6 +398,7 @@ public class GameActivity extends AppCompatActivity {
      * @param player_won player_won: a String contains the player name
      * @return winner AlertDialog
      */
+    @NonNull
     private AlertDialog.Builder winnerAlert(boolean player, String player_won) {
         thisCanPlay = false;
         return new AlertDialog.Builder(this).setCancelable(false).setTitle(R.string.congratulations).setMessage(player ? String.format("%s %s %s", getString(R.string.player), player_won, getString(R.string.won)) : String.format("%s %s", player_won, getString(R.string.won))).setPositiveButton(R.string.continue_dialog, (dialog, which) -> {
@@ -430,6 +425,7 @@ public class GameActivity extends AppCompatActivity {
      * @param player_won a String contains the player name
      * @return absolute winner AlertDialog
      */
+    @NonNull
     private AlertDialog.Builder absoluteWinnerAlert(boolean player, String player_won) {
         return new AlertDialog.Builder(this).setCancelable(false).setTitle(R.string.winner).setMessage(player ? String.format("%s %s %s", getString(R.string.player), player_won, getString(R.string.won_the_game)) : String.format("%s %s", player_won, getString(R.string.won_the_game))).setPositiveButton(R.string.continue_dialog, (dialog, which) -> {
             finishAffinity();
@@ -507,7 +503,7 @@ public class GameActivity extends AppCompatActivity {
         turn = comType.flip();
     }
 
-    private int minimax(Cell[][] board, int depth, int alpha, int beta, boolean isMaximizing) {
+    private int minimax(@NotNull Cell[][] board, int depth, int alpha, int beta, boolean isMaximizing) {
         Type result;
         if ((result = checkWinner(board)) != null) {
             if (result == None) {
@@ -585,7 +581,8 @@ public class GameActivity extends AppCompatActivity {
      *
      * @return true if there is a winner, otherwise false
      */
-    private Type checkWinner(Cell[][] cells) {
+    @Nullable
+    private Type checkWinner(@NotNull Cell[][] cells) {
         Type winner = null;
         for (int i = 0; i < 3; i++) {
             if (cells[i][0].getType() == cells[i][1].getType() && cells[i][1].getType() == cells[i][2].getType() && cells[i][0].getType() != None) {

@@ -35,6 +35,8 @@ public class LobbyActivity extends AppCompatActivity {
 
     private Switch sw_host;
     private Switch sw_client;
+    private CheckBox checkBox_host_ready;
+    private CheckBox checkBox_client_ready;
 
     private CheckBox checkbox_ready;
 
@@ -72,6 +74,8 @@ public class LobbyActivity extends AppCompatActivity {
         binding.tvRoomNumber.setText(lobbyNumber);
         sw_host = binding.swHostSide;
         sw_client = binding.swClientSide;
+        checkBox_host_ready = binding.checkBoxHostReady;
+        checkBox_client_ready = binding.checkBoxClientReady;
         checkbox_ready = binding.ckbxReady;
         tv_uploading_photo = binding.tvUploadingPhoto;
         progressBar_uploading_photo = binding.progressBarUploadingPhoto;
@@ -79,22 +83,29 @@ public class LobbyActivity extends AppCompatActivity {
         tv_host_name.setText(hostName);
         tv_client_name.setText(R.string.waiting);
 
-        sw_client.setEnabled(false);
         sw_client.setChecked(true);
 
         if (isHost) {
+            checkBox_host_ready.setVisibility(View.INVISIBLE);
             sw_host.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 sw_client.setChecked(!isChecked);
                 setHostType(isChecked);
             });
+            sw_client.setOnCheckedChangeListener(((buttonView, isChecked) -> {
+                sw_host.setChecked(!isChecked);
+                setHostType(!isChecked);
+
+            }));
         } else {
-            sw_host.setEnabled(false);
+            checkBox_client_ready.setVisibility(View.INVISIBLE);
+            sw_host.setClickable(false);
         }
 
         checkbox_ready.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isHost) {
+                writeDatabaseMessage(isChecked ? "ready" : "not_ready");
                 ready_host = isChecked;
-                sw_host.setEnabled(!isChecked);
+                sw_host.setClickable(!isChecked);
                 if (ready_host && ready_client) {
                     isLaunchingGame = true;
                     writeDatabaseMessage("play");
@@ -143,9 +154,10 @@ public class LobbyActivity extends AppCompatActivity {
                                 startActivity(new Intent(LobbyActivity.this, GameActivity.class).putExtra("LobbyNumber", lobbyNumber).putExtra("Multiplayer", "Host"));
                                 finish();
                             }
-                        } else if ("not_ready".equals(clientMessage)) {
+                        } else /* if ("not_ready".equals(clientMessage)) */ {
                             ready_client = false;
                         }
+                        checkBox_client_ready.setChecked(ready_client);
                     }
                 } else {
                     if (hostName == null) {
@@ -165,7 +177,10 @@ public class LobbyActivity extends AppCompatActivity {
                         isLaunchingGame = true;
                         startActivity(new Intent(LobbyActivity.this, GameActivity.class).putExtra("LobbyNumber", lobbyNumber).putExtra("Multiplayer", "Client"));
                         finish();
+                    } else {
+                        ready_host = "ready".equals(hostMessage);
                     }
+                    checkBox_host_ready.setChecked(ready_host);
                 }
             }
 

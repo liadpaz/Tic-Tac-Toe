@@ -7,55 +7,40 @@
     tools:context=".LobbyActivity">
 
     <TextView
-        android:id="@+id/tv_lobby"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="@string/lobby"
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
         android:id="@+id/tv_host_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="200dp"
+        android:layout_marginStart="32dp"
         android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/sw_host_side"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/sw_host_side" />
 
     <TextView
         android:id="@+id/tv_client_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="70dp"
         android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_host_name" />
+        app:layout_constraintBottom_toBottomOf="@+id/sw_client_side"
+        app:layout_constraintStart_toStartOf="@+id/tv_host_name"
+        app:layout_constraintTop_toTopOf="@+id/sw_client_side" />
 
     <Switch
         android:id="@+id/sw_host_side"
         android:layout_width="100sp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="200dp"
-        android:layout_marginEnd="50dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginEnd="32dp"
+        app:layout_constraintBottom_toBottomOf="@+id/checkBox_host_ready"
+        app:layout_constraintEnd_toStartOf="@+id/checkBox_host_ready"
+        app:layout_constraintTop_toTopOf="@+id/checkBox_host_ready" />
 
     <Switch
         android:id="@+id/sw_client_side"
         android:layout_width="100sp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="68dp"
-        android:layout_marginEnd="50dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sw_host_side" />
+        app:layout_constraintBottom_toBottomOf="@+id/checkBox_client_ready"
+        app:layout_constraintEnd_toEndOf="@+id/sw_host_side"
+        app:layout_constraintTop_toTopOf="@+id/checkBox_client_ready" />
 
     <Button
         android:id="@+id/btn_exit_lobby"
@@ -84,18 +69,18 @@
         android:id="@+id/tv_room_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="450dp"
         android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/sw_client_side" />
 
     <TextView
         android:id="@+id/tv_O"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="16dp"
         android:text="@string/o"
         android:textAlignment="center"
         android:textSize="20sp"
@@ -106,13 +91,12 @@
         android:id="@+id/tv_X"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="50dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="16dp"
         android:text="@string/x"
         android:textAlignment="center"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/sw_host_side"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="@+id/sw_host_side" />
 
     <TextView
         android:id="@+id/tv_lobby_number"
@@ -150,4 +134,64 @@
         app:layout_constraintBottom_toTopOf="@+id/progressBar_uploading_photo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <CheckBox
+        android:id="@+id/checkBox_host_ready"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="128dp"
+        android:layout_marginEnd="24dp"
+        android:checked="false"
+        android:clickable="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+
+    <CheckBox
+        android:id="@+id/checkBox_client_ready"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        android:checked="false"
+        android:clickable="false"
+        app:layout_constraintEnd_toEndOf="@+id/checkBox_host_ready"
+        app:layout_constraintStart_toStartOf="@+id/checkBox_host_ready"
+        app:layout_constraintTop_toBottomOf="@+id/checkBox_host_ready" />
+
+    <TextView
+        android:id="@+id/tv_ready_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ready"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_X"
+        app:layout_constraintEnd_toEndOf="@+id/checkBox_host_ready"
+        app:layout_constraintStart_toStartOf="@+id/checkBox_host_ready"
+        app:layout_constraintTop_toTopOf="@+id/tv_X" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/colorLightPrimaryDark"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tv_lobby"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/lobby"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textSize="30sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
