@@ -1,7 +1,6 @@
 package com.liadpaz.tic_tac_toe;
 
 import android.annotation.SuppressLint;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -14,7 +13,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.liadpaz.tic_tac_toe.databinding.ActivityStatisticsBinding;
 
-import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 
 public class StatisticsActivity extends AppCompatActivity {
@@ -23,7 +21,7 @@ public class StatisticsActivity extends AppCompatActivity {
     private TextView tv_globalX;
     private TextView tv_globalTime;
 
-    @SuppressWarnings("ConstantConditions")
+    @SuppressWarnings({"ConstantConditions"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +37,25 @@ public class StatisticsActivity extends AppCompatActivity {
         binding.tvLocalTime.setText(String.format("%s %s", String.valueOf(Stats.readStat(Stats.Readables.Time)), getString(R.string.seconds)));
         tv_globalTime = binding.tvGlobalTime;
 
-        new CheckInternetConnection(this).execute();
+        new Thread(() -> {
+            try {
+                if (InetAddress.getByName("www.google.com").isReachable(2000)) {
+                    runOnUiThread(() -> {
+                        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                            getGlobals();
+                        } else {
+                            tv_globalO.setText(R.string.authenticated_users);
+                            tv_globalX.setText(R.string.authenticated_users);
+                            tv_globalTime.setText(R.string.authenticated_users);
+                        }
+                    });
+                }
+            } catch (Exception ignored) {
+                tv_globalO.setText(R.string.not_available_offline);
+                tv_globalX.setText(R.string.not_available_offline);
+                tv_globalTime.setText(R.string.not_available_offline);
+            }
+        }).start();
     }
 
     /**
@@ -77,44 +93,5 @@ public class StatisticsActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
         });
-    }
-
-    /**
-     * This class is used to check for internet connection by pinging google site (google.com).
-     */
-    private static class CheckInternetConnection extends AsyncTask<Void, Void, Boolean> {
-
-        private WeakReference<StatisticsActivity> activityReference;
-
-        CheckInternetConnection(StatisticsActivity activityReference) {
-            this.activityReference = new WeakReference<>(activityReference);
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            try {
-                return InetAddress.getByName("www.google.com").isReachable(2000);
-            } catch (Exception ignored) {
-                return false;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            if (aBoolean) {
-                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                    activityReference.get().getGlobals();
-                } else {
-                    activityReference.get().tv_globalO.setText(activityReference.get().getString(R.string.authenticated_users));
-                    activityReference.get().tv_globalX.setText(activityReference.get().getString(R.string.authenticated_users));
-                    activityReference.get().tv_globalTime.setText(activityReference.get().getString(R.string.authenticated_users));
-                }
-            } else {
-                activityReference.get().tv_globalO.setText(activityReference.get().getString(R.string.not_available_offline));
-                activityReference.get().tv_globalX.setText(activityReference.get().getString(R.string.not_available_offline));
-                activityReference.get().tv_globalTime.setText(activityReference.get().getString(R.string.not_available_offline));
-            }
-            super.onPostExecute(aBoolean);
-        }
     }
 }

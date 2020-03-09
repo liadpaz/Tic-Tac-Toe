@@ -19,7 +19,7 @@ import com.liadpaz.tic_tac_toe.databinding.ActivityDeveloperBinding;
 import java.util.ArrayList;
 
 /**
- *
+ *  This activity is the developer activity, it is to close any lobbies that somehow still open.
  */
 public class DeveloperActivity extends AppCompatActivity {
 
