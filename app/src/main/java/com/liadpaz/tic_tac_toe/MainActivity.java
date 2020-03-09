@@ -117,31 +117,28 @@ public class MainActivity extends AppCompatActivity {
         };
 
         btn_singleplayer.setOnClickListener(v -> MainActivity.this.startActivity(new Intent(MainActivity.this, OptionsActivity.class)));
-        btn_multiplayer.setOnClickListener(v -> {
-            registerReceiver(new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
-                    //noinspection deprecation
-                    NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-                    //noinspection deprecation
-                    NetworkInfo mobile = connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        btn_multiplayer.setOnClickListener(v -> registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                //noinspection deprecation
+                NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                //noinspection deprecation
+                NetworkInfo mobile = connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
 
-                    boolean isConnected = (wifi != null && wifi.isConnected()) || (mobile != null && mobile.isConnected());
-                    if (isConnected) {
-                        if (auth.getCurrentUser() != null) {
-                            new AlertDialog.Builder(MainActivity.this).setNegativeButton(R.string.host_game, (dialogInterface, i) -> startActivity(new Intent(MainActivity.this, OptionsActivity.class).putExtra("Mode", Utils.Mode.Multiplayer))).setPositiveButton(R.string.join_game, (dialogInterface, i) -> startActivity(new Intent(MainActivity.this, JoinMultiplayerActivity.class))).setTitle(R.string.multiplayer_settings).setMessage(R.string.multiplayer_dialog).show();
-                        } else {
-                            Toast.makeText(MainActivity.this, R.string.unauthed_user, Toast.LENGTH_LONG).show();
-                        }
+                boolean isConnected = (wifi != null && wifi.isConnected()) || (mobile != null && mobile.isConnected());
+                if (isConnected) {
+                    if (auth.getCurrentUser() != null) {
+                        new AlertDialog.Builder(MainActivity.this).setNegativeButton(R.string.host_game, (dialogInterface, i) -> startActivity(new Intent(MainActivity.this, OptionsActivity.class).putExtra("Mode", Utils.Mode.Multiplayer))).setPositiveButton(R.string.join_game, (dialogInterface, i) -> startActivity(new Intent(MainActivity.this, JoinMultiplayerActivity.class))).setTitle(R.string.multiplayer_settings).setMessage(R.string.multiplayer_dialog).show();
                     } else {
-                        Toast.makeText(MainActivity.this, R.string.not_available_offline, Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, R.string.unauthed_user, Toast.LENGTH_LONG).show();
                     }
-                    context.unregisterReceiver(this);
+                } else {
+                    Toast.makeText(MainActivity.this, R.string.not_available_offline, Toast.LENGTH_LONG).show();
                 }
-            }, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
-            //new InternetTask(MainActivity.this).execute());
-        });
+                context.unregisterReceiver(this);
+            }
+        }, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE")));
         btn_user_action.setOnClickListener(v -> {
             if (auth.getCurrentUser() != null) {    //User connected (logout active)
                 AuthUI.getInstance().signOut(MainActivity.this).addOnCompleteListener(task -> {
