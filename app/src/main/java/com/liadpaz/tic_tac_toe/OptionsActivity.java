@@ -75,7 +75,7 @@ public class OptionsActivity extends AppCompatActivity {
         NumberPicker numpic_maxgames = binding.numpicMaxgames;
         numpic_timer = binding.numpicTimer;
         CheckBox checkbox_timer = binding.chbxTimer;
-        CheckBox checkbox_google_name = binding.ckbxGoogleName;
+        CheckBox checkbox_google_name = binding.checkboxGoogleName;
         btn_play = binding.btnPlay;
         Button btn_camera = binding.btnSettingsCamera;
         et_name_host = binding.etNameHost;
@@ -132,7 +132,7 @@ public class OptionsActivity extends AppCompatActivity {
             if (!Stats.readPrivacy()) {
                 btn_camera.setVisibility(View.VISIBLE);
             }
-            photo = new File(OptionsActivity.this.getFilesDir(), "Photo.jpg");
+            photo = new File(getFilesDir(), "Photo.jpg");
             if (!Stats.getGooglePhoto()) {
                 btn_camera.setOnClickListener(v -> {
                     Utils.localPhotoUri = FileProvider.getUriForFile(OptionsActivity.this, "com.liadpaz.tic_tac_toe.fileprovider", photo);
@@ -199,19 +199,17 @@ public class OptionsActivity extends AppCompatActivity {
             @NonNull
             @Override
             public Transaction.Result doTransaction(@NonNull MutableData currentData) {
-                lobbyNumber = Utils.getRoomNumber();
-                int tries = 1;
-                while (currentData.hasChild(lobbyNumber)) {
-                    lobbyNumber = Utils.getRoomNumber();
-                    if (++tries == 9999) {
-                        return Transaction.abort();
+                for (String number : Utils.getRoomNumber()) {
+                    if (!currentData.hasChild(number)) {
+                        lobbyNumber = number;
+
+                        currentData.child(lobbyNumber).setValue(new Lobby(et_name_host.getText().toString(), false, max_games, Stats.readPrivacy(), starting_player.toString(), timer));
+                        currentData.child(lobbyNumber).child("startingType").setValue(starting_player.toString());
+
+                        return Transaction.success(currentData);
                     }
                 }
-
-                currentData.child(lobbyNumber).setValue(new Lobby(et_name_host.getText().toString(), starting_player.toString(), timer, max_games, Stats.readPrivacy()));
-                currentData.child(lobbyNumber).child("startingType").setValue(starting_player.toString());
-
-                return Transaction.success(currentData);
+                return Transaction.abort();
             }
 
             @Override

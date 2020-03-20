@@ -51,7 +51,7 @@
     <string name="host_game">Host a game</string>
     <string name="join_game">Join a lobby</string>
     <string name="multiplayer_settings">Multiplayer Settings</string>
-    <string name="multiplayer_dialog">Choose if you\'d like to join a game / host a game</string>
+    <string name="multiplayer_dialog">Choose if you\'d like to join a game / host a game / matchmaking (require taking a photo)</string>
     <string name="lobby">Multiplayer Lobby</string>
     <string name="lobby_number">Lobby number:</string>
     <string name="ready">Ready</string>
@@ -69,8 +69,8 @@
     <string name="hard">Hard</string>
     <string name="camera">Take Photo</string>
     <string name="privacy">Privacy</string>
-    <string name="privacy_activated">You won\'t be able to see other player\'s photos</string>
-    <string name="privacy_deactivated">You will see other player\'s photos</string>
+    <string name="privacy_activated">You won\'t be able to see other player\'s photos (won\'t affect matchmaking)</string>
+    <string name="privacy_deactivated">You will see other player\'s photos (won\'t affect matchmaking)</string>
     <string name="developer" translatable="false">Developer</string>
     <string name="app_version">Version:</string>
     <string name="developed_by">Developed by Liad Paz</string>
@@ -80,7 +80,14 @@
     <string name="game">Game</string>
     <string name="not_authorized">You are not authorized…</string>
     <string name="whats_new">What\'s New:</string>
-    <string name="new_things">-Added Smart AI, so now there are two AI difficulties\n-Added broadcast receiver to check internet connectivity\n-Added background music while in-game option (Porter Robinson &amp; Madeon - Shelter)\n-Added player left lobby failsafe\n-Changed the create lobby to a safer method\n-Added uploading photo progress bar to multiplayer lobby</string>
+    <string name="new_things">-Added Smart AI, so now there are two AI difficulties
+-Added broadcast receiver to check internet connectivity
+-Added background music while in-game option (Porter Robinson &amp; Madeon - Shelter)
+-Added player left lobby failsafe
+-Changed the create lobby to a safer method
+-Added uploading photo progress bar to multiplayer lobby
+-Added matchmaking
+-Optimizations and bug fixes</string>
     <string name="logout">Logout</string>
     <string name="login">Login</string>
     <string name="unauthed_user" tools:ignore="Typos">You need to be signed in in order to play online</string>
@@ -114,4 +121,9 @@
     <string name="hear_music">Hear music while in game</string>
     <string name="lobby_couldnt_make">Couldn\'t make new lobby</string>
     <string name="uploading_photo">Uploading photo in progress</string>
+    <string name="matchmaking">Matchmaking</string>
+    <string name="waiting_matchmaking">Looking for a match…</string>
+    <string name="matchmaking_unavailable">Couldn\'t find a match for you</string>
+    <string name="matchmaking_uploading_photo">A match was found. Uploading photo…</string>
+    <string name="matchmaking_waiting_other_player">Waiting to the other player…</string>
 </resources>

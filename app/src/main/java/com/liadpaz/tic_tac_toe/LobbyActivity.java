@@ -17,7 +17,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.liadpaz.tic_tac_toe.databinding.ActivityLobbyBinding;
+
+import org.jetbrains.annotations.NotNull;
 
 import static com.liadpaz.tic_tac_toe.Stats.readPrivacy;
 
@@ -53,6 +56,8 @@ public class LobbyActivity extends AppCompatActivity {
     private boolean ready_client = false;
     private boolean ready_photo = true;
 
+    private UploadTask uploadPhotoTask;
+
     private boolean isLaunchingGame = false;
 
     @Override
@@ -76,7 +81,7 @@ public class LobbyActivity extends AppCompatActivity {
         sw_client = binding.swClientSide;
         checkBox_host_ready = binding.checkBoxHostReady;
         checkBox_client_ready = binding.checkBoxClientReady;
-        checkbox_ready = binding.ckbxReady;
+        checkbox_ready = binding.checkboxReady;
         tv_uploading_photo = binding.tvUploadingPhoto;
         progressBar_uploading_photo = binding.progressBarUploadingPhoto;
 
@@ -220,7 +225,7 @@ public class LobbyActivity extends AppCompatActivity {
      *
      * @param hostType the type of the host
      */
-    private void swapSwitches(String hostType) {
+    private void swapSwitches(@NotNull String hostType) {
         if (hostType.equals("X")) {
             sw_host.setChecked(true);
             sw_client.setChecked(false);
@@ -239,12 +244,7 @@ public class LobbyActivity extends AppCompatActivity {
         tv_uploading_photo.setVisibility(View.VISIBLE);
         progressBar_uploading_photo.setVisibility(View.VISIBLE);
         StorageReference storageRef = Firebase.storeRef.child("Lobbies").child(lobbyNumber);
-        storageRef.child(isHost ? "Host" : "Client").putFile(Utils.localPhotoUri).addOnProgressListener(taskSnapshot -> {
-            if (progressBar_uploading_photo.getMax() == 0) {
-                progressBar_uploading_photo.setMax((int)taskSnapshot.getTotalByteCount());
-            }
-            progressBar_uploading_photo.setProgress((int) taskSnapshot.getBytesTransferred(), true);
-        }).addOnCompleteListener(task -> {
+        (uploadPhotoTask = storageRef.child(isHost ? "Host" : "Client").putFile(Utils.localPhotoUri)).addOnCompleteListener(task -> {
             ready_photo = true;
             checkbox_ready.setEnabled(clientName != null);
             tv_uploading_photo.setVisibility(View.INVISIBLE);
@@ -257,6 +257,9 @@ public class LobbyActivity extends AppCompatActivity {
         lobbyRef.removeEventListener(listener);
         if (!isLaunchingGame) {
             lobbyRef.removeValue();
+            if (uploadPhotoTask != null) {
+                uploadPhotoTask.cancel();
+            }
         }
         super.onDestroy();
     }

@@ -52,7 +52,7 @@
     <string name="host_game">פתח/י לובי</string>
     <string name="join_game">הצטרף/הצטרפי ללובי קיים</string>
     <string name="multiplayer_settings">הגדרות משחק מרובה שחקנים</string>
-    <string name="multiplayer_dialog">תבחר/י אם את/ה רוצה לפתוח לובי או להצטרף ללובי קיים</string>
+    <string name="multiplayer_dialog">תבחר/י אם את/ה רוצה לפתוח לובי או להצטרף ללובי קיים / מחשק אקראי (מחייב צילום תמונה)</string>
     <string name="lobby">לובי משחק מרובה שחקנים</string>
     <string name="lobby_number">מספר לובי:</string>
     <string name="ready">מוכן</string>
@@ -68,15 +68,22 @@
     <string name="hard">קשה</string>
     <string name="camera">צילום</string>
     <string name="privacy">פרטיות</string>
-    <string name="privacy_activated">לא תוכל/י לראות תמונות של שחקנים אחרים</string>
-    <string name="privacy_deactivated">את/ה תוכל/י לראות תמונות של שחקנים אחרים</string>
+    <string name="privacy_activated">לא תוכל/י לראות תמונות של שחקנים אחרים (לא ישפיע על משחק אקראי)</string>
+    <string name="privacy_deactivated">את/ה תוכל/י לראות תמונות של שחקנים אחרים (לא ישפיע על משחק אקראי)</string>
     <string name="app_version">גרסא:</string>
     <string name="developed_by">פותח על ידי ליעד פז</string>
     <string name="about_app">" עשיתי את האפליקציה הזאת בתור פרויקט לבית ספר בפיתוח אפליקציה לאנדרויד. עשיתי את האפליקציה בערך בחודשיים, אם את/ה מוצא/ת באגים או גליצ'ים לא צפויים בבקשה שלח/י לי מייל. תודה שאת/ה משחק!"</string>
     <string name="game">משחק</string>
     <string name="not_authorized">אין לך הרשאה…</string>
     <string name="whats_new">מה חדש:</string>
-    <string name="new_things">-נוסף מחשב חכם, אז מעכשיו יש שתי רמות למחשב\n-נוספה דרך חדשה לבדוק חיבור לאינטרנט\n-מוזיקת רקע בזמן משחק (Porter Robinson &amp; Madeon - Shelter)\n-נוסף מנגון אל כשל למקרה ששחקן עזב את המשחק באמצע\n-שונתה הדרך ליצור לובי חדש לדרך יותר בטוחה\n-נוסף בר התקדמות להעלאת תמונה ללובי משחק מרובה שחקנים</string>
+    <string name="new_things">-נוסף מחשב חכם, אז מעכשיו יש שתי רמות למחשב
+-נוספה דרך חדשה לבדוק חיבור לאינטרנט
+-מוזיקת רקע בזמן משחק (Porter Robinson &amp; Madeon - Shelter)
+-נוסף מנגון אל כשל למקרה ששחקן עזב את המשחק באמצע
+-שונתה הדרך ליצור לובי חדש לדרך יותר בטוחה
+-נוסף בר התקדמות להעלאת תמונה ללובי משחק מרובה שחקנים
+-נוסף משחק מול שחקן אקראי
+-שיפור יעילות ותיקוני באגים</string>
     <string name="logout">התנתק/י</string>
     <string name="login">התבחר/י</string>
     <string name="unauthed_user">כדי לשחק ברשת את/ה צריך/צריכה להיות מחובר/ת</string>
@@ -110,4 +117,9 @@
     <string name="hear_music">לשמוע מוזיקה בזמן משחק</string>
     <string name="lobby_couldnt_make">אי אפשר היה ליצור לובי חדש</string>
     <string name="uploading_photo">בתהליך העלת התמונה</string>
+    <string name="matchmaking">משחק אקראי</string>
+    <string name="waiting_matchmaking">מחפש משחק…</string>
+    <string name="matchmaking_unavailable">לא נמצא משחק בשבילך</string>
+    <string name="matchmaking_uploading_photo">משחק נמצא. מעלה תמונה…</string>
+    <string name="matchmaking_waiting_other_player">מחכה לשחקן השני…</string>
 </resources>

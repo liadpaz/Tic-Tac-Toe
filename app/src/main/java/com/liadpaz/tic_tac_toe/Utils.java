@@ -18,8 +18,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Random;
+import java.util.Collections;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.liadpaz.tic_tac_toe.Cell.Type.None;
 import static com.liadpaz.tic_tac_toe.Cell.Type.X;
@@ -30,6 +35,10 @@ import static com.liadpaz.tic_tac_toe.Cell.Type.X;
 class Utils {
     static Uri localPhotoUri;
     static Uri remotePhotoUri;
+
+    private static ArrayList<Integer> lobbiesInt = IntStream.range(0, 10000).boxed().collect(Collectors.toCollection(ArrayList::new));
+    private static ArrayList<String> lobbies;
+
     /**
      * This variable is the last time that was recorded
      */
@@ -58,12 +67,27 @@ class Utils {
      *
      * @return String containing 4 random integers
      */
-    static String getRoomNumber() {
-        StringBuilder number = new StringBuilder();
-        for (int i = 0; i < 4; i++) {
-            number.append((new Random()).nextInt(10));
+    static ArrayList<String> getRoomNumber() {
+        if (lobbies == null) {
+            lobbies = new ArrayList<>();
+            for (int number : lobbiesInt) {
+                if (number < 1000) {
+                    if (number < 100) {
+                        if (number < 10) {
+                            lobbies.add("000" + number);
+                            continue;
+                        }
+                        lobbies.add("00" + number);
+                        continue;
+                    }
+                    lobbies.add("0" + number);
+                    continue;
+                }
+                lobbies.add(String.valueOf(number));
+            }
         }
-        return number.toString();
+        Collections.shuffle(lobbies);
+        return lobbies;
     }
 
     /**
@@ -94,7 +118,7 @@ class Firebase {
  * This class represents the game cell
  */
 class Cell {
-    private ImageView XO;
+    private final ImageView XO;
     private Type type;
     private boolean visible = false;
 
@@ -140,7 +164,9 @@ class Cell {
     }
 
     /**
-     * This function sets the cell type to the {@code type} type without the visual representation in order not to overload the ui thread work on the minimax algorithm.
+     * This function sets the cell type to the {@code type} type without the visual representation
+     * in order not to overload the ui thread work on the minimax algorithm.
+     *
      * @param type the type to set the cell to
      */
     void setInvisibleType(Type type) {
@@ -218,7 +244,7 @@ class Stats {
 
     /**
      * Constructor for an instance of the Stats class, sets the static shared preferences to the
-     * paramater
+     * parameter
      *
      * @param sharedPreferences the shared preferences to set
      */
@@ -255,7 +281,7 @@ class Stats {
     }
 
     /**
-     * This function return whether the user prefer to use his google phot in multiplayer or not
+     * This function return whether the user prefer to use his google photo in multiplayer or not
      *
      * @return true if the user prefer to his google photo in multiplayer or not
      */
@@ -270,7 +296,7 @@ class Stats {
      * @param param the stat to read from the file
      * @return the stat from the file
      */
-    static int readStat(Readables param) {
+    static int readStat(@NotNull Readables param) {
         return sharedPreferences.getInt(param.toString(), 0);
     }
 
@@ -281,7 +307,7 @@ class Stats {
      * @param message the message to write to the type
      */
     @SuppressLint("DefaultLocale")
-    static private void writeFile(Readables type, int message) {
+    static private void writeFile(@NotNull Readables type, int message) {
         sharedPreferences.edit().putInt(type.toString(), message).apply();
     }
 
@@ -368,47 +394,55 @@ class Stats {
 /**
  * This class represents the lobby
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 @Keep
 class Lobby {
-    private int max;
-    private int timer;
-    private boolean privacy;
+    private String clientMessage;
+    private String clientName;
+    private String hostMessage;
     private String hostName;
     private String hostType;
+    private boolean matchmaking;
+    private int max;
+    private boolean privacy;
     private String startingType;
+    private int timer;
 
-    Lobby(String hostName, String startingType, int timer, int max, boolean privacy) {
+    public Lobby(String hostName, boolean matchmaking, int max, boolean privacy, String startingType, int timer) {
         this.hostName = hostName;
+        this.hostType = "O";
+        this.matchmaking = matchmaking;
+        this.max = max;
+        this.privacy = privacy;
         this.startingType = startingType;
         this.timer = timer;
-        this.max = max;
-        this.privacy = privacy;
-        this.hostType = "O";
     }
 
-    public int getMax() {
-        return max;
+    public Lobby() {
     }
 
-    public void setMax(int max) {
-        this.max = max;
+    public String getClientMessage() {
+        return clientMessage;
     }
 
-    public int getTimer() {
-        return timer;
+    public void setClientMessage(String clientMessage) {
+        this.clientMessage = clientMessage;
     }
 
-    public void setTimer(int timer) {
-        this.timer = timer;
+    public String getClientName() {
+        return clientName;
     }
 
-    public boolean isPrivacy() {
-        return privacy;
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
     }
 
-    public void setPrivacy(boolean privacy) {
-        this.privacy = privacy;
+    public String getHostMessage() {
+        return hostMessage;
+    }
+
+    public void setHostMessage(String hostMessage) {
+        this.hostMessage = hostMessage;
     }
 
     public String getHostName() {
@@ -427,11 +461,43 @@ class Lobby {
         this.hostType = hostType;
     }
 
+    public boolean isMatchmaking() {
+        return matchmaking;
+    }
+
+    public void setMatchmaking(boolean matchmaking) {
+        this.matchmaking = matchmaking;
+    }
+
+    public int getMax() {
+        return max;
+    }
+
+    public void setMax(int max) {
+        this.max = max;
+    }
+
+    public boolean isPrivacy() {
+        return privacy;
+    }
+
+    public void setPrivacy(boolean privacy) {
+        this.privacy = privacy;
+    }
+
     public String getStartingType() {
         return startingType;
     }
 
     public void setStartingType(String startingType) {
         this.startingType = startingType;
+    }
+
+    public int getTimer() {
+        return timer;
+    }
+
+    public void setTimer(int timer) {
+        this.timer = timer;
     }
 }

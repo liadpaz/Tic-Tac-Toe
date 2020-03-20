@@ -17,22 +17,25 @@ import androidx.preference.PreferenceManager;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
+import com.liadpaz.tic_tac_toe.databinding.SettingsActivityBinding;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public class SettingsActivity extends AppCompatActivity {
 
     public static final String DARK_MODE_PREFERENCES = "dark_mode";
+    public static final String DELETE_PREFERENCE = "delete";
+    public static final String ABOUT_PREFERENCE = "about";
 
     SharedPreferences.OnSharedPreferenceChangeListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settings_activity);
-        setSupportActionBar(findViewById(R.id.toolbar_settings));
+        SettingsActivityBinding binding = SettingsActivityBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        setSupportActionBar(binding.toolbarSettings);
         getSupportFragmentManager().beginTransaction().replace(R.id.settings, new SettingsFragment()).commit();
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -77,7 +80,7 @@ public class SettingsActivity extends AppCompatActivity {
         PreferenceManager.getDefaultSharedPreferences(SettingsActivity.this).unregisterOnSharedPreferenceChangeListener(listener);
     }
 
-    public static class SettingsFragment extends PreferenceFragmentCompat {
+    static class SettingsFragment extends PreferenceFragmentCompat {
 
         private static final int LOGIN_ACTIVITY = 162;
 
@@ -88,8 +91,8 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
-            delete = findPreference("delete");
-            findPreference("about").setOnPreferenceClickListener(preference -> {
+            delete = findPreference(DELETE_PREFERENCE);
+            findPreference(ABOUT_PREFERENCE).setOnPreferenceClickListener(preference -> {
                 startActivity(new Intent(getContext(), AboutActivity.class));
                 return true;
             });
@@ -114,11 +117,12 @@ public class SettingsActivity extends AppCompatActivity {
             });
         }
 
+        @SuppressWarnings("ConstantConditions")
         @Override
         public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
             super.onActivityResult(requestCode, resultCode, data);
             if (requestCode == LOGIN_ACTIVITY && resultCode == RESULT_OK) {
-                AuthUI.getInstance().delete(Objects.requireNonNull(getContext())).addOnCompleteListener(task -> {
+                AuthUI.getInstance().delete(getContext()).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         delete.setEnabled(false);
                         Toast.makeText(getContext(), R.string.delete_user_success, Toast.LENGTH_LONG).show();

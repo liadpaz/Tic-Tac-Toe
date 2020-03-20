@@ -24,7 +24,7 @@ class HelloDialog extends Dialog {
         setCancelable(true);
 
         TextView tv_hello_name = binding.tvHelloName;
-        binding.btnHello.setOnClickListener(v -> HelloDialog.this.dismiss());
+        binding.btnHello.setOnClickListener(v -> dismiss());
 
         int time = Integer.parseInt(new SimpleDateFormat("HH", Locale.ENGLISH).format(new Date()));
         if (time <= 5) {

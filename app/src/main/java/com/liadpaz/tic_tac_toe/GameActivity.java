@@ -31,7 +31,6 @@ import com.liadpaz.tic_tac_toe.databinding.ActivityGameBinding;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.Objects;
 import java.util.Random;
 
 import static com.liadpaz.tic_tac_toe.Cell.Type;
@@ -45,6 +44,14 @@ import static java.lang.Math.min;
  * This class is the game activity. It contains all the game graphics and mechanics.
  */
 public class GameActivity extends AppCompatActivity {
+
+    static final String MAX_EXTRA = "Max";
+    static final String TIMER_EXTRA = "Timer";
+    static final String MODE_EXTRA = "Mode";
+    static final String STARTING_EXTRA = "Starting";
+    static final String LOBBY_NUMBER_EXTRA = "LobbyNumber";
+    static final String MULTIPLAYER_EXTRA = "Multiplayer";
+    static final String DIFFICULTY_EXTRA = "Difficulty";
 
     private Intent musicService;
 
@@ -67,8 +74,6 @@ public class GameActivity extends AppCompatActivity {
 
     private String thisName;
     private String otherName;
-    private String xName;
-    private String oName;
     private String lobbyNumber;
     private String multiType;
     private String lastHostMessage;
@@ -103,13 +108,13 @@ public class GameActivity extends AppCompatActivity {
         ActivityGameBinding binding = ActivityGameBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        maxGames = getIntent().getIntExtra("Max", -1);
-        timer = getIntent().getIntExtra("Timer", -1);
-        Utils.Mode mode = (Utils.Mode)getIntent().getSerializableExtra("Mode");
-        startingType = (Type)getIntent().getSerializableExtra("Starting");
-        lobbyNumber = getIntent().getStringExtra("LobbyNumber");
-        multiType = getIntent().getStringExtra("Multiplayer");
-        difficulty = getIntent().getBooleanExtra("Difficulty", false);
+        maxGames = getIntent().getIntExtra(MAX_EXTRA, -1);
+        timer = getIntent().getIntExtra(TIMER_EXTRA, 0);
+        Utils.Mode mode = (Utils.Mode)getIntent().getSerializableExtra(MODE_EXTRA);
+        startingType = (Type)getIntent().getSerializableExtra(STARTING_EXTRA);
+        lobbyNumber = getIntent().getStringExtra(LOBBY_NUMBER_EXTRA);
+        multiType = getIntent().getStringExtra(MULTIPLAYER_EXTRA);
+        difficulty = getIntent().getBooleanExtra(DIFFICULTY_EXTRA, false);
 
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("music", false)) {
             musicService = new Intent(this, MusicPlayerService.class);
@@ -161,27 +166,38 @@ public class GameActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (privacy == null) {
-                        privacy = Objects.requireNonNull(dataSnapshot.child("privacy").getValue(Boolean.class));
+                        privacy = dataSnapshot.child("privacy").getValue(Boolean.class);
                         if (!privacy) {
                             storageRef = FirebaseStorage.getInstance().getReference().child("Lobbies").child(lobbyNumber);
                             putPhotos();
                         }
                     }
-
+                    String xName;
+                    String oName;
                     if ("X".equals(dataSnapshot.child("hostType").getValue(String.class))) {
-                        thisType = "Host".equals(multiType) ? X : O;
                         xName = dataSnapshot.child("hostName").getValue(String.class);
                         oName = dataSnapshot.child("clientName").getValue(String.class);
-
-                        thisName = "Host".equals(multiType) ? xName : oName;
-                        otherName = "Host".equals(multiType) ? oName : xName;
+                        if ("Host".equals(multiType)) {
+                            thisType = X;
+                            thisName = xName;
+                            otherName = oName;
+                        } else {
+                            thisType = O;
+                            thisName = oName;
+                            otherName = xName;
+                        }
                     } else {
-                        thisType = multiType.equals("Host") ? O : X;
-                        xName = dataSnapshot.child("clientName").getValue(String.class);
                         oName = dataSnapshot.child("hostName").getValue(String.class);
-
-                        thisName = "Host".equals(multiType) ? oName : xName;
-                        otherName = "Host".equals(multiType) ? xName : oName;
+                        xName = dataSnapshot.child("clientName").getValue(String.class);
+                        if ("Host".equals(multiType)) {
+                            thisType = O;
+                            thisName = oName;
+                            otherName = xName;
+                        } else {
+                            thisType = X;
+                            thisName = oName;
+                            otherName = xName;
+                        }
                     }
 
                     timer = dataSnapshot.child("timer").getValue(Integer.class);

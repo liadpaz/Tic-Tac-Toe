@@ -75,15 +75,9 @@ public class StatisticsActivity extends AppCompatActivity {
                 int xWins = 0;
                 int oWins = 0;
                 for (DataSnapshot user : snapshot.getChildren()) {
-                    for (DataSnapshot info : user.getChildren()) {
-                        if ("Time".equals(info.getKey())) {
-                            time += info.getValue(Integer.class);
-                        } else if ("Xwins".equals(info.getKey())) {
-                            xWins += info.getValue(Integer.class);
-                        } else {
-                            oWins += info.getValue(Integer.class);
-                        }
-                    }
+                    time += user.child("Time").getValue(Integer.class);
+                    xWins += user.child("Xwins").getValue(Integer.class);
+                    oWins += user.child("Owins").getValue(Integer.class);
                 }
                 tv_globalO.setText(String.valueOf(oWins));
                 tv_globalX.setText(String.valueOf(xWins));

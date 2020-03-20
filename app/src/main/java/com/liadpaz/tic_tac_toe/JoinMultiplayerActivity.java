@@ -32,7 +32,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.URL;
-import java.util.Objects;
 
 public class JoinMultiplayerActivity extends AppCompatActivity {
 
@@ -71,7 +70,7 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
         Button btn_camera = binding.btnJoinCamera;
         et_name_join = binding.etNameJoin;
         et_lobby_number = binding.etLobbyNumber;
-        CheckBox checkbox_google_name_join = binding.ckbxGoogleNameJoin;
+        CheckBox checkbox_google_name_join = binding.checkboxGoogleNameJoin;
 
         checkbox_google_name_join.setChecked(Stats.getGoogleName());
 
@@ -86,11 +85,11 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.hasChild(lobbyNumber)) {
-                            if (dataSnapshot.child(lobbyNumber).child("clientName").getValue(String.class) == null) {
-                                startActivity(new Intent(JoinMultiplayerActivity.this, LobbyActivity.class).putExtra("ClientName", clientName).putExtra("Multiplayer", "Client").putExtra("LobbyNumber", lobbyNumber));
+                            if (!dataSnapshot.child(lobbyNumber).hasChild("clientName")) {
+                                startActivity(new Intent(JoinMultiplayerActivity.this, LobbyActivity.class).putExtra("ClientName", clientName).putExtra(GameActivity.MULTIPLAYER_EXTRA, "Client").putExtra(GameActivity.LOBBY_NUMBER_EXTRA, lobbyNumber));
                                 joinRef.child(lobbyNumber).child("clientName").setValue(clientName);
-                                if (!Objects.requireNonNull(dataSnapshot.child(lobbyNumber).child("privacy").getValue(Boolean.class))) {
-                                    joinRef.child(lobbyNumber).child("privacy").setValue(Stats.readPrivacy());
+                                if (!dataSnapshot.child(lobbyNumber + "/privacy").getValue(Boolean.class)) {
+                                    joinRef.child(lobbyNumber + "/privacy").setValue(Stats.readPrivacy());
                                 }
                             } else {
                                 Toast.makeText(JoinMultiplayerActivity.this, R.string.lobby_full, Toast.LENGTH_LONG).show();
@@ -107,7 +106,7 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
         });
         if (!Stats.readPrivacy()) {
             btn_camera.setVisibility(View.VISIBLE);
-            photo = new File(JoinMultiplayerActivity.this.getFilesDir(), "PhotoLocal.jpg");
+            photo = new File(getFilesDir(), "PhotoLocal.jpg");
             if (!Stats.getGooglePhoto()) {
                 btn_camera.setOnClickListener(v -> {
                     Utils.localPhotoUri = FileProvider.getUriForFile(JoinMultiplayerActivity.this, "com.liadpaz.tic_tac_toe.fileprovider", photo);
@@ -122,7 +121,7 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
         checkbox_google_name_join.setOnCheckedChangeListener((buttonView, isChecked) -> {
             nameOk = isChecked;
             Stats.setGoogleName(isChecked);
-            et_name_join.setText(isChecked ? Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName() : "");
+            et_name_join.setText(isChecked ? FirebaseAuth.getInstance().getCurrentUser().getDisplayName() : "");
             et_name_join.setEnabled(!isChecked);
         });
 
@@ -157,7 +156,7 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
 
         if (Stats.getGoogleName()) {
             nameOk = true;
-            et_name_join.setText(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName());
+            et_name_join.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
             et_name_join.setEnabled(false);
         }
 
@@ -192,7 +191,7 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(String... strings) {
             try {
-                URL url = new URL(Objects.requireNonNull(strings[0]));
+                URL url = new URL(strings[0]);
                 InputStream is = url.openStream();
                 OutputStream os = new FileOutputStream(photo);
 
@@ -221,5 +220,3 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
         }
     }
 }
-
-
