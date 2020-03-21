@@ -33,6 +33,8 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 
+import static com.liadpaz.tic_tac_toe.Constants.LOBBIES;
+
 public class JoinMultiplayerActivity extends AppCompatActivity {
 
     private static final int PHOTO_ACTIVITY = 1;
@@ -64,7 +66,7 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.join_lobby);
 
-        joinRef = Firebase.dataRef.child("Lobbies");
+        joinRef = Firebase.dataRef.child(LOBBIES);
 
         btn_join = binding.btnJoin;
         Button btn_camera = binding.btnJoinCamera;
@@ -85,11 +87,11 @@ public class JoinMultiplayerActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.hasChild(lobbyNumber)) {
-                            if (!dataSnapshot.child(lobbyNumber).hasChild("clientName")) {
-                                startActivity(new Intent(JoinMultiplayerActivity.this, LobbyActivity.class).putExtra("ClientName", clientName).putExtra(GameActivity.MULTIPLAYER_EXTRA, "Client").putExtra(GameActivity.LOBBY_NUMBER_EXTRA, lobbyNumber));
-                                joinRef.child(lobbyNumber).child("clientName").setValue(clientName);
-                                if (!dataSnapshot.child(lobbyNumber + "/privacy").getValue(Boolean.class)) {
-                                    joinRef.child(lobbyNumber + "/privacy").setValue(Stats.readPrivacy());
+                            if (!dataSnapshot.child(lobbyNumber).hasChild(Constants.CLIENT_NAME) && !dataSnapshot.child(lobbyNumber).child(Constants.MATCHMAKING).getValue(Boolean.class)) {
+                                startActivity(new Intent(JoinMultiplayerActivity.this, LobbyActivity.class).putExtra(Constants.CLIENT_NAME, clientName).putExtra(Constants.MULTIPLAYER_EXTRA, Constants.CLIENT).putExtra(Constants.LOBBY_NUMBER_EXTRA, lobbyNumber));
+                                joinRef.child(lobbyNumber).child(Constants.CLIENT_NAME).setValue(clientName);
+                                if (!dataSnapshot.child(lobbyNumber).child(Constants.PRIVACY).getValue(Boolean.class)) {
+                                    joinRef.child(lobbyNumber).child(Constants.PRIVACY).setValue(Stats.readPrivacy());
                                 }
                             } else {
                                 Toast.makeText(JoinMultiplayerActivity.this, R.string.lobby_full, Toast.LENGTH_LONG).show();

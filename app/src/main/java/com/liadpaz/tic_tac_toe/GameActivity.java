@@ -37,6 +37,7 @@ import static com.liadpaz.tic_tac_toe.Cell.Type;
 import static com.liadpaz.tic_tac_toe.Cell.Type.None;
 import static com.liadpaz.tic_tac_toe.Cell.Type.O;
 import static com.liadpaz.tic_tac_toe.Cell.Type.X;
+import static com.liadpaz.tic_tac_toe.Constants.LOBBIES;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -44,14 +45,6 @@ import static java.lang.Math.min;
  * This class is the game activity. It contains all the game graphics and mechanics.
  */
 public class GameActivity extends AppCompatActivity {
-
-    static final String MAX_EXTRA = "Max";
-    static final String TIMER_EXTRA = "Timer";
-    static final String MODE_EXTRA = "Mode";
-    static final String STARTING_EXTRA = "Starting";
-    static final String LOBBY_NUMBER_EXTRA = "LobbyNumber";
-    static final String MULTIPLAYER_EXTRA = "Multiplayer";
-    static final String DIFFICULTY_EXTRA = "Difficulty";
 
     private Intent musicService;
 
@@ -108,13 +101,13 @@ public class GameActivity extends AppCompatActivity {
         ActivityGameBinding binding = ActivityGameBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        maxGames = getIntent().getIntExtra(MAX_EXTRA, -1);
-        timer = getIntent().getIntExtra(TIMER_EXTRA, 0);
-        Utils.Mode mode = (Utils.Mode)getIntent().getSerializableExtra(MODE_EXTRA);
-        startingType = (Type)getIntent().getSerializableExtra(STARTING_EXTRA);
-        lobbyNumber = getIntent().getStringExtra(LOBBY_NUMBER_EXTRA);
-        multiType = getIntent().getStringExtra(MULTIPLAYER_EXTRA);
-        difficulty = getIntent().getBooleanExtra(DIFFICULTY_EXTRA, false);
+        maxGames = getIntent().getIntExtra(Constants.MAX_EXTRA, -1);
+        timer = getIntent().getIntExtra(Constants.TIMER_EXTRA, 0);
+        Utils.Mode mode = (Utils.Mode)getIntent().getSerializableExtra(Constants.MODE_EXTRA);
+        startingType = (Type)getIntent().getSerializableExtra(Constants.STARTING_EXTRA);
+        lobbyNumber = getIntent().getStringExtra(Constants.LOBBY_NUMBER_EXTRA);
+        multiType = getIntent().getStringExtra(Constants.MULTIPLAYER_EXTRA);
+        difficulty = getIntent().getBooleanExtra(Constants.DIFFICULTY_EXTRA, false);
 
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("music", false)) {
             musicService = new Intent(this, MusicPlayerService.class);
@@ -160,24 +153,24 @@ public class GameActivity extends AppCompatActivity {
             vs_on_this_device = mode == Utils.Mode.TwoPlayer;
             initialize();
         } else {
-            gameRef = Firebase.dataRef.child("Lobbies").child(lobbyNumber);
+            gameRef = Firebase.dataRef.child(LOBBIES).child(lobbyNumber);
             gameRef.onDisconnect().removeValue();
             gameRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (privacy == null) {
-                        privacy = dataSnapshot.child("privacy").getValue(Boolean.class);
+                        privacy = dataSnapshot.child(Constants.PRIVACY).getValue(Boolean.class);
                         if (!privacy) {
-                            storageRef = FirebaseStorage.getInstance().getReference().child("Lobbies").child(lobbyNumber);
+                            storageRef = FirebaseStorage.getInstance().getReference().child(LOBBIES).child(lobbyNumber);
                             putPhotos();
                         }
                     }
                     String xName;
                     String oName;
-                    if ("X".equals(dataSnapshot.child("hostType").getValue(String.class))) {
-                        xName = dataSnapshot.child("hostName").getValue(String.class);
-                        oName = dataSnapshot.child("clientName").getValue(String.class);
-                        if ("Host".equals(multiType)) {
+                    if ("X".equals(dataSnapshot.child(Constants.HOST_TYPE).getValue(String.class))) {
+                        xName = dataSnapshot.child(Constants.HOST_NAME).getValue(String.class);
+                        oName = dataSnapshot.child(Constants.CLIENT_NAME).getValue(String.class);
+                        if (Constants.HOST.equals(multiType)) {
                             thisType = X;
                             thisName = xName;
                             otherName = oName;
@@ -187,9 +180,9 @@ public class GameActivity extends AppCompatActivity {
                             otherName = xName;
                         }
                     } else {
-                        oName = dataSnapshot.child("hostName").getValue(String.class);
-                        xName = dataSnapshot.child("clientName").getValue(String.class);
-                        if ("Host".equals(multiType)) {
+                        oName = dataSnapshot.child(Constants.HOST_NAME).getValue(String.class);
+                        xName = dataSnapshot.child(Constants.CLIENT_NAME).getValue(String.class);
+                        if (Constants.HOST.equals(multiType)) {
                             thisType = O;
                             thisName = oName;
                             otherName = xName;
@@ -200,8 +193,8 @@ public class GameActivity extends AppCompatActivity {
                         }
                     }
 
-                    timer = dataSnapshot.child("timer").getValue(Integer.class);
-                    maxGames = dataSnapshot.child("max").getValue(Integer.class);
+                    timer = dataSnapshot.child(Constants.TIMER).getValue(Integer.class);
+                    maxGames = dataSnapshot.child(Constants.MAX).getValue(Integer.class);
 
                     tv_playerO.setText(oName);
                     tv_playerX.setText(xName);
@@ -210,7 +203,7 @@ public class GameActivity extends AppCompatActivity {
                     tv_playerXwins.setVisibility(View.VISIBLE);
                     tv_playerOwins.setVisibility(View.VISIBLE);
 
-                    startingType = "X".equals(dataSnapshot.child("startingType").getValue(String.class)) ? X : O;
+                    startingType = "X".equals(dataSnapshot.child(Constants.STARTING_TYPE).getValue(String.class)) ? X : O;
                     turn = startingType;
                     tv_turn.setText(String.format("%s %s%s (%s)", getString(R.string.its), thisType == startingType ? thisName : otherName, getString(R.string.turn), startingType.toString()));
 
@@ -232,8 +225,8 @@ public class GameActivity extends AppCompatActivity {
                             return;
                         }
                     }
-                    if ("Host".equals(multiType)) {
-                        String message = dataSnapshot.child("clientMessage").getValue(String.class);
+                    if (Constants.HOST.equals(multiType)) {
+                        String message = dataSnapshot.child(Constants.CLIENT_MESSAGE).getValue(String.class);
                         if (lastClientMessage == null) {
                             lastClientMessage = message;
                         }
@@ -258,7 +251,7 @@ public class GameActivity extends AppCompatActivity {
                         }
                         lastClientMessage = message;
                     } else {
-                        String message = dataSnapshot.child("hostMessage").getValue(String.class);
+                        String message = dataSnapshot.child(Constants.HOST_MESSAGE).getValue(String.class);
                         if (lastHostMessage == null) {
                             lastHostMessage = message;
                         }
@@ -519,6 +512,16 @@ public class GameActivity extends AppCompatActivity {
         turn = comType.flip();
     }
 
+    /**
+     * This function is the recursive minimax algorithm aka 'smart AI'
+     *
+     * @param board        3x3 cells
+     * @param depth        depth of the recursion
+     * @param alpha        the best score the maximizing player get have
+     * @param beta         the best score the minimizing player can have
+     * @param isMaximizing if the current player is the maximizing player or the minimizing player
+     * @return the score of the move
+     */
     private int minimax(@NotNull Cell[][] board, int depth, int alpha, int beta, boolean isMaximizing) {
         Type result;
         if ((result = checkWinner(board)) != null) {
@@ -669,7 +672,7 @@ public class GameActivity extends AppCompatActivity {
      * @param message the message to write
      */
     private void writeDatabaseMessage(String message) {
-        gameRef.child(multiType.equals("Host") ? "hostMessage" : "clientMessage").setValue(message);
+        gameRef.child(multiType.equals(Constants.HOST) ? Constants.HOST_MESSAGE : Constants.CLIENT_MESSAGE).setValue(message);
     }
 
     /**
@@ -735,7 +738,7 @@ public class GameActivity extends AppCompatActivity {
      */
     private void putPhotos() {
         final File remotePhoto = new File(getFilesDir(), "PhotoRemote.jpg");
-        storageRef.child(multiType.equals("Host") ? "Client" : "Host").getFile(remotePhoto).addOnCompleteListener(task -> {
+        storageRef.child(multiType.equals(Constants.HOST) ? Constants.CLIENT : Constants.HOST).getFile(remotePhoto).addOnCompleteListener(task -> {
             Utils.remotePhotoUri = FileProvider.getUriForFile(GameActivity.this, "com.liadpaz.tic_tac_toe.fileprovider", remotePhoto);
             if (thisType == X) {
                 iv_playerX.setImageURI(Utils.localPhotoUri);

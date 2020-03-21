@@ -22,6 +22,9 @@ import com.liadpaz.tic_tac_toe.databinding.ActivityLobbyBinding;
 
 import org.jetbrains.annotations.NotNull;
 
+import static com.liadpaz.tic_tac_toe.Constants.LOBBIES;
+import static com.liadpaz.tic_tac_toe.Constants.NOT_READY;
+import static com.liadpaz.tic_tac_toe.Constants.READY;
 import static com.liadpaz.tic_tac_toe.Stats.readPrivacy;
 
 public class LobbyActivity extends AppCompatActivity {
@@ -66,9 +69,9 @@ public class LobbyActivity extends AppCompatActivity {
         ActivityLobbyBinding binding = ActivityLobbyBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        lobbyNumber = getIntent().getStringExtra("LobbyNumber");
-        isHost = "Host".equals(getIntent().getStringExtra("Multiplayer"));
-        hostName = getIntent().getStringExtra("HostName");
+        lobbyNumber = getIntent().getStringExtra(Constants.LOBBY_NUMBER_EXTRA);
+        isHost = Constants.HOST.equals(getIntent().getStringExtra(Constants.MULTIPLAYER_EXTRA));
+        hostName = getIntent().getStringExtra(Constants.HOST_NAME);
 
         binding.btnExitLobby.setOnClickListener(v -> {
             lobbyRef.removeValue();
@@ -108,23 +111,23 @@ public class LobbyActivity extends AppCompatActivity {
 
         checkbox_ready.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isHost) {
-                writeDatabaseMessage(isChecked ? "ready" : "not_ready");
+                writeDatabaseMessage(isChecked ? READY : NOT_READY);
                 ready_host = isChecked;
                 sw_host.setClickable(!isChecked);
                 if (ready_host && ready_client) {
                     isLaunchingGame = true;
-                    writeDatabaseMessage("play");
-                    startActivity(new Intent(LobbyActivity.this, GameActivity.class).putExtra("LobbyNumber", lobbyNumber).putExtra("Multiplayer", "Host"));
+                    writeDatabaseMessage(Constants.PLAY);
+                    startActivity(new Intent(LobbyActivity.this, GameActivity.class).putExtra(Constants.LOBBY_NUMBER_EXTRA, lobbyNumber).putExtra(Constants.MULTIPLAYER_EXTRA, Constants.HOST));
 
                 }
             } else {
-                writeDatabaseMessage(isChecked ? "ready" : "not_ready");
+                writeDatabaseMessage(isChecked ? READY : NOT_READY);
             }
         });
 
         checkbox_ready.setEnabled(!isHost);
 
-        lobbyRef = Firebase.dataRef.child("Lobbies/" + lobbyNumber);
+        lobbyRef = Firebase.dataRef.child(LOBBIES).child(lobbyNumber);
 
         lobbyRef.onDisconnect().removeValue();
 
@@ -140,23 +143,23 @@ public class LobbyActivity extends AppCompatActivity {
                     return;
                 }
                 if (max == null || timer == null) {
-                    max = dataSnapshot.child("max").getValue(Integer.class);
-                    timer = dataSnapshot.child("timer").getValue(Integer.class);
+                    max = dataSnapshot.child(Constants.MAX).getValue(Integer.class);
+                    timer = dataSnapshot.child(Constants.TIMER).getValue(Integer.class);
                 }
                 if (isHost) {
                     if (clientName == null) {
-                        if ((clientName = dataSnapshot.child("clientName").getValue(String.class)) != null) {
+                        if ((clientName = dataSnapshot.child(Constants.CLIENT_NAME).getValue(String.class)) != null) {
                             tv_client_name.setText(clientName);
                             checkbox_ready.setEnabled(ready_photo);
                         }
                     } else {
-                        String clientMessage = dataSnapshot.child("clientMessage").getValue(String.class);
-                        if ("ready".equals(clientMessage)) {
+                        String clientMessage = dataSnapshot.child(Constants.CLIENT_MESSAGE).getValue(String.class);
+                        if (READY.equals(clientMessage)) {
                             ready_client = true;
                             if (ready_host && ready_photo) {
                                 isLaunchingGame = true;
-                                writeDatabaseMessage("play");
-                                startActivity(new Intent(LobbyActivity.this, GameActivity.class).putExtra("LobbyNumber", lobbyNumber).putExtra("Multiplayer", "Host"));
+                                writeDatabaseMessage(Constants.PLAY);
+                                startActivity(new Intent(LobbyActivity.this, GameActivity.class).putExtra(Constants.LOBBY_NUMBER_EXTRA, lobbyNumber).putExtra(Constants.MULTIPLAYER_EXTRA, Constants.HOST));
                                 finish();
                             }
                         } else /* if ("not_ready".equals(clientMessage)) */ {
@@ -166,24 +169,24 @@ public class LobbyActivity extends AppCompatActivity {
                     }
                 } else {
                     if (hostName == null) {
-                        hostName = dataSnapshot.child("hostName").getValue(String.class);
-                        clientName = dataSnapshot.child("clientName").getValue(String.class);
+                        hostName = dataSnapshot.child(Constants.HOST_NAME).getValue(String.class);
+                        clientName = dataSnapshot.child(Constants.CLIENT_NAME).getValue(String.class);
                         tv_host_name.setText(hostName);
                         tv_client_name.setText(clientName);
                     }
 
                     String hostType;
-                    if ((hostType = dataSnapshot.child("hostType").getValue(String.class)) != null) {
+                    if ((hostType = dataSnapshot.child(Constants.HOST_TYPE).getValue(String.class)) != null) {
                         swapSwitches(hostType);
                     }
 
-                    String hostMessage = dataSnapshot.child("hostMessage").getValue(String.class);
-                    if ("play".equals(hostMessage)) {
+                    String hostMessage = dataSnapshot.child(Constants.HOST_MESSAGE).getValue(String.class);
+                    if (Constants.PLAY.equals(hostMessage)) {
                         isLaunchingGame = true;
-                        startActivity(new Intent(LobbyActivity.this, GameActivity.class).putExtra("LobbyNumber", lobbyNumber).putExtra("Multiplayer", "Client"));
+                        startActivity(new Intent(LobbyActivity.this, GameActivity.class).putExtra(Constants.LOBBY_NUMBER_EXTRA, lobbyNumber).putExtra(Constants.MULTIPLAYER_EXTRA, Constants.CLIENT));
                         finish();
                     } else {
-                        ready_host = "ready".equals(hostMessage);
+                        ready_host = READY.equals(hostMessage);
                     }
                     checkBox_host_ready.setChecked(ready_host);
                 }
@@ -205,19 +208,19 @@ public class LobbyActivity extends AppCompatActivity {
      */
     private void writeDatabaseMessage(String message) {
         if (isHost) {
-            lobbyRef.child("hostMessage").setValue(message);
+            lobbyRef.child(Constants.HOST_MESSAGE).setValue(message);
         } else {
-            lobbyRef.child("clientMessage").setValue(message);
+            lobbyRef.child(Constants.CLIENT_MESSAGE).setValue(message);
         }
     }
 
     /**
      * This function writes to the database the host type
      *
-     * @param type true if the host is X, false if the host is O
+     * @param type <code>true</code> if the host is X, <code>false</code> if the host is O
      */
     private void setHostType(boolean type) {
-        lobbyRef.child("hostType").setValue(type ? "X" : "O");
+        lobbyRef.child(Constants.HOST_TYPE).setValue(type ? "X" : "O");
     }
 
     /**
@@ -226,7 +229,7 @@ public class LobbyActivity extends AppCompatActivity {
      * @param hostType the type of the host
      */
     private void swapSwitches(@NotNull String hostType) {
-        if (hostType.equals("X")) {
+        if ("X".equals(hostType)) {
             sw_host.setChecked(true);
             sw_client.setChecked(false);
         } else {
@@ -243,8 +246,8 @@ public class LobbyActivity extends AppCompatActivity {
         checkbox_ready.setEnabled(false);
         tv_uploading_photo.setVisibility(View.VISIBLE);
         progressBar_uploading_photo.setVisibility(View.VISIBLE);
-        StorageReference storageRef = Firebase.storeRef.child("Lobbies").child(lobbyNumber);
-        (uploadPhotoTask = storageRef.child(isHost ? "Host" : "Client").putFile(Utils.localPhotoUri)).addOnCompleteListener(task -> {
+        StorageReference storageRef = Firebase.storeRef.child(LOBBIES).child(lobbyNumber);
+        (uploadPhotoTask = storageRef.child(isHost ? Constants.HOST : Constants.CLIENT).putFile(Utils.localPhotoUri)).addOnCompleteListener(task -> {
             ready_photo = true;
             checkbox_ready.setEnabled(clientName != null);
             tv_uploading_photo.setVisibility(View.INVISIBLE);

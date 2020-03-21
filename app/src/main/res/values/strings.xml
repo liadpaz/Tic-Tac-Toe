@@ -71,7 +71,7 @@
     <string name="privacy">Privacy</string>
     <string name="privacy_activated">You won\'t be able to see other player\'s photos (won\'t affect matchmaking)</string>
     <string name="privacy_deactivated">You will see other player\'s photos (won\'t affect matchmaking)</string>
-    <string name="developer" translatable="false">Developer</string>
+    <string name="developer">Developer</string>
     <string name="app_version">Version:</string>
     <string name="developed_by">Developed by Liad Paz</string>
     <string name="about_app">I made this app as a school project in app development in Android. I made this in about two months, if you find any bugs or glitches please send me an email. Thanks for playing!</string>
@@ -112,8 +112,8 @@
     <string name="delete_user_warning">You may be required to reauthenticate</string>
     <string name="delete_user_fail">Something went wrong while trying to delete your user</string>
     <string name="delete_user_success">Successfully deleted your user</string>
-    <string name="delete_all" translatable="false">Delete All</string>
-    <string name="delete_all_message" translatable="false">Are you sure you want to delete all lobbies?</string>
+    <string name="delete_all">Delete All</string>
+    <string name="delete_all_message">Are you sure you want to delete all lobbies?</string>
     <string name="display">Display</string>
     <string name="delete_user_message">Are you sure you want to delete your user?</string>
     <string name="use_google_photo">Use Google photo</string>
@@ -126,4 +126,6 @@
     <string name="matchmaking_unavailable">Couldn\'t find a match for you</string>
     <string name="matchmaking_uploading_photo">A match was found. Uploading photo…</string>
     <string name="matchmaking_waiting_other_player">Waiting to the other player…</string>
+    <string name="delete_lobby">Delete Lobby</string>
+    <string name="delete_lobby_message">Are you sure you want to delete</string>
 </resources>

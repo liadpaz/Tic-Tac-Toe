@@ -16,6 +16,8 @@ import com.liadpaz.tic_tac_toe.databinding.LayoutLobbiesBinding;
 
 import java.util.List;
 
+import static com.liadpaz.tic_tac_toe.Constants.LOBBIES;
+
 /**
  * This class is the adapter for the developer activity lobbies' list view.
  */
@@ -43,11 +45,11 @@ public class LobbiesAdapter extends ArrayAdapter<String> {
         ImageView delete = binding.ivDeleteLobby;
 
         textView.setText(lobbyTitle.get(position));
-        delete.setOnClickListener(v -> new AlertDialog.Builder(context).setMessage(String.format("Are you sure you want to delete %s?", textView.getText())).setTitle("Delete Lobby").setPositiveButton("Yes", (dialog, which) -> {
-            Firebase.dataRef.child("Lobbies").child(textView.getText().toString()).removeValue();
+        delete.setOnClickListener(v -> new AlertDialog.Builder(context).setMessage(String.format("%s %s?", context.getString(R.string.delete_lobby_message), textView.getText())).setTitle(R.string.delete_lobby).setPositiveButton(R.string.yes, (dialog, which) -> {
+            Firebase.dataRef.child(LOBBIES).child(textView.getText().toString()).removeValue();
             lobbyTitle.remove(position);
             notifyDataSetChanged();
-        }).setNegativeButton("No", null).show());
+        }).setNegativeButton(R.string.no, null).show());
 
         return convertView;
     }

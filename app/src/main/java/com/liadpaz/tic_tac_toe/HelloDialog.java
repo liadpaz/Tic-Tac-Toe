@@ -17,7 +17,7 @@ import java.util.Locale;
  */
 class HelloDialog extends Dialog {
 
-    HelloDialog(Context context, @NotNull String name) {
+    HelloDialog(@NotNull Context context, @NotNull String name) {
         super(context);
         LayoutHelloBinding binding = LayoutHelloBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

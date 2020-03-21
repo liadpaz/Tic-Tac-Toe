@@ -122,4 +122,9 @@
     <string name="matchmaking_unavailable">לא נמצא משחק בשבילך</string>
     <string name="matchmaking_uploading_photo">משחק נמצא. מעלה תמונה…</string>
     <string name="matchmaking_waiting_other_player">מחכה לשחקן השני…</string>
+    <string name="delete_lobby">מחיקת לובי</string>
+    <string name="delete_lobby_message">האם את/ה בטוח/ה שאת/ה רוצה למחוק את</string>
+    <string name="developer">מפתח</string>
+    <string name="delete_all" translatable="false">מחק הכל</string>
+    <string name="delete_all_message" translatable="false">האם את/ה בטוח/ה שאת/ה רוצה למחוק את כל הלובים?</string>
 </resources>

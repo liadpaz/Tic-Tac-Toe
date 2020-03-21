@@ -37,6 +37,8 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 
+import static com.liadpaz.tic_tac_toe.Constants.LOBBIES;
+
 public class OptionsActivity extends AppCompatActivity {
 
     private static final int CAMERA_ACTIVITY = 968;
@@ -194,7 +196,7 @@ public class OptionsActivity extends AppCompatActivity {
      * This function initializes a lobby
      */
     private void initializeLobby() {
-        DatabaseReference settingRef = Firebase.dataRef.child("Lobbies");
+        DatabaseReference settingRef = Firebase.dataRef.child(LOBBIES);
         settingRef.runTransaction(new Transaction.Handler() {
             @NonNull
             @Override
@@ -204,7 +206,7 @@ public class OptionsActivity extends AppCompatActivity {
                         lobbyNumber = number;
 
                         currentData.child(lobbyNumber).setValue(new Lobby(et_name_host.getText().toString(), false, max_games, Stats.readPrivacy(), starting_player.toString(), timer));
-                        currentData.child(lobbyNumber).child("startingType").setValue(starting_player.toString());
+                        currentData.child(lobbyNumber).child(Constants.STARTING_TYPE).setValue(starting_player.toString());
 
                         return Transaction.success(currentData);
                     }
@@ -215,7 +217,7 @@ public class OptionsActivity extends AppCompatActivity {
             @Override
             public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
                 if (committed) {
-                    startActivity(new Intent(OptionsActivity.this, LobbyActivity.class).putExtra("HostName", et_name_host.getText().toString()).putExtra("Multiplayer", "Host").putExtra("Starting", starting_player).putExtra("LobbyNumber", lobbyNumber));
+                    startActivity(new Intent(OptionsActivity.this, LobbyActivity.class).putExtra(Constants.HOST_NAME, et_name_host.getText().toString()).putExtra(Constants.MULTIPLAYER_EXTRA, Constants.HOST).putExtra(Constants.STARTING_EXTRA, starting_player).putExtra(Constants.LOBBY_NUMBER_EXTRA, lobbyNumber));
                 } else {
                     Toast.makeText(OptionsActivity.this, R.string.lobby_couldnt_make, Toast.LENGTH_LONG).show();
                 }

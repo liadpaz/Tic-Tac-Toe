@@ -18,6 +18,8 @@ import com.liadpaz.tic_tac_toe.databinding.ActivityDeveloperBinding;
 
 import java.util.ArrayList;
 
+import static com.liadpaz.tic_tac_toe.Constants.LOBBIES;
+
 /**
  *  This activity is the developer activity, it is to close any lobbies that somehow still open.
  */
@@ -41,10 +43,10 @@ public class DeveloperActivity extends AppCompatActivity {
 
         lv_lobbies = binding.lvLobbies;
         lv_lobbies.setOnItemLongClickListener((parent, view, position, id) -> {
-            new AlertDialog.Builder(DeveloperActivity.this).setMessage(String.format("Are you sure you want to delete %s?", ((TextView)((ConstraintLayout)view).getViewById(R.id.tv_lobby_dev)).getText().toString())).setTitle("Delete Lobby").setPositiveButton("Yes", (dialog, which) -> {
-                Firebase.dataRef.child("Lobbies").child(((TextView)((ConstraintLayout)view).getViewById(R.id.tv_lobby_dev)).getText().toString()).removeValue();
+            new AlertDialog.Builder(DeveloperActivity.this).setMessage(String.format("%s %s?", getString(R.string.delete_lobby_message), ((TextView)((ConstraintLayout)view).getViewById(R.id.tv_lobby_dev)).getText())).setTitle(R.string.delete_lobby).setPositiveButton(R.string.yes, (dialog, which) -> {
+                Firebase.dataRef.child(LOBBIES).child(((TextView)((ConstraintLayout)view).getViewById(R.id.tv_lobby_dev)).getText().toString()).removeValue();
                 getLobbies();
-            }).setNegativeButton("No", null).show();
+            }).setNegativeButton(R.string.no, null).show();
             return true;
         });
 
@@ -61,7 +63,7 @@ public class DeveloperActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         new AlertDialog.Builder(DeveloperActivity.this).setTitle(R.string.delete_all).setMessage(R.string.delete_all_message).setPositiveButton(R.string.yes, (dialog, which) -> {
             for (String lobby : lobbiesNumber) {
-                Firebase.dataRef.child("Lobbies").child(lobby).removeValue();
+                Firebase.dataRef.child(LOBBIES).child(lobby).removeValue();
             }
             getLobbies();
         }).setNegativeButton(R.string.no, null).show();
@@ -73,7 +75,7 @@ public class DeveloperActivity extends AppCompatActivity {
      * on screen as a list
      */
     private void getLobbies() {
-        Firebase.dataRef.child("Lobbies").addListenerForSingleValueEvent(new ValueEventListener() {
+        Firebase.dataRef.child(LOBBIES).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 lobbiesNumber.clear();

@@ -32,7 +32,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
+import com.liadpaz.tic_tac_toe.Constants.User;
 import com.liadpaz.tic_tac_toe.databinding.ActivityMainBinding;
 
 import org.jetbrains.annotations.NotNull;
@@ -43,12 +46,11 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private File photo;
-
     private static final int USER_AUTH = 578;
     private static final int SETTINGS_ACTIVITY = 275;
     private static final int PHOTO_ACTIVITY = 725;
     private static boolean first_open = true;
+    private File photo;
     private FirebaseAuth auth;
     private DatabaseReference mainRef;
     private boolean stats;
@@ -60,6 +62,47 @@ public class MainActivity extends AppCompatActivity {
 
     private CountDownTimer count;
     private SharedPreferences sharedPreferences;
+
+    private ValueEventListener updateStats = new ValueEventListener() {
+        @SuppressWarnings("ConstantConditions")
+        @Override
+        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            int localTime = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Time) : 0, serverTime;
+            if (dataSnapshot.hasChild(User.TIME)) {
+                if (localTime > (serverTime = dataSnapshot.child(User.TIME).getValue(Integer.class))) {
+                    mainRef.child(User.TIME).setValue(localTime);
+                } else {
+                    Stats.setTime(serverTime);
+                }
+            } else {
+                mainRef.child(User.TIME).setValue(localTime);
+            }
+            int localX = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Xwins) : 0, serverX;
+            if (dataSnapshot.hasChild(User.X_WINS)) {
+                if (localX > (serverX = dataSnapshot.child(User.X_WINS).getValue(Integer.class))) {
+                    mainRef.child(User.X_WINS).setValue(localX);
+                } else {
+                    Stats.setXwins(serverX);
+                }
+            } else {
+                mainRef.child(User.X_WINS).setValue(localX);
+            }
+            int localO = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Owins) : 0, serverO;
+            if (dataSnapshot.hasChild(User.O_WINS)) {
+                if (localO > (serverO = dataSnapshot.child(User.O_WINS).getValue(Integer.class))) {
+                    mainRef.child(User.O_WINS).setValue(localO);
+                } else {
+                    Stats.setOwins(serverO);
+                }
+            } else {
+                mainRef.child(User.O_WINS).setValue(localO);
+            }
+
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {}
+    };
 
     private int devCounter;
     private boolean can_open_menu = true;
@@ -182,52 +225,14 @@ public class MainActivity extends AppCompatActivity {
                 btn_singleplayer.setEnabled(true);
                 btn_multiplayer.setEnabled(true);
                 if (auth.getCurrentUser() != null) {
-                    mainRef = (Firebase.userRef = Firebase.dataRef.child("Users").child(auth.getCurrentUser().getUid()));
+                    mainRef = (Firebase.userRef = Firebase.dataRef.child(User.USERS).child(auth.getCurrentUser().getUid()));
                     if (first_open) {
                         new HelloDialog(MainActivity.this, getUsername()).show();
                         first_open = false;
                     }
                     can_open_menu = true;
                     tv_user_state.setText(String.format("%s: %s", getString(R.string.connected), getUsername()));
-                    mainRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @SuppressWarnings("ConstantConditions")
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            int localTime = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Time) : 0, serverTime;
-                            if (dataSnapshot.hasChild("Time")) {
-                                if (localTime > (serverTime = dataSnapshot.child("Time").getValue(Integer.class))) {
-                                    mainRef.child("Time").setValue(localTime);
-                                } else {
-                                    Stats.setTime(serverTime);
-                                }
-                            } else {
-                                mainRef.child("Time").setValue(localTime);
-                            }
-                            int localX = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Xwins) : 0, serverX;
-                            if (dataSnapshot.hasChild("Xwins")) {
-                                if (localX > (serverX = dataSnapshot.child("Xwins").getValue(Integer.class))) {
-                                    mainRef.child("Xwins").setValue(localX);
-                                } else {
-                                    Stats.setXwins(serverX);
-                                }
-                            } else {
-                                mainRef.child("Xwins").setValue(localX);
-                            }
-                            int localO = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Owins) : 0, serverO;
-                            if (dataSnapshot.hasChild("Owins")) {
-                                if (localO > (serverO = dataSnapshot.child("Owins").getValue(Integer.class))) {
-                                    mainRef.child("Owins").setValue(localO);
-                                } else {
-                                    Stats.setOwins(serverO);
-                                }
-                            } else {
-                                mainRef.child("Owins").setValue(localO);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {}
-                    });
+                    mainRef.addListenerForSingleValueEvent(updateStats);
                 } else {
                     btn_user_action.setText(R.string.login);
                     tv_user_state.setText(R.string.not_connected);
@@ -247,15 +252,17 @@ public class MainActivity extends AppCompatActivity {
             Stats.addTime(time);
             if (auth.getCurrentUser() != null && getUsername() != null) {
                 try {
-                    mainRef.child("Time").addListenerForSingleValueEvent(new ValueEventListener() {
-                        @SuppressWarnings("ConstantConditions")
+                    mainRef.child(User.TIME).runTransaction(new Transaction.Handler() {
+                        @NonNull
                         @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            mainRef.child("Time").setValue(dataSnapshot.getValue(Integer.class) + time);
+                        public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                            //noinspection ConstantConditions
+                            currentData.setValue(currentData.getValue(Integer.class) + time);
+                            return Transaction.success(currentData);
                         }
 
                         @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {}
+                        public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {}
                     });
                 } catch (Exception ignored) {
                 }
@@ -293,11 +300,11 @@ public class MainActivity extends AppCompatActivity {
                             boolean isConnected = (wifi != null && wifi.isConnected()) || (mobile != null && mobile.isConnected());
                             if (isConnected) {
                                 if (auth.getCurrentUser() != null) {
-                                    mainRef.child("Time").addListenerForSingleValueEvent(new ValueEventListener() {
+                                    mainRef.child(User.TIME).addListenerForSingleValueEvent(new ValueEventListener() {
                                         @SuppressWarnings("ConstantConditions")
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            mainRef.child("Time").setValue(dataSnapshot.getValue(Integer.class) + time).addOnCompleteListener(task -> startActivity(new Intent(MainActivity.this, StatisticsActivity.class)));
+                                            mainRef.child(User.TIME).setValue(dataSnapshot.getValue(Integer.class) + time).addOnCompleteListener(task -> startActivity(new Intent(MainActivity.this, StatisticsActivity.class)));
                                         }
 
                                         @Override
@@ -348,44 +355,7 @@ public class MainActivity extends AppCompatActivity {
                     new HelloDialog(MainActivity.this, getUsername()).show();
                     btn_user_action.setText(R.string.logout);
                     tv_user_state.setText(String.format("%s: %s", getString(R.string.connected), getUsername()));
-                    (mainRef = Firebase.userRef = Firebase.dataRef.child("Users").child(user.getUid())).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            int localTime = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Time) : 0, serverTime;
-                            if (dataSnapshot.hasChild("Time")) {
-                                if (localTime > (serverTime = dataSnapshot.child("Time").getValue(Integer.class))) {
-                                    mainRef.child("Time").setValue(localTime);
-                                } else {
-                                    Stats.setTime(serverTime);
-                                }
-                            } else {
-                                mainRef.child("Time").setValue(localTime);
-                            }
-                            int localX = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Xwins) : 0, serverX;
-                            if (dataSnapshot.hasChild("Xwins")) {
-                                if (localX > (serverX = dataSnapshot.child("Xwins").getValue(Integer.class))) {
-                                    mainRef.child("Xwins").setValue(localX);
-                                } else {
-                                    Stats.setXwins(serverX);
-                                }
-                            } else {
-                                mainRef.child("Xwins").setValue(localX);
-                            }
-                            int localO = getUsername().equals(auth.getCurrentUser().getDisplayName()) ? Stats.readStat(Stats.Readables.Owins) : 0, serverO;
-                            if (dataSnapshot.hasChild("Owins")) {
-                                if (localO > (serverO = dataSnapshot.child("Owins").getValue(Integer.class))) {
-                                    mainRef.child("Owins").setValue(localO);
-                                } else {
-                                    Stats.setOwins(serverO);
-                                }
-                            } else {
-                                mainRef.child("Owins").setValue(localO);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {}
-                    });
+                    (mainRef = Firebase.userRef = Firebase.dataRef.child(User.USERS).child(user.getUid())).addListenerForSingleValueEvent(updateStats);
                 }
                 break;
             }

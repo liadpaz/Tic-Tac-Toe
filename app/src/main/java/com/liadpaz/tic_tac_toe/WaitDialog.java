@@ -21,6 +21,8 @@ import com.liadpaz.tic_tac_toe.databinding.LayoutWaitDialogBinding;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.liadpaz.tic_tac_toe.Constants.LOBBIES;
+
 class WaitDialog extends Dialog {
 
     private static final String CLIENT_NAME = "clientName";
@@ -81,7 +83,7 @@ class WaitDialog extends Dialog {
                                 activity.runOnUiThread(() -> binding.tvWaitingMatchmaking.setText(R.string.matchmaking_waiting_other_player));
                                 if (isOtherSideReady) {
                                     dismiss();
-                                    activity.startActivity(new Intent(activity, GameActivity.class).putExtra(GameActivity.MULTIPLAYER_EXTRA, "Client").putExtra(GameActivity.LOBBY_NUMBER_EXTRA, lobbyNumber).putExtra(GameActivity.STARTING_EXTRA, Cell.Type.X));
+                                    activity.startActivity(new Intent(activity, GameActivity.class).putExtra(Constants.MULTIPLAYER_EXTRA, Constants.CLIENT).putExtra(Constants.LOBBY_NUMBER_EXTRA, lobbyNumber).putExtra(Constants.STARTING_EXTRA, Cell.Type.X));
                                 }
                             });
                             activity.runOnUiThread(() -> binding.tvWaitingMatchmaking.setText(R.string.matchmaking_uploading_photo));
@@ -96,11 +98,11 @@ class WaitDialog extends Dialog {
                         lobbyNumber = number;
                         currentData.child(number).setValue(new Lobby(FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), true, 3, false, "X", 0));
                         currentData.child(number).child(HOST_MESSAGE).setValue(UPLOADING);
-                        (task = Firebase.storeRef.child("Lobbies").child(lobbyNumber).child(HOST).putFile(Utils.localPhotoUri)).addOnCompleteListener(task -> {
-                            Firebase.dataRef.child("Lobbies").child(lobbyNumber).child(HOST_MESSAGE).setValue(UPLOAD);
+                        (task = Firebase.storeRef.child(LOBBIES).child(lobbyNumber).child(HOST).putFile(Utils.localPhotoUri)).addOnCompleteListener(task -> {
+                            Firebase.dataRef.child(LOBBIES).child(lobbyNumber).child(HOST_MESSAGE).setValue(UPLOAD);
                             if (isOtherSideReady) {
                                 dismiss();
-                                activity.startActivity(new Intent(activity, GameActivity.class).putExtra(GameActivity.MULTIPLAYER_EXTRA, "Client").putExtra(GameActivity.LOBBY_NUMBER_EXTRA, lobbyNumber).putExtra(GameActivity.STARTING_EXTRA, Cell.Type.X));
+                                activity.startActivity(new Intent(activity, GameActivity.class).putExtra(Constants.MULTIPLAYER_EXTRA, Constants.CLIENT).putExtra(Constants.LOBBY_NUMBER_EXTRA, lobbyNumber).putExtra(Constants.STARTING_EXTRA, Cell.Type.X));
                             }
                         });
                         return Transaction.success(currentData);
@@ -127,7 +129,7 @@ class WaitDialog extends Dialog {
                                     WaitDialog.this.committed = true;
                                     if (task.isComplete()) {
                                         dismiss();
-                                        activity.startActivity(new Intent(activity, GameActivity.class).putExtra(GameActivity.MULTIPLAYER_EXTRA, "Client").putExtra(GameActivity.LOBBY_NUMBER_EXTRA, lobbyNumber).putExtra(GameActivity.STARTING_EXTRA, Cell.Type.X).putExtra(GameActivity.MAX_EXTRA, 3));
+                                        activity.startActivity(new Intent(activity, GameActivity.class).putExtra(Constants.MULTIPLAYER_EXTRA, Constants.CLIENT).putExtra(Constants.LOBBY_NUMBER_EXTRA, lobbyNumber).putExtra(Constants.STARTING_EXTRA, Cell.Type.X).putExtra(Constants.MAX_EXTRA, 3));
                                         reference.removeEventListener(valueEventListener);
                                     } else {
                                         activity.runOnUiThread(() -> binding.tvWaitingMatchmaking.setText(R.string.matchmaking_uploading_photo));
@@ -140,7 +142,7 @@ class WaitDialog extends Dialog {
                                     WaitDialog.this.committed = true;
                                     if (task.isComplete()) {
                                         dismiss();
-                                        activity.startActivity(new Intent(activity, GameActivity.class).putExtra(GameActivity.MULTIPLAYER_EXTRA, "Host").putExtra(GameActivity.LOBBY_NUMBER_EXTRA, lobbyNumber).putExtra(GameActivity.STARTING_EXTRA, Cell.Type.X).putExtra(GameActivity.MAX_EXTRA, 3));
+                                        activity.startActivity(new Intent(activity, GameActivity.class).putExtra(Constants.MULTIPLAYER_EXTRA, Constants.HOST).putExtra(Constants.LOBBY_NUMBER_EXTRA, lobbyNumber).putExtra(Constants.STARTING_EXTRA, Cell.Type.X).putExtra(Constants.MAX_EXTRA, 3));
                                         reference.removeEventListener(valueEventListener);
                                     }
                                 } else if (dataSnapshot.hasChild(CLIENT_NAME)) {
