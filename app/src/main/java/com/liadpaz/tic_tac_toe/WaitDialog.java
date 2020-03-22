@@ -25,14 +25,6 @@ import static com.liadpaz.tic_tac_toe.Constants.LOBBIES;
 
 class WaitDialog extends Dialog {
 
-    private static final String CLIENT_NAME = "clientName";
-    private static final String HOST_MESSAGE = "hostMessage";
-    private static final String CLIENT_MESSAGE = "clientMessage";
-    private static final String CLIENT = "Client";
-    private static final String HOST = "Host";
-    private static final String UPLOADING = "uploading";
-    private static final String UPLOAD = "upload";
-
     private Boolean isJoining = null;
     private boolean committed;
 
@@ -44,7 +36,6 @@ class WaitDialog extends Dialog {
     private String lobbyNumber;
 
     private Handler handler = new Handler();
-    private Runnable callback;
 
     @SuppressWarnings("ConstantConditions")
     WaitDialog(Activity activity) {
@@ -53,7 +44,7 @@ class WaitDialog extends Dialog {
         setContentView(binding.getRoot());
         setCancelable(false);
 
-        handler.postDelayed(callback = () -> {
+        handler.postDelayed(() -> {
             committed = false;
             dismiss();
             Toast.makeText(activity, R.string.matchmaking_unavailable, Toast.LENGTH_LONG).show();
@@ -64,7 +55,7 @@ class WaitDialog extends Dialog {
             dismiss();
         });
 
-        Firebase.dataRef.child("Lobbies").runTransaction(new Transaction.Handler() {
+        Firebase.dataRef.child(LOBBIES).runTransaction(new Transaction.Handler() {
             @NonNull
             @Override
             public Transaction.Result doTransaction(@NonNull MutableData currentData) {
@@ -73,13 +64,13 @@ class WaitDialog extends Dialog {
                     // iterating all the lobbies found
                     for (MutableData lobby : currentData.getChildren()) {
                         // checking if lobby is available for matchmaking and is vacant
-                        if (lobby.getValue(Lobby.class).isMatchmaking() && !currentData.hasChild(CLIENT_NAME)) {
+                        if (lobby.getValue(Lobby.class).isMatchmaking() && !currentData.hasChild(Constants.CLIENT_NAME)) {
                             isJoining = true;
                             lobbyNumber = lobby.getKey();
-                            lobby.child(CLIENT_NAME).setValue(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-                            lobby.child(CLIENT_MESSAGE).setValue(UPLOADING);
-                            (task = Firebase.storeRef.child("Lobbies").child(lobbyNumber).child(CLIENT).putFile(Utils.localPhotoUri)).addOnCompleteListener(task -> {
-                                Firebase.dataRef.child("Lobbies").child(lobbyNumber).child(CLIENT_MESSAGE).setValue(UPLOAD);
+                            lobby.child(Constants.CLIENT_NAME).setValue(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+                            lobby.child(Constants.CLIENT_MESSAGE).setValue(Constants.UPLOADING);
+                            (task = Firebase.storeRef.child(LOBBIES).child(lobbyNumber).child(Constants.CLIENT).putFile(Utils.localPhotoUri)).addOnCompleteListener(task -> {
+                                Firebase.dataRef.child(LOBBIES).child(lobbyNumber).child(Constants.CLIENT_MESSAGE).setValue(Constants.UPLOAD);
                                 activity.runOnUiThread(() -> binding.tvWaitingMatchmaking.setText(R.string.matchmaking_waiting_other_player));
                                 if (isOtherSideReady) {
                                     dismiss();
@@ -97,9 +88,9 @@ class WaitDialog extends Dialog {
                         isJoining = false;
                         lobbyNumber = number;
                         currentData.child(number).setValue(new Lobby(FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), true, 3, false, "X", 0));
-                        currentData.child(number).child(HOST_MESSAGE).setValue(UPLOADING);
-                        (task = Firebase.storeRef.child(LOBBIES).child(lobbyNumber).child(HOST).putFile(Utils.localPhotoUri)).addOnCompleteListener(task -> {
-                            Firebase.dataRef.child(LOBBIES).child(lobbyNumber).child(HOST_MESSAGE).setValue(UPLOAD);
+                        currentData.child(number).child(Constants.HOST_MESSAGE).setValue(Constants.UPLOADING);
+                        (task = Firebase.storeRef.child(LOBBIES).child(lobbyNumber).child(Constants.HOST).putFile(Utils.localPhotoUri)).addOnCompleteListener(task -> {
+                            Firebase.dataRef.child(LOBBIES).child(lobbyNumber).child(Constants.HOST_MESSAGE).setValue(Constants.UPLOAD);
                             if (isOtherSideReady) {
                                 dismiss();
                                 activity.startActivity(new Intent(activity, GameActivity.class).putExtra(Constants.MULTIPLAYER_EXTRA, Constants.CLIENT).putExtra(Constants.LOBBY_NUMBER_EXTRA, lobbyNumber).putExtra(Constants.STARTING_EXTRA, Cell.Type.X));
@@ -124,7 +115,7 @@ class WaitDialog extends Dialog {
                                 return;
                             }
                             if (isJoining) {    // joining / client
-                                if (UPLOAD.equals(dataSnapshot.child(HOST_MESSAGE).getValue(String.class))) {
+                                if (Constants.UPLOAD.equals(dataSnapshot.child(Constants.HOST_MESSAGE).getValue(String.class))) {
                                     isOtherSideReady = true;
                                     WaitDialog.this.committed = true;
                                     if (task.isComplete()) {
@@ -136,7 +127,7 @@ class WaitDialog extends Dialog {
                                     }
                                 }
                             } else {    // host
-                                if (UPLOAD.equals(dataSnapshot.child(CLIENT_MESSAGE).getValue(String.class))) {
+                                if (Constants.UPLOAD.equals(dataSnapshot.child(Constants.CLIENT_MESSAGE).getValue(String.class))) {
                                     activity.runOnUiThread(() -> binding.tvWaitingMatchmaking.setText(R.string.matchmaking_waiting_other_player));
                                     isOtherSideReady = true;
                                     WaitDialog.this.committed = true;
@@ -145,8 +136,8 @@ class WaitDialog extends Dialog {
                                         activity.startActivity(new Intent(activity, GameActivity.class).putExtra(Constants.MULTIPLAYER_EXTRA, Constants.HOST).putExtra(Constants.LOBBY_NUMBER_EXTRA, lobbyNumber).putExtra(Constants.STARTING_EXTRA, Cell.Type.X).putExtra(Constants.MAX_EXTRA, 3));
                                         reference.removeEventListener(valueEventListener);
                                     }
-                                } else if (dataSnapshot.hasChild(CLIENT_NAME)) {
-                                    handler.removeCallbacks(callback);
+                                } else if (dataSnapshot.hasChild(Constants.CLIENT_NAME)) {
+                                    handler.removeCallbacksAndMessages(null);
                                     activity.runOnUiThread(() -> binding.tvWaitingMatchmaking.setText(R.string.matchmaking_waiting_other_player));
                                 }
                             }
@@ -161,6 +152,7 @@ class WaitDialog extends Dialog {
         });
 
         setOnDismissListener(dialog -> {
+            handler.removeCallbacksAndMessages(null);
             if (valueEventListener != null) {
                 this.reference.removeEventListener(valueEventListener);
             }

@@ -25,6 +25,8 @@ class Constants {
     static final String DIFFICULTY_EXTRA = "Difficulty";
     static final String PLAY = "play";
     static final String LOBBIES = "Lobbies";
+    static final String UPLOAD = "upload";
+    static final String UPLOADING = "uploading";
 
     static class User {
         static final String USERS = "Users";
