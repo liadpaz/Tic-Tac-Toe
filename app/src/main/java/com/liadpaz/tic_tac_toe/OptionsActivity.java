@@ -76,7 +76,7 @@ public class OptionsActivity extends AppCompatActivity {
 
         NumberPicker numpic_maxgames = binding.numpicMaxgames;
         numpic_timer = binding.numpicTimer;
-        CheckBox checkbox_timer = binding.chbxTimer;
+        CheckBox checkbox_timer = binding.checkboxTimer;
         CheckBox checkbox_google_name = binding.checkboxGoogleName;
         btn_play = binding.btnPlay;
         Button btn_camera = binding.btnSettingsCamera;

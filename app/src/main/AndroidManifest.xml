@@ -13,8 +13,8 @@
         android:resizeableActivity="false"
         android:roundIcon="@mipmap/tic_tac_toe_round"
         android:supportsRtl="true"
-        tools:ignore="LockedOrientationActivity"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="LockedOrientationActivity">
 
         <activity
             android:name=".SettingsActivity"

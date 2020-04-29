@@ -404,7 +404,8 @@ public class GameActivity extends AppCompatActivity {
     /**
      * This function builds and returns a winner AlertDialog with the winner name in it
      *
-     * @param player_won player_won: a String contains the player name
+     * @param player     true if multiplayer, otherwise false
+     * @param player_won a String contains the player name
      * @return winner AlertDialog
      */
     @NonNull

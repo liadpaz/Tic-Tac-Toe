@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.liadpaz.tic_tac_toe.Constants.User;
 import com.liadpaz.tic_tac_toe.databinding.ActivityStatisticsBinding;
 
 import java.net.InetAddress;
@@ -66,7 +67,7 @@ public class StatisticsActivity extends AppCompatActivity {
         tv_globalX.setText(R.string.loading);
         tv_globalTime.setText(R.string.loading);
 
-        Firebase.dataRef.child("Users").addValueEventListener(new ValueEventListener() {
+        Firebase.dataRef.child(User.USERS).addValueEventListener(new ValueEventListener() {
             @SuppressWarnings("ConstantConditions")
             @SuppressLint("DefaultLocale")
             @Override
@@ -75,9 +76,9 @@ public class StatisticsActivity extends AppCompatActivity {
                 int xWins = 0;
                 int oWins = 0;
                 for (DataSnapshot user : snapshot.getChildren()) {
-                    time += user.child("Time").getValue(Integer.class);
-                    xWins += user.child("Xwins").getValue(Integer.class);
-                    oWins += user.child("Owins").getValue(Integer.class);
+                    time += user.child(User.TIME).getValue(Integer.class);
+                    xWins += user.child(User.X_WINS).getValue(Integer.class);
+                    oWins += user.child(User.O_WINS).getValue(Integer.class);
                 }
                 tv_globalO.setText(String.valueOf(oWins));
                 tv_globalX.setText(String.valueOf(xWins));

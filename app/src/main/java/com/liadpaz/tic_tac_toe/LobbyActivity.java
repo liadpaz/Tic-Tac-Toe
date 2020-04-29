@@ -207,11 +207,7 @@ public class LobbyActivity extends AppCompatActivity {
      * @param message the message to write
      */
     private void writeDatabaseMessage(String message) {
-        if (isHost) {
-            lobbyRef.child(Constants.HOST_MESSAGE).setValue(message);
-        } else {
-            lobbyRef.child(Constants.CLIENT_MESSAGE).setValue(message);
-        }
+        lobbyRef.child(isHost ? Constants.HOST_MESSAGE : Constants.CLIENT_MESSAGE).setValue(message);
     }
 
     /**
@@ -242,17 +238,19 @@ public class LobbyActivity extends AppCompatActivity {
      * This function uploads the photo the player took to the Firebase Storage
      */
     private void uploadPhoto() {
-        ready_photo = false;
-        checkbox_ready.setEnabled(false);
-        tv_uploading_photo.setVisibility(View.VISIBLE);
-        progressBar_uploading_photo.setVisibility(View.VISIBLE);
-        StorageReference storageRef = Firebase.storeRef.child(LOBBIES).child(lobbyNumber);
-        (uploadPhotoTask = storageRef.child(isHost ? Constants.HOST : Constants.CLIENT).putFile(Utils.localPhotoUri)).addOnCompleteListener(task -> {
-            ready_photo = true;
-            checkbox_ready.setEnabled(clientName != null);
-            tv_uploading_photo.setVisibility(View.INVISIBLE);
-            progressBar_uploading_photo.setVisibility(View.INVISIBLE);
-        });
+        if (Utils.localPhotoUri != null) {
+            ready_photo = false;
+            checkbox_ready.setEnabled(false);
+            tv_uploading_photo.setVisibility(View.VISIBLE);
+            progressBar_uploading_photo.setVisibility(View.VISIBLE);
+            StorageReference storageRef = Firebase.storeRef.child(LOBBIES).child(lobbyNumber);
+            (uploadPhotoTask = storageRef.child(isHost ? Constants.HOST : Constants.CLIENT).putFile(Utils.localPhotoUri)).addOnCompleteListener(task -> {
+                ready_photo = true;
+                checkbox_ready.setEnabled(clientName != null);
+                tv_uploading_photo.setVisibility(View.INVISIBLE);
+                progressBar_uploading_photo.setVisibility(View.INVISIBLE);
+            });
+        }
     }
 
     @Override

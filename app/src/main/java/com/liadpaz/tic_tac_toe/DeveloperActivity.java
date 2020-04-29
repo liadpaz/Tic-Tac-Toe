@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import static com.liadpaz.tic_tac_toe.Constants.LOBBIES;
 
 /**
- *  This activity is the developer activity, it is to close any lobbies that somehow still open.
+ * This activity is the developer activity, it is to close any lobbies that somehow still open.
  */
 public class DeveloperActivity extends AppCompatActivity {
 
